@@ -1,0 +1,108 @@
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="pragma" content="no-cache">
+<link rel="import" href="./view/new/OTDCPWCreate.html"/>
+<link rel="import" href="./view/facets/OTDCPWFacetsView.html"/>
+<link rel="import" href="./view/assetsFacets/OTDCPWAssetsFacetsView.html"/>
+<link rel="import" href="./view/detailEdit/OTDCPWDetailEditView.html"/>
+<link rel="import" href="./view/detail/OTDCPWDetailView.html"/>
+<link rel="import" href="./view/dialog/markForAssignment/OTDCPWMarkForAssignment.html"/>
+<link rel="import" href="./view/assetAITab/OTDCPWAssetAITab.html"/>
+<link rel="import" href="./view/dialog/variantLookup/OTDCPWVariantsLookup.html"/>
+
+<script type="text/javascript" src="./manager/OTDCBWWorkspaceManager.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./manager/OTDCPWWorkspaceManager.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./manager/OTDCPWAssetActionsManager.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./manager/OTDCPWFacetsManager.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./manager/OTDCPWSearchManager.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./manager/OTDCPWAssetSearchManager.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./view/OTDCPWSidebarView.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./view/OTDCPWHomeHeaderActions.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./view/OTDCPWHomeView.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./view/OTDCBWHomeView.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./view/OTDCUtilities.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./view/assetAITab/OTDCPWAssetAITab.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+
+<link rel="import" href="./view/dialog/assignToProduct/OTDCPWAssignToProduct.html"/> 
+<link rel="stylesheet" type="text/css" href="./include.css?v=@DAMLINK_VERSION_TOKEN@"/>
+
+<template ot-template id="content" ot-view="OTDCPWHomeView">
+	<master template="content-master">
+		<content-area results-header>
+			<div class="ot-collections-header-wrapper" ot-platform="desktop">
+				<div id="ot-breadcrumb-layout" class="ot-breadcrumb-layout">
+					<div class="ot-collections-header-name">
+						<ot-i18n>Product Dashboard</ot-i18n>
+						<div class="ot-collections-view-refresh" onclick="event.stopImmediatePropagation(); otui.Views.containing(this).reload(true)"></div>
+					</div>
+					<!--commented unused code from collections-->
+					<div class="ot-collections-tracker-chicklets">
+						<ot-view-prop ot-property="chickletFilters" ot-parser="CollectionListView.parseFilters" class="ot-activity-tracker-filters"></ot-view-prop>
+					</div>
+					<!--ot-view-prop ot-property="pageProperties" template="pagingTemplate" ot-parser="parsePaging" class="ot-paging"></ot-view-prop-->
+							
+					<ot-hover id="dampwpageOptions" class="ot-page-options" ot-as-menu template="pageOptions-hover">   </ot-hover>
+					<a class="ot-page-options-gear" onclick="OTDCPWHomeView.gearOnClick(event)" tabindex="0" content-map-id="pagingtemplate-master-0" title="Change view settings">
+						<ot-i18n ot-as-title="" ot-token="Change view settings" parsed="true"></ot-i18n>
+					</a>				
+				</div>
+				<!--ot-hover id="pageOptions" class="ot-page-options" ot-as-menu template="pageOptions-hover"></ot-hover-->
+				<!-- <ot-layout class="ot-Collections-actions-holder" ot-platform="desktop"> -->
+				<ot-layout class="ot-folder-asset-actions-holder" ot-platform="desktop">
+					<!--span class="ot-folder-asset-action-button ot-enabled ot-selection-button" onclick="otui.GalleryViewActions.showPageSelectionOptions(event, '#pageSelectionOptions');"><span id="selectionIndicator" class="ot-asset-select-toggle" onclick="SelectionManager.toggleSelectionState(event);"></span><span class="ot-dropdown-arrow"></span></span>
+					<ot-hover id="pageSelectionOptions" class="ot-asset-selection-hover" template="pageSelectionOptions-hover"></ot-hover-->
+					<a class="ot-folder-asset-action-button ot-enabled ot-selection-button" onclick="otui.GalleryViewActions.showPageSelectionOptions(event, '#pageSelectionOptions');" onkeydown="otui.GalleryViewActions.switchPageSelection(event, '#pageSelectionOptions');"  tabindex="0">
+						<span id="selectionIndicator" class="ot-asset-select-toggle" onclick="SelectionManager.toggleSelectionState(event);" onkeydown=" SelectionManager.toggleSelectionState(event);"></span>
+						<span class="ot-page-select-text"></span>
+						<span class="ot-dropdown-arrow"></span>
+					</a>
+					<ot-hover id="pageSelectionOptions" class="ot-asset-selection-hover" template="pageSelectionOptions-hover"></ot-hover>
+					<ot-point ot-lookup="OTDCPWHomeHeaderActions" class="ot-collection-list-action" ot-use-selection></ot-point>
+					<span class="ot-folder-asset-actions-separator"></span>
+					<ot-point ot-lookup="GalleryViewActions" ot-calculate-bounds-without-children class="ot-folder-asset-actions ot-galleryview-action" onviewresize="this.recalculateLater && this.recalculateLater()" ot-use-selection></ot-point>
+				</ot-layout>
+			</div>
+		</content-area>
+	</master>
+</template>
+<template ot-template id="content" ot-view="OTDCBWHomeView">
+	<master template="content-master">
+		<content-area results-header>
+			<div class="ot-collections-header-wrapper" ot-platform="desktop">
+				<div id="ot-breadcrumb-layout" class="ot-breadcrumb-layout">
+					<div class="ot-collections-header-name">
+						<ot-i18n>Enterprise Asset Management Dashboard</ot-i18n>
+						<div class="ot-collections-view-refresh" onclick="event.stopImmediatePropagation(); otui.Views.containing(this).reload(true)"></div>
+					</div>
+					<div class="ot-collections-tracker-chicklets">
+						<ot-view-prop ot-property="chickletFilters" ot-parser="CollectionListView.parseFilters" class="ot-activity-tracker-filters"></ot-view-prop>
+					</div>
+					<ot-hover id="dambwPageOptions" class="ot-page-options" ot-as-menu template="pageOptions-hover"></ot-hover>
+					<a class="ot-page-options-gear" onclick="OTDCBWHomeView.gearOnClick(event)" tabindex="0" content-map-id="pagingtemplate-master-0" title="Change view settings">
+						<ot-i18n ot-as-title="" ot-token="Change view settings" parsed="true"></ot-i18n>
+					</a>				
+				</div>
+				<ot-layout class="ot-folder-asset-actions-holder" ot-platform="desktop">
+					<a class="ot-folder-asset-action-button ot-enabled ot-selection-button" onclick="otui.GalleryViewActions.showPageSelectionOptions(event, '#pageSelectionOptions');" onkeydown="otui.GalleryViewActions.switchPageSelection(event, '#pageSelectionOptions');"  tabindex="0">
+						<span id="selectionIndicator" class="ot-asset-select-toggle" onclick="SelectionManager.toggleSelectionState(event);" onkeydown=" SelectionManager.toggleSelectionState(event);"></span>
+						<span class="ot-page-select-text"></span>
+						<span class="ot-dropdown-arrow"></span>
+					</a>
+					<ot-hover id="pageSelectionOptions" class="ot-asset-selection-hover" template="pageSelectionOptions-hover"></ot-hover>
+					<ot-point ot-lookup="OTDCBWHomeHeaderActions" class="ot-collection-list-action" ot-use-selection></ot-point>
+					<span class="ot-folder-asset-actions-separator"></span>
+					<ot-point ot-lookup="GalleryViewActions" ot-calculate-bounds-without-children class="ot-folder-asset-actions ot-galleryview-action" onviewresize="this.recalculateLater && this.recalculateLater()" ot-use-selection></ot-point>
+				</ot-layout>
+			</div>
+		</content-area>
+	</master>
+</template>
+
+<template ot-template ot-view="OTDCPWSidebarView" id="content">
+	<div class="ot-card-body"><!--Workaround: This div is added for assign to product view-->
+		<ot-accordion class="with-collapser" ot-platform="desktop,tablet"></ot-accordion>
+		<ot-view-collapser collapser-style="vertical-bar" ot-platform="desktop" resizable></ot-view-collapser>
+	</div>
+</template>
+<script>
+	otui.Templates.load();
+</script>

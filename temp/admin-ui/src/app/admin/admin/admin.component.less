@@ -1,0 +1,119 @@
+.wrapper {
+  width: 100%;
+  max-height: 100%;
+  align-items: stretch;
+}
+
+.toolbar {
+  height: calc(4em + 1px);
+  padding-bottom: 1px;
+  background: -webkit-linear-gradient(29deg, #090e2c 0%, #122c69 59%, #078db3 100%);
+  background: -o-linear-gradient(29deg, #090e2c 0%, #122c69 59%, #078db3 100%);
+  background: -ms-linear-gradient(29deg, #090e2c 0%, #122c69 59%, #078db3 100%);
+  background: -moz-linear-gradient(29deg, #090e2c 0%, #122c69 59%, #078db3 100%);
+  background: linear-gradient(61deg, #090e2c 0%, #122c69 59%, #078db3 100%);
+}
+
+.sidebar {
+  width: 300px;
+  float: left;
+}
+
+.content {
+  position: relative;
+  float: right;
+  width: calc(100% - 60px);
+  overflow-y: auto;
+  height: calc(100vh - 4em - 1px);
+
+  &-expanded {
+    width: calc(100% - 300px);
+  }
+
+}
+
+.loaderWrapper {
+  z-index: 99;
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  cursor: not-allowed;
+  background: #8080808c;
+}
+
+.loader {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  height: 50px;
+  margin: auto;
+}
+
+.loaderText {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  top: 165px;
+  bottom: 0;
+  width: fit-content;
+  height: 50px;
+  margin: auto;
+  font-size: x-large;
+  font-weight: 700;
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 13px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #f8f9fa
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dadae3;
+  border-radius: 10px;
+  border: 1px solid #aeaeb5
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4c4cc
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #aeaeb5
+}
+
+.spinner {
+  margin: auto;
+  position: relative;
+  border: 12px solid #dbf1fe;
+  border-left: 12px solid #0072aa;
+  border-left-width: 12px;
+  border-left-style: solid;
+  border-left-color: rgb(0, 114, 170);
+  transform: translateZ(0);
+  -webkit-animation: spinner-border 1s infinite linear;
+  animation: spinner-border 1s infinite linear;
+  width: 67px;
+  height: 67px;
+  border-radius: 50%;
+}
+
+@keyframes spinner-border {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

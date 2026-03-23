@@ -1,0 +1,73 @@
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="pragma" content="no-cache">
+<div class="container-fluid">
+    <div class="main-content">
+        <h5>{{header}}</h5>
+        <form #mdsForm="ngForm" (ngSubmit)="onSubmit(mdsForm.value)" autocomplete="off" class="ui form">
+            <button type="submit" id="save" class="btn btn-sm btn-primary"
+                [attr.disabled]="!unSavedData ? 'true' : null">SAVE</button>
+            <button type="button" id="cancel" class="btn btn-sm btn-secondary"
+                [attr.disabled]="!unSavedData ? 'true' : null" (click)="openConfirmationModal()">CANCEL</button>
+            <button *ngIf="initializable" type="button" id="initializeButton"
+                class="btn btn-sm btn-primary btn-right-align" [attr.disabled]="unSavedData ? 'true' : null"
+                (click)="initializeWorkspace()">{{initializeButtonText}}</button>
+            <p *ngIf="isError" class="text-danger">{{errorText}}</p>
+            <ngx-codemirror id="ot-config-tab-content" name="configData" [(ngModel)]="properties"
+                (ngModelChange)="enableButton($event)" [options]="codeMirrorOptions"></ngx-codemirror>
+        </form>
+        <!-- Confirmation Modal for Cancel start-->
+        <div #confirmationModal class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"
+            aria-labelledby="mdsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header otdc-header">
+                        <h5 class="modal-title" id="mdsModalLabel">Confirmation</h5>
+                        <button class="close otdc-X-icon" type="button" data-dismiss="modal" aria-label="Close"
+                            (click)="closeConfirmationModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to cancel ? Any unsaved changes will be lost.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            (click)="onYesClick()">Yes</button>
+                        <button type="button" class="btn btn-primary" (click)="closeConfirmationModal()">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Confirmation Modal for Cancel end-->
+
+        <!-- Modal for MDS start-->
+        <div #mdsModal class="modal fade" id="mdsModal" tabindex="-1" role="dialog" aria-labelledby="mdsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mdsModalLabel">Enter MDS Details or click show embedded</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div>{{fetchError}}</div>
+                        <div class="input-group mb-3">
+                            <input id="mdsUrl" type="text" class="form-control"
+                                aria-label="URL of Media Delivery Service" placeholder="Enter MDS Base URL...">
+                            <div class="input-group-postpend">
+                                <span class="input-group-text">/ImConvServlet/imconv</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input id="mdsPwd" type="password" class="form-control"
+                                aria-label="Password of Media Delivery Service" placeholder="Enter MDS Password...">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" (click)="fetchFromRemote()">Fetch Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal for MDS end-->
+    </div>
+</div>

@@ -1,0 +1,14 @@
+image: docker:latest
+
+stages:
+  - build
+
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  DOCKER_HOST: tcp://localhost:2375
+  # This will instruct Docker not to start over TLS.
+  DOCKER_TLS_CERTDIR: ""
+  PIPE_LINE_ID: $CI_PIPELINE_IID
+  IMAGE: ${IMAGE_NAME}.${PIPE_LINE_ID}
+

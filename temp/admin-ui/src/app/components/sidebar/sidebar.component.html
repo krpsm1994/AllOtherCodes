@@ -1,0 +1,109 @@
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="pragma" content="no-cache">
+<div class="container-fluid p-0">
+    <!-- Bootstrap row -->
+    <div class="row" id="body-row">
+        <!-- Sidebar -->
+        <div id="sidebar-container" class="bg-light shadow bg-white"
+            [ngClass]="{'sidebar-collapsed': isMobileDevice, 'sidebar-expanded': !isMobileDevice}">
+            <!-- Bootstrap List Group -->
+            <ul class="list-group">
+                <!-- Separator with title -->
+                <a class="bg-light list-group-item list-group-item-action" [ngClass]="{'px-2': !isMobileDevice}"
+                    title="Configuration Wizard" [routerLink]="['/home']">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <span class="fa fa-home fa-fw mr-3 image-icon-main"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Configuration Wizard</small>
+                    </div>
+                </a>
+                <a href="#" class="bg-light list-group-item list-group-item-action"
+                    [ngClass]="{'px-2': !isMobileDevice}" title="Create Metadata" [routerLink]="['/createmetadata']">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <span class="fa fa-table fa-fw mr-3 image-icon-main"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Create Metadata</small>
+                    </div>
+                </a>
+
+                <!--Damlink Configuration Starts-->
+                <a href="#DamlinkConfig" class="bg-light list-group-item list-group-item-action"
+                    [ngClass]="{'px-2': !isMobileDevice}" title="DAMLink Configuration"
+                    [routerLink]="['/damlinkconfig']">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <span class="fa fa-file-text-o fa-fw mr-3 image-icon-main"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">DAMLink Configuration</small>
+                    </div>
+                </a>
+                <!--Damlink Configuration Ends-->
+                <!--Workspace Configuration starts-->
+                <a href="#workspaceConfiguration" data-bs-toggle="collapse" aria-expanded="false"
+                    class="bg-light list-group-item list-group-item-action flex-column"
+                    [ngClass]="{'px-2': !isMobileDevice}" title="Business Workspace Configuration">
+                    <div class="d-flex w-100 justify-content-start align-items-start">
+                        <img _ngcontent-wrb-c3="" src="assets/images/business_workspace_config.svg" class="image-icon-main" alt="BWLogo"/>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Business Workspace Configuration</small>
+                        <span class="submenu-icon ml-auto"></span>
+                    </div>
+                </a>
+                <div id='workspaceConfiguration' class="collapse sidebar-submenu align-items-end">
+                    <a class="list-group-item list-group-item-action bg-light text-dark py-1" title="Product Workspace"
+                        [routerLink]="['/pwconfig']">
+                        <span class="fa fa-file-code-o fa-fw mr-3 image-icon-sub"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Product Workspace</small>
+                    </a>
+                </div>
+                <div id='workspaceConfiguration' class="collapse sidebar-submenu align-items-end">
+                    <a class="list-group-item list-group-item-action bg-light text-dark py-1" title="EAM Workspace"
+                        [routerLink]="['/eamconfig']">
+                        <span class="fa fa-file-code-o fa-fw mr-3 image-icon-sub"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">EAM Workspace</small>
+                    </a>
+                </div>
+                <!--Workspace Configuration ends-->
+                <!--Tagging Configuration starts-->
+                <a href="#taggingConfiguration" data-bs-toggle="collapse" aria-expanded="false"
+                    class="bg-light list-group-item list-group-item-action flex-column"
+                    [ngClass]="{'px-2': !isMobileDevice}" title="Tagging Configuration">
+                    <div class="d-flex w-100 justify-content-start align-items-start">
+                        <img src="assets/images/tagging_config.svg" class="image-icon-main" alt="TaggingLogo"/>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Tagging Configuration</small>
+                        <span class="submenu-icon ml-auto"></span>
+                    </div>
+                </a>
+                <div id='taggingConfiguration' class="collapse sidebar-submenu align-items-end">
+                    <a class="list-group-item list-group-item-action bg-light text-dark font-italic py-1" title="AI Configuration" [routerLink]="['/aiconfig']">
+                        <img src="assets/images/ai_config.svg" class="image-icon-sub" alt="aiLogo"/>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">AI Configuration</small>
+                    </a>
+                </div>
+                <div id='taggingConfiguration' class="collapse sidebar-submenu align-items-end">
+                    <a class="list-group-item list-group-item-action bg-light text-dark font-italic py-1" title="Upload Taxonomy" [routerLink]="['/taxonomy']">
+                        <img src="assets/images/upload_taxonomy.svg" class="image-icon-sub" alt="uploadLogo"/>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Upload Taxonomy</small>
+                    </a>
+                </div>
+                <!-- Grocery Preferred attributes screen. This can be used for future screens-->
+                <!--<div id='taggingConfiguration' class="collapse sidebar-submenu align-items-end">
+                    <a class="list-group-item list-group-item-action bg-light text-dark font-italic py-1" title="Grocery Preferred Attributes" [routerLink]="['/groceryAttributes']">
+                        <span class="fa fa-file-code-o fa-fw mr-3 image-icon-sub"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Grocery Preferred Attributes</small>
+                    </a>
+                </div>-->
+                <!--Tagging Configuration ends-->
+                <a href="#" class="bg-light list-group-item list-group-item-action"
+                    [ngClass]="{'px-2': !isMobileDevice}" title="Folder Mapping" [routerLink]="['/foldermapping']">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <span class="fa fa-bars fa-fw mr-3 image-icon-main"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">Folder Mapping</small>
+                    </div>
+                </a>
+                <a href="#" class="bg-light list-group-item list-group-item-action"
+                    [ngClass]="{'px-2': !isMobileDevice}" title="JMS Messages" [routerLink]="['/messages']">
+                    <div class="d-flex w-100 justify-content-start align-items-start">
+                        <span class="fa fa-bullhorn fa-fw mr-3 image-icon-main"></span>
+                        <small *ngIf='!isMobileDevice' class="menu-collapsed text-dark">JMS Messages</small>
+                    </div>
+                </a>
+            </ul><!-- List Group END-->
+        </div><!-- sidebar-container END -->
+    </div><!-- body-row END -->
+</div><!-- container -->

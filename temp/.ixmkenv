@@ -1,0 +1,19 @@
+BUILD_SAP.DAM.Hybris_main=27
+GITREV=d169c35e0375323f96376716794043141c812af0
+IXMKREPODIR=C:/Drive/CodeBase/temp
+OBJROOT=C:/Drive/CodeBase/temp
+PRODUCTION_BRANCHES=master
+REVISIONTIME_SAP.DAM.Hybris_main=@2025/12/14:18:39:21
+REVISION_SAP.DAM.Hybris_main=@2025/12/15:12:54:25
+SRCROOT=C:/Drive/CodeBase/temp
+VIEWBUILD=2025.1215
+VIEWBUILDTIME=20:00
+VIEWMODES=
+VIEWREVISION=@2025/12/15:12:54:25
+VIEWSPEC=SAP.DAM.Hybris:main
+VIEWTIMESTAMP=2025/12/15 12:54:25 +0000 UTC
+VIEWTIME_T=1765803265
+VIEW_CLIENT_TIME=21
+VIEW_SYNC_TIME=0
+
+PATH=C:\Drive\CodeBase\temp\PRODUC~1\master\pkg\BUILD\bin;C:\STRAWB~1\perl\bin;C:\Drive\CodeBase\temp\PRODUC~1\master\pkg\BUILD\bin\MSWin32;C:\Program Files\Microsoft\jdk-11.0.28.6-hotspot\bin;C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\TortoiseGit\bin;C:\Program Files\nodejs;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\cmd;C:\Users\skanimetta\AppData\Local\Microsoft\WindowsApps;C:\Users\skanimetta\AppData\Local\Programs\Microsoft VS Code\bin;C:\Drive\Utilities\IXMK;C:\Program Files\nodejs\node_modules\npm;C:\Drive\Softwares\apache-ant-1.10.14;C:\HybrisJDK21_0;C:\Users\skanimetta\AppData\Roaming\npm

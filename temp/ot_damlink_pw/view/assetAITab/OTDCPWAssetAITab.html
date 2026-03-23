@@ -1,0 +1,24 @@
+<link rel="stylesheet" type="text/css" href="./OTDCPWAssetAITab.css?v=@DAMLINK_VERSION_TOKEN@" />
+
+<!-- Templates for a view are always template elements with an "ot-template" attribute. 
+	 The "ot-view" attribute determines which view the template is intended for.
+	 The "id" attribute determines the name of the template. -->
+<template ot-template ot-view="AiTagsInspectorTabView" id="content1">
+    <div class="ot-child-content" style="height:100%" ot-view="AiTagsInspectorTabView">
+        <div class="otdcpw-settings-panel">
+            <span class="otdcpw-buttonsPanel">
+                <button class="otdcpw-buttonsPanelButon otdcpw-generateAiTagsButton" tabindex="0">
+                    <ot-i18n>Generate AI Tags</ot-i18n>
+                </button>
+            </span>
+            <span id="otdcpw-accordion-group" class="otdcpw-accordion-group"
+                alt="Open and Close accordion group"></span>
+        </div>
+        <div class="ot-card-body" style="min-width: 13rem;">
+            <div class="otdcpw-accordion"></div>
+        </div>
+    </div>
+</template>
+
+<!-- otui.Templates.load() is required in every include file that includes a template. -->
+<script>otui.Templates.load();</script>

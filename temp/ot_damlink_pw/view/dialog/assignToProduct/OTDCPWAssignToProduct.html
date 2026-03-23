@@ -1,0 +1,85 @@
+<script src="./OTDCPWAssignToProduct.js?v=@DAMLINK_VERSION_TOKEN@" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWAssignToProduct.css?v=@DAMLINK_VERSION_TOKEN@"/> 
+
+<template id="OTDCPWAssignToProductView_content" ot-template ot-view="OTDCPWAssignToProductView">		
+	<div class="ot-workflowjobs-wrapper">
+		<div class="otdcpw-atp-header">
+			<div class="otdcpw-atp-title">
+				<ot-i18n id="workspace_title" parsed="true" ot-token="Workspaces">Workspaces</ot-i18n>
+			</div>
+			<!--Chicklet filters section-->
+			<div class="otdcpw-atp-tracker-chicklets">
+				<ot-view-prop ot-property="chickletFilters" ot-parser="CollectionListView.parseFilters" class="ot-activity-tracker-filters"></ot-view-prop>
+			</div>
+		</div>
+		<div class="ot-table-content ot-workflow ot-workflowjobs-body-content"></div>
+		<div class="ot-results-footer ot-paginate ot-hide-block" ot-platform="desktop">
+			<div class="ot-results-footer-wrapper">
+				<ot-page-navigator></ot-page-navigator>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template ot-template ot-view="OTDCPWAssignToProductView" id="header" ot-platform="desktop">
+	<div name="checkbox" style="width:18%; align-self: center; display: flex;"  class="ot-table-header-element">
+		<!-- <ot-i18n ot-with-title>Select</ot-i18n> -->
+		<a class="ot-folder-asset-action-button ot-enabled ot-selection-button show" onclick="otui.GalleryViewActions.showPageSelectionOptions(event, '#otdcpw-atp-pageSelectionOptions');" onkeydown="otui.GalleryViewActions.switchPageSelection(event, '#otdcpw-atp-pageSelectionOptions');" tabindex="0">
+			<span id="selectionIndicator" class="ot-asset-select-toggle" onclick="SelectionManager.toggleSelectionState(event);" onkeydown=" SelectionManager.toggleSelectionState(event);"></span>
+			<span class="ot-page-select-text"></span>
+			<span class="ot-dropdown-arrow"></span>
+		</a>
+		<!--ot-hover options are loaded based on the template name provided-->
+		<ot-hover id="otdcpw-atp-pageSelectionOptions" class="ot-asset-selection-hover" template="otdcpw-atp-pageSelectionOptions-hover"> 
+		</ot-hover>
+	</div>
+	<!--<div name="thumbnail" style="width:10%"  class="ot-table-header-element"><ot-i18n ot-with-title>Thumbnail</ot-i18n></div>-->
+	<div name="name" style="width:25%; align-self: center;" class="ot-table-header-element"><ot-i18n ot-with-title>Workspace Name</ot-i18n></div>
+	<div name="description" style="width:40%; align-self: center;" class="ot-table-header-element"><ot-i18n ot-with-title>Description</ot-i18n></div>
+	<div id="article_id" name="article_id" style="width:20%; align-self: center;" class="ot-table-header-element"><ot-i18n ot-with-title>Article Number</ot-i18n></div>
+</template>
+
+<template id="OTDCPWAssignToProductView_row" ot-template ot-view="OTDCPWAssignToProductView">
+	<ot-resource class="ot-row-result ot-table-row ot-workflowjob-row">
+		<div class="ot-table-element ot-table-static" name="select" onclick="event.stopPropagation(); var checkbox = this.querySelector('input'); checkbox.checked = !checkbox.checked; SelectionManager.selectionChanged(checkbox)" style="width: 18%; display: flex;"> 
+			<input type="checkbox" class="results-view-selected" onclick="event.stopPropagation(); SelectionManager.selectionChanged(this)" style="align-self: center;">
+			<div name="thumbnail" class="ot-workflowjob-thumbnails ot-table-element" ot-platform="desktop" oncontextmenu="return false;" style="width:auto; padding:0px; padding-left: 25px; align-self: center;"></div>
+		</div>
+		<ot-metadata style="width:25%;" class="ot-table-element" ot-fields="name" ot-db-value-translate ot-with-title></ot-metadata>
+		<ot-metadata style="width:40%;" class="ot-table-element" ot-fields="description" ot-db-value-translate ot-with-title></ot-metadata>
+		<ot-metadata style="width:20%; align-self: center;" class="ot-table-element" ot-fields="article_id" ot-db-value-translate ot-with-title></ot-metadata>
+	</ot-resource>
+</template>
+
+<template ot-template id="thumbnailEntry" ot-view="OTDCPWAssignToProductView">
+	<ot-resource class="ot-workflowjob-thumbnails-resource">
+		<ot-rendition ot-asset-rendition class="ot-workflowjob-thumbnail-entry" ot-rendition-types="thumbnail" ot-from-cache="false" ot-rendition-format="img" ot-static-height="48" ot-fallback='{"img" : "style/img/mime_type_unknown32.png", "width" : 48, "height" : 48}'></ot-rendition>
+	</ot-resource>
+</template>
+
+<template ot-template id="content" ot-view="OTDCPWAssignToProdWrapper">	
+	<div class="ot-child-container">
+	</div>
+	<ot-dialog-footer ot-platform="desktop">
+		<div class="ot-modal-dialog-footer-buttons">
+			<div class="otdcpw-atp-back-button" title="Back" onclick="OTDCPWAssignToProductView.onClickBack(event)"><ot-i18n ot-as-title="" ot-token="Back" parsed="true"></ot-i18n></div>
+			<button id="otdcpwatpFinishBtn" type="submit" class="ot-button ot-upload-modal-dialog-button" onclick="OTDCPWAssignToProductView.onClickFinish(event)"><ot-i18n>Finish</ot-i18n></button>
+			<button type="button" class="ot-button secondary" onclick="otui.DialogUtils.cancelDialog(this)"><ot-i18n>Cancel</ot-i18n></button>
+		</div>
+	</ot-dialog-footer>
+</template>
+
+<template id="OTDCPWAssignToProdWrapperDialog" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWAssignToProdWrapper" class="ot-new-folder-dialog "
+		ot-view-props='{"name" : "OTDCPWAssignToProdWrapper", "type" : "OTDCPWAssignToProdWrapper"}'>
+	</ot-view>
+</template>
+
+<!--Using custom pageselectoptions template as we dont need selectallpages option-->
+<template id="otdcpw-atp-pageSelectionOptions-hover" ot-template>
+	<a id="selectThisPage" class="ot-page-selection-item" onmouseup="SelectionManager.hoverSelectionChange(event, 'selectThisPage');" onkeydown="if(event.which === 13) SelectionManager.selectThisPage(otui.Views.containing(otui.parent(this, 'ot-hover').caller));" tabindex="0"><span class="ot-check"></span><ot-i18n>This page</ot-i18n></a>
+	<!-- commenting select all as selectionmanager is not storing the assets from all pages, without which we cannot perform atp
+		<a id="selectAllPages" class="ot-page-selection-item" onmouseup="SelectionManager.hoverSelectionChange(event, 'selectAll');" onkeydown="if(event.which === 13) SelectionManager.selectAll(otui.Views.containing(otui.parent(this, 'ot-hover').caller));" tabindex="0"><span class="ot-check"></span><ot-i18n>All pages</ot-i18n></a> -->
+	<a id="selectNone" class="ot-page-selection-item ot-page-selection-item-selected" onmouseup="SelectionManager.hoverSelectionChange(event, 'unselectAll');" onkeydown="if(event.which === 13) SelectionManager.unselectAll(otui.Views.containing(otui.parent(this, 'ot-hover').caller));" tabindex="0"><span class="ot-check"></span><ot-i18n>None</ot-i18n></a>
+</template>
+<script>otui.Templates.load();</script>

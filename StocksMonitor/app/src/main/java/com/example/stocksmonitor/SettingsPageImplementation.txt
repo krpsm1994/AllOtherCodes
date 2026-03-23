@@ -1,0 +1,358 @@
+// Add this function to MainActivity.kt - showSettingsPage
+// This is a helper file showing the complete implementation
+
+private fun showSettingsPage() {
+    currentStocksBinding = null  // Clear reference when leaving stocks page
+    val settingsBinding = LayoutInflater.from(this).inflate(R.layout.fragment_settings, null) as LinearLayout
+    binding.contentContainer.removeAllViews()
+    binding.contentContainer.addView(settingsBinding)
+    supportActionBar?.title = "Settings"
+    
+    // Get all UI elements
+    val autoOrdersCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.auto_orders_checkbox)
+    val pollingIntervalInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.polling_interval_input)
+    val brokerageInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.brokerage_input)
+    val defaultQuantityInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.default_quantity_input)
+    
+    // Credentials
+    val kiteApiKeyInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.kite_api_key_input)
+    val kiteSecretKeyInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.kite_secret_key_input)
+    val angelApiKeyInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.angel_api_key_input)
+    val angelClientIpInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.angel_client_ip_input)
+    val angelPublicIpInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.angel_public_ip_input)
+    val angelMacAddressInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.angel_mac_address_input)
+    
+    // Notifications
+    val notifyOrderPlacedCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.notify_order_placed_checkbox)
+    val notifyOrderFilledCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.notify_order_filled_checkbox)
+    val notifySlHitCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.notify_sl_hit_checkbox)
+    val notifyTargetHitCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.notify_target_hit_checkbox)
+    val soundAlertsCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.sound_alerts_checkbox)
+    val vibrationCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.vibration_checkbox)
+    
+    // UI Settings
+    val themeSpinner = settingsBinding.findViewById<AutoCompleteTextView>(R.id.theme_spinner)
+    val showPercentageCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.show_percentage_checkbox)
+    val compactViewCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.compact_view_checkbox)
+    
+    // Debug
+    val debugLogsCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.debug_logs_checkbox)
+    val maxLogEntriesInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.max_log_entries_input)
+    
+    // Login Reminder
+    val loginReminderCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.login_reminder_checkbox)
+    val reminderHourInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.reminder_hour_input)
+    val reminderMinuteInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.reminder_minute_input)
+    
+    // Background Service
+    val backgroundServiceCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.background_service_checkbox)
+    val keepScreenAwakeCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.keep_screen_awake_checkbox)
+    
+    // Risk Management
+    val maxDailyOrdersInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.max_daily_orders_input)
+    val maxPerStockInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.max_per_stock_input)
+    val maxTotalInvestmentInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.max_total_investment_input)
+    val requireConfirmationCheckbox = settingsBinding.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.require_confirmation_checkbox)
+    val autoLogoutHoursInput = settingsBinding.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.auto_logout_hours_input)
+    
+    // Buttons
+    val exportDataButton = settingsBinding.findViewById<Button>(R.id.export_data_button)
+    val importDataButton = settingsBinding.findViewById<Button>(R.id.import_data_button)
+    val clearLogsButton = settingsBinding.findViewById<Button>(R.id.clear_logs_button)
+    val clearHistoryButton = settingsBinding.findViewById<Button>(R.id.clear_history_button)
+    val saveButton = settingsBinding.findViewById<Button>(R.id.save_settings_button)
+    val resetButton = settingsBinding.findViewById<Button>(R.id.reset_settings_button)
+    
+    // Load current settings
+    loadSettings(
+        autoOrdersCheckbox, pollingIntervalInput, brokerageInput, defaultQuantityInput,
+        kiteApiKeyInput, kiteSecretKeyInput, angelApiKeyInput, angelClientIpInput, angelPublicIpInput, angelMacAddressInput,
+        notifyOrderPlacedCheckbox, notifyOrderFilledCheckbox, notifySlHitCheckbox, notifyTargetHitCheckbox, soundAlertsCheckbox, vibrationCheckbox,
+        themeSpinner, showPercentageCheckbox, compactViewCheckbox,
+        debugLogsCheckbox, maxLogEntriesInput,
+        loginReminderCheckbox, reminderHourInput, reminderMinuteInput,
+        backgroundServiceCheckbox, keepScreenAwakeCheckbox,
+        maxDailyOrdersInput, maxPerStockInput, maxTotalInvestmentInput, requireConfirmationCheckbox, autoLogoutHoursInput
+    )
+    
+    // Save button
+    saveButton.setOnClickListener {
+        saveSettings(
+            autoOrdersCheckbox, pollingIntervalInput, brokerageInput, defaultQuantityInput,
+            kiteApiKeyInput, kiteSecretKeyInput, angelApiKeyInput, angelClientIpInput, angelPublicIpInput, angelMacAddressInput,
+            notifyOrderPlacedCheckbox, notifyOrderFilledCheckbox, notifySlHitCheckbox, notifyTargetHitCheckbox, soundAlertsCheckbox, vibrationCheckbox,
+            themeSpinner, showPercentageCheckbox, compactViewCheckbox,
+            debugLogsCheckbox, maxLogEntriesInput,
+            loginReminderCheckbox, reminderHourInput, reminderMinuteInput,
+            backgroundServiceCheckbox, keepScreenAwakeCheckbox,
+            maxDailyOrdersInput, maxPerStockInput, maxTotalInvestmentInput, requireConfirmationCheckbox, autoLogoutHoursInput
+        )
+        Snackbar.make(binding.root, "Settings saved successfully", Snackbar.LENGTH_SHORT).show()
+    }
+    
+    // Reset button
+    resetButton.setOnClickListener {
+        AlertDialog.Builder(this)
+            .setTitle("Reset Settings")
+            .setMessage("Are you sure you want to reset all settings to defaults?")
+            .setPositiveButton("Reset") { _, _ ->
+                settingsManager.clearAllSettings()
+                Logger.enableDebugLogs = settingsManager.isDebugLogsEnabled()
+                Snackbar.make(binding.root, "Settings reset to defaults", Snackbar.LENGTH_SHORT).show()
+                showSettingsPage()  // Reload settings page
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    // Export button
+    exportDataButton.setOnClickListener {
+        exportDataToJson()
+    }
+    
+    // Import button
+    importDataButton.setOnClickListener {
+        importDataFromJson()
+    }
+    
+    // Clear logs button
+    clearLogsButton.setOnClickListener {
+        AlertDialog.Builder(this)
+            .setTitle("Clear Logs")
+            .setMessage("Are you sure you want to delete all logs?")
+            .setPositiveButton("Clear") { _, _ ->
+                // Get max log entries and clear in LogManager
+                Snackbar.make(binding.root, "Logs cleared", Snackbar.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    // Clear history button
+    clearHistoryButton.setOnClickListener {
+        AlertDialog.Builder(this)
+            .setTitle("Clear History")
+            .setMessage("Are you sure you want to delete all history stocks?")
+            .setPositiveButton("Clear") { _, _ ->
+                val historyStocks = stockManager.getAllStocks().filter { it.status == StockStatus.HISTORY }
+                historyStocks.forEach { stock ->
+                    stockManager.deleteStock(stock)
+                }
+                Snackbar.make(binding.root, "History cleared", Snackbar.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+}
+
+private fun loadSettings(
+    autoOrdersCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    pollingIntervalInput: com.google.android.material.textfield.TextInputEditText,
+    brokerageInput: com.google.android.material.textfield.TextInputEditText,
+    defaultQuantityInput: com.google.android.material.textfield.TextInputEditText,
+    kiteApiKeyInput: com.google.android.material.textfield.TextInputEditText,
+    kiteSecretKeyInput: com.google.android.material.textfield.TextInputEditText,
+    angelApiKeyInput: com.google.android.material.textfield.TextInputEditText,
+    angelClientIpInput: com.google.android.material.textfield.TextInputEditText,
+    angelPublicIpInput: com.google.android.material.textfield.TextInputEditText,
+    angelMacAddressInput: com.google.android.material.textfield.TextInputEditText,
+    notifyOrderPlacedCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    notifyOrderFilledCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    notifySlHitCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    notifyTargetHitCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    soundAlertsCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    vibrationCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    themeSpinner: AutoCompleteTextView,
+    showPercentageCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    compactViewCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    debugLogsCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    maxLogEntriesInput: com.google.android.material.textfield.TextInputEditText,
+    loginReminderCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    reminderHourInput: com.google.android.material.textfield.TextInputEditText,
+    reminderMinuteInput: com.google.android.material.textfield.TextInputEditText,
+    backgroundServiceCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    keepScreenAwakeCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    maxDailyOrdersInput: com.google.android.material.textfield.TextInputEditText,
+    maxPerStockInput: com.google.android.material.textfield.TextInputEditText,
+    maxTotalInvestmentInput: com.google.android.material.textfield.TextInputEditText,
+    requireConfirmationCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    autoLogoutHoursInput: com.google.android.material.textfield.TextInputEditText
+) {
+    // Load order management settings
+    autoOrdersCheckbox.isChecked = settingsManager.isAutoOrdersEnabled()
+    pollingIntervalInput.setText(settingsManager.getOrderPollingInterval().toString())
+    brokerageInput.setText(settingsManager.getBrokerageCharges().toString())
+    defaultQuantityInput.setText(settingsManager.getDefaultQuantity().toString())
+    
+    // Load credentials
+    kiteApiKeyInput.setText(settingsManager.getKiteApiKey() ?: KITE_API_KEY)
+    kiteSecretKeyInput.setText(settingsManager.getKiteSecretKey() ?: KITE_SECRET_KEY)
+    angelApiKeyInput.setText(settingsManager.getAngelApiKey() ?: ANGEL_API_KEY)
+    angelClientIpInput.setText(settingsManager.getAngelClientIp())
+    angelPublicIpInput.setText(settingsManager.getAngelPublicIp())
+    angelMacAddressInput.setText(settingsManager.getAngelMacAddress())
+    
+    // Load notifications
+    notifyOrderPlacedCheckbox.isChecked = settingsManager.isNotifyOrderPlaced()
+    notifyOrderFilledCheckbox.isChecked = settingsManager.isNotifyOrderFilled()
+    notifySlHitCheckbox.isChecked = settingsManager.isNotifySlHit()
+    notifyTargetHitCheckbox.isChecked = settingsManager.isNotifyTargetHit()
+    soundAlertsCheckbox.isChecked = settingsManager.isSoundAlertsEnabled()
+    vibrationCheckbox.isChecked = settingsManager.isVibrationEnabled()
+    
+    // Load UI settings
+    themeSpinner.setText(settingsManager.getThemeMode(), false)
+    showPercentageCheckbox.isChecked = settingsManager.shouldShowPercentage()
+    compactViewCheckbox.isChecked = settingsManager.isCompactViewEnabled()
+    
+    // Load debug
+    debugLogsCheckbox.isChecked = settingsManager.isDebugLogsEnabled()
+    maxLogEntriesInput.setText(settingsManager.getMaxLogEntries().toString())
+    
+    // Load login reminder
+    loginReminderCheckbox.isChecked = settingsManager.isLoginReminderEnabled()
+    reminderHourInput.setText(settingsManager.getLoginReminderHour().toString())
+    reminderMinuteInput.setText(settingsManager.getLoginReminderMinute().toString())
+    
+    // Load background service
+    backgroundServiceCheckbox.isChecked = settingsManager.isBackgroundServiceEnabled()
+    keepScreenAwakeCheckbox.isChecked = settingsManager.isKeepScreenAwakeEnabled()
+    
+    // Load risk management
+    maxDailyOrdersInput.setText(settingsManager.getMaxDailyOrders().toString())
+    maxPerStockInput.setText(settingsManager.getMaxInvestmentPerStock().toString())
+    maxTotalInvestmentInput.setText(settingsManager.getMaxTotalInvestment().toString())
+    requireConfirmationCheckbox.isChecked = settingsManager.isOrderConfirmationRequired()
+    autoLogoutHoursInput.setText(settingsManager.getAutoLogoutHours().toString())
+    
+    // Setup theme dropdown
+    val themeOptions = arrayOf("light", "dark", "system")
+    val themeAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, themeOptions)
+    themeSpinner.setAdapter(themeAdapter)
+}
+
+private fun saveSettings(
+    autoOrdersCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    pollingIntervalInput: com.google.android.material.textfield.TextInputEditText,
+    brokerageInput: com.google.android.material.textfield.TextInputEditText,
+    defaultQuantityInput: com.google.android.material.textfield.TextInputEditText,
+    kiteApiKeyInput: com.google.android.material.textfield.TextInputEditText,
+    kiteSecretKeyInput: com.google.android.material.textfield.TextInputEditText,
+    angelApiKeyInput: com.google.android.material.textfield.TextInputEditText,
+    angelClientIpInput: com.google.android.material.textfield.TextInputEditText,
+    angelPublicIpInput: com.google.android.material.textfield.TextInputEditText,
+    angelMacAddressInput: com.google.android.material.textfield.TextInputEditText,
+    notifyOrderPlacedCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    notifyOrderFilledCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    notifySlHitCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    notifyTargetHitCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    soundAlertsCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    vibrationCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    themeSpinner: AutoCompleteTextView,
+    showPercentageCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    compactViewCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    debugLogsCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    maxLogEntriesInput: com.google.android.material.textfield.TextInputEditText,
+    loginReminderCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    reminderHourInput: com.google.android.material.textfield.TextInputEditText,
+    reminderMinuteInput: com.google.android.material.textfield.TextInputEditText,
+    backgroundServiceCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    keepScreenAwakeCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    maxDailyOrdersInput: com.google.android.material.textfield.TextInputEditText,
+    maxPerStockInput: com.google.android.material.textfield.TextInputEditText,
+    maxTotalInvestmentInput: com.google.android.material.textfield.TextInputEditText,
+    requireConfirmationCheckbox: com.google.android.material.checkbox.MaterialCheckBox,
+    autoLogoutHoursInput: com.google.android.material.textfield.TextInputEditText
+) {
+    // Save order management settings
+    settingsManager.setAutoOrdersEnabled(autoOrdersCheckbox.isChecked)
+    val pollingInterval = pollingIntervalInput.text.toString().toIntOrNull() ?: 20
+    settingsManager.setOrderPollingInterval(pollingInterval)
+    val brokerage = brokerageInput.text.toString().toDoubleOrNull() ?: 20.0
+    settingsManager.setBrokerageCharges(brokerage)
+    val quantity = defaultQuantityInput.text.toString().toIntOrNull() ?: 1
+    settingsManager.setDefaultQuantity(quantity)
+    
+    // Save credentials
+    settingsManager.setKiteApiKey(kiteApiKeyInput.text.toString())
+    settingsManager.setKiteSecretKey(kiteSecretKeyInput.text.toString())
+    settingsManager.setAngelApiKey(angelApiKeyInput.text.toString())
+    settingsManager.setAngelClientIp(angelClientIpInput.text.toString())
+    settingsManager.setAngelPublicIp(angelPublicIpInput.text.toString())
+    settingsManager.setAngelMacAddress(angelMacAddressInput.text.toString())
+    
+    // Save notifications
+    settingsManager.setNotifyOrderPlaced(notifyOrderPlacedCheckbox.isChecked)
+    settingsManager.setNotifyOrderFilled(notifyOrderFilledCheckbox.isChecked)
+    settingsManager.setNotifySlHit(notifySlHitCheckbox.isChecked)
+    settingsManager.setNotifyTargetHit(notifyTargetHitCheckbox.isChecked)
+    settingsManager.setSoundAlertsEnabled(soundAlertsCheckbox.isChecked)
+    settingsManager.setVibrationEnabled(vibrationCheckbox.isChecked)
+    
+    // Save UI settings
+    settingsManager.setThemeMode(themeSpinner.text.toString())
+    settingsManager.setShowPercentage(showPercentageCheckbox.isChecked)
+    settingsManager.setCompactViewEnabled(compactViewCheckbox.isChecked)
+    
+    // Save debug
+    settingsManager.setDebugLogsEnabled(debugLogsCheckbox.isChecked)
+    Logger.enableDebugLogs = debugLogsCheckbox.isChecked
+    val maxLogEntries = maxLogEntriesInput.text.toString().toIntOrNull() ?: 1000
+    settingsManager.setMaxLogEntries(maxLogEntries)
+    
+    // Save login reminder
+    settingsManager.setLoginReminderEnabled(loginReminderCheckbox.isChecked)
+    val hour = reminderHourInput.text.toString().toIntOrNull() ?: 8
+    val minute = reminderMinuteInput.text.toString().toIntOrNull() ?: 30
+    settingsManager.setLoginReminderHour(hour)
+    settingsManager.setLoginReminderMinute(minute)
+    if (loginReminderCheckbox.isChecked) {
+        scheduleDailyLoginReminder()
+    }
+    
+    // Save background service
+    settingsManager.setBackgroundServiceEnabled(backgroundServiceCheckbox.isChecked)
+    settingsManager.setKeepScreenAwakeEnabled(keepScreenAwakeCheckbox.isChecked)
+    
+    // Save risk management
+    val maxDailyOrders = maxDailyOrdersInput.text.toString().toIntOrNull() ?: 100
+    settingsManager.setMaxDailyOrders(maxDailyOrders)
+    val maxPerStock = maxPerStockInput.text.toString().toDoubleOrNull() ?: 100000.0
+    settingsManager.setMaxInvestmentPerStock(maxPerStock)
+    val maxTotal = maxTotalInvestmentInput.text.toString().toDoubleOrNull() ?: 500000.0
+    settingsManager.setMaxTotalInvestment(maxTotal)
+    settingsManager.setOrderConfirmationRequired(requireConfirmationCheckbox.isChecked)
+    val autoLogoutHours = autoLogoutHoursInput.text.toString().toIntOrNull() ?: 0
+    settingsManager.setAutoLogoutHours(autoLogoutHours)
+}
+
+private fun exportDataToJson() {
+    try {
+        val stocks = stockManager.getAllStocks()
+        val logs = logManager.getAllLogs()
+        
+        val gson = com.google.gson.Gson()
+        val dataMap = mapOf(
+            "stocks" to stocks,
+            "logs" to logs,
+            "exportDate" to java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+        )
+        
+        val json = gson.toJson(dataMap)
+        
+        // Save to file
+        val fileName = "StocksMonitor_Export_${System.currentTimeMillis()}.json"
+        val file = java.io.File(getExternalFilesDir(null), fileName)
+        file.writeText(json)
+        
+        Snackbar.make(binding.root, "Data exported to $fileName", Snackbar.LENGTH_LONG).show()
+    } catch (e: Exception) {
+        Logger.e("MainActivity", "Error exporting data", e)
+        Snackbar.make(binding.root, "Error exporting data: ${e.message}", Snackbar.LENGTH_LONG).show()
+    }
+}
+
+private fun importDataFromJson() {
+    // TODO: Implement file picker and import logic
+    Snackbar.make(binding.root, "Import feature coming soon", Snackbar.LENGTH_SHORT).show()
+}

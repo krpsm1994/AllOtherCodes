@@ -1,0 +1,26 @@
+<script src="./OTDCPWVariantsLookup.js?v=@DAMLINK_VERSION_TOKEN@" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWVariantsLookup.css?v=@DAMLINK_VERSION_TOKEN@" />
+
+<template ot-template id="otdcpw-variants-lookup-content" ot-view="OTDCPWVariantsLookupView">
+	<div class="ot-content">
+		<ot-dialog-body class="otdcpw-variants-content-body">
+			<div id="otdcpw-variants-div"></div>
+		</ot-dialog-body>
+		<ot-dialog-footer ot-platform="desktop">
+			<div class="ot-modal-dialog-footer-buttons">
+				<button id="ot-newfolder-create-button" type="submit" class="ot-button ot-upload-modal-dialog-button"
+					onclick="OTDCPWVariantsLookupView.onClickContinue(event)"><ot-i18n>Continue</ot-i18n></button>
+				<button type="button" class="ot-button secondary"
+					onclick="otui.DialogUtils.cancelDialog(this)"><ot-i18n>Cancel</ot-i18n></button>
+			</div>
+		</ot-dialog-footer>
+	</div>
+</template>
+
+<template id="otdcpwvariantslookupdialog" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWVariantsLookupView" class="ot-new-folder-dialog "
+		ot-view-props='{"name" : "OTDCPWVariantsLookupView", "type" : "OTDCPWVariantsLookupView"}'>
+	</ot-view>
+</template>
+
+<script>otui.Templates.load();</script>

@@ -1,0 +1,60 @@
+<script  type="text/javascript" src="./OTDCPWCreate.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWCreate.css?v=@DAMLINK_VERSION_TOKEN@"/> 
+
+<template ot-template id="content" ot-view="OTDCPWNewWorkspaceView">
+   <div class="ot-content">
+		<ot-dialog-body>
+			<ot-tabs clear-tabs></ot-tabs>
+		</ot-dialog-body>
+		<ot-dialog-footer ot-platform="desktop">
+			<div class="ot-modal-dialog-footer-buttons">
+				<button id="ot-newfolder-create-button" type="submit" class="ot-button ot-upload-modal-dialog-button" onclick="OTDCPWNewWorkspaceView.createWorkspace(event)"><ot-i18n>Create</ot-i18n></button>
+				<button type="button" class="ot-button secondary" onclick="otui.DialogUtils.cancelDialog(this)"><ot-i18n>Cancel</ot-i18n></button>
+			</div>
+		</ot-dialog-footer>
+   </div>
+</template>
+
+<template id="OTDCPWCreate" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWNewWorkspaceView" class="ot-new-folder-dialog "
+		ot-view-props='{"name" : "OTDCPWNewWorkspaceView", "type" : "OTDCPWNewWorkspaceView"}'>
+	</ot-view>
+</template>
+
+
+<template id="OTDCPWMetadataView_content" ot-template ot-view="OTDCPWMetadataView">
+	<div class="ot-newfolder-input-wrapper otdcpw-title">
+		<ot-i18n style="font-weight: bold">Product Workspace Name</ot-i18n> <span class="ot-foldername-mandatory-field">*</span>
+		<div>
+			<input id="ot-newfolder-name" tabindex="0" autofocus placeholder="Enter name" class="ot-text-input ot-newfolder-form-element ot-dampw-input"></input>
+		</div>
+		<div class="ot-error-msg"></div>
+	</div>
+	<div class="otdcpw-hide-content">
+		<div class="otdcpw-main-catalog">
+			<div class="otdcpw-catalogcol1">
+				<div class="otdcpw-create-cat-title"><ot-i18n>Catalog Version</ot-i18n></div>
+				<div class="otdcpw-pim-catalog"></div>
+			</div>
+
+			<div class="otdcpw-catalogcol2">
+				<div class="otdcpw-create-cat-title"><ot-i18n>Search Product in SAP Commerce Cloud</ot-i18n></div>
+				<input id="otdcpw-create-pim-input" class="otdcpw-pim-input ot-newfolder-form-element ot-text-input" oninput="OTDCPWNewWorkspaceView.handlePimInputChange(event)"></input>
+			</div>		
+		</div>
+		<div class="ot-metadata-message-text ot-modal-dialog-footer-buttons">
+			<ot-i18n style="padding : 1rem">If you add a workspace reference, workspace attributes will be overwritten with the metadata of the business object</ot-i18n>
+		</div>
+	</div>
+	<ot-resource class="ot-new-folder-metadata" ot-resource-locator="verbose" ot-edit-mode="edit" id="otdcpw-metadata-type">
+		<ot-model ot-display-editable="true" ot-group-template="ot-flat-metadata-group-template" ot-section-template="ot-metadata-folder-section-message"></ot-model>
+	</ot-resource>
+</template>
+
+<template id="OTDCPWSecurityView_content" ot-template ot-view="OTDCPWSecurityView">
+	<ot-resource class="ot-new-folder-security">
+		<ot-security-policy ot-mode="create" ot-security-policy-view="ALL"/>
+	</ot-resource>
+</template>
+
+<script>otui.Templates.load();</script>

@@ -1,0 +1,51 @@
+<div class="container-fluid p-0">
+    <div class="main-content">
+        <h4>Messages</h4>
+        <div class="row" id="body-row">
+            <ul class="list-group d-flex w-100 justify-content-between">
+                <div *ngIf="connections.length === 0" class="font-italic badge text-black">No Messages exist.</div>
+                <div *ngFor="let connection of connections" class="list-group-item flex-column align-items-start">
+                    <div class="justify-content-between align-items-start row">
+                        <span class="col-4 col-sm-5 connectiondetail">{{connection[0]}}
+                            <span class="badge badge-primary badge-pill" style="background-color: #007bff;">{{connection[1]}}</span>
+                        </span>
+                        <a class="btn btn-info col mr-2 collapsed otdc-info-button" role="button" href="#submenu1-{{connection[0]}}"
+                        data-bs-toggle="collapse"></a>
+                        <button class="btn btn-danger col mr-2" style="margin-left: 10px;" type="button" (click)="onAction(connection[0], $event)"
+                            id="deletemessage">Delete</button>
+                        <button class="btn btn-success col mr-2 otdc-success-button" style="margin-left: 10px;" type="button" (click)="onAction(connection[0], $event)"
+                            id="recovermessage">Recover</button>
+                    </div>
+                    <div id='submenu1-{{connection[0]}}' class="collapse align-items-end mt-2">
+                        <span class="list-group-item bg-light text-dark font-italic">
+                            <span class="menu-collapsed text-dark">
+                                <div *ngFor="let connectionMessage of connectionMessages | keyvalue">
+                                    <div *ngIf="connectionMessage.key == connection[0]">
+                                        <div *ngFor="let message of connectionMessage.value | paginate: { itemsPerPage: 3, currentPage: page.get(connection[0]), id: connection[0] }"
+                                            class="mb-3 mt-1 input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text otdc-input-group-text">
+                                                    <input type="checkbox" name="{{connectionMessage.key}}" class="otdc-checkbox"
+                                                        aria-label="Checkbox for following text input"
+                                                        id="{{message | slice:14:message.indexOf(';')}}"
+                                                        (change)="updateCheckOption(connectionMessage.key, $event)"
+                                                        [checked]="(message | slice:14:message.indexOf(';')).toString() === checkedmessages.get(connectionMessage.key)">
+                                                </div>
+                                            </div>
+                                            <span class="message">{{message}}</span>
+                                            <br>
+                                        </div>
+                                        <pagination-controls class="{{page.get(connection[0])}}" id="{{connection[0]}}"
+                                            (pageChange)="page.set(connection[0], $event)" maxSize="10"
+                                            autoHide="true"></pagination-controls>
+
+                                    </div>
+                                </div>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </ul>
+        </div>
+    </div>
+</div>

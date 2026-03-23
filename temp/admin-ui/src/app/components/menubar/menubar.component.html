@@ -1,0 +1,13 @@
+<div class="menu-bar">
+    <div class="menu-logo">
+        <img class="logo-img" src="assets/images/DAMLink-logo.svg" alt="DAMLink Logo">
+    </div>
+    <div class="menu-actions">
+        <span class="version">{{version}}</span>
+        <img class="logo-admin" src="assets/images/Administration.svg" alt="Administration">
+    </div>
+    <div class="menu-user-actions">
+        <app-menu-options [username]='user != null ? user.username: "username"' [systemDetails]="systemDetail"
+            [lastLoginDate]="lastLoginDate"></app-menu-options>
+    </div>
+</div>

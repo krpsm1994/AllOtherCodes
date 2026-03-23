@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cult.fit Tax Invoice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: white;
+            padding: 0;
+            margin: 0;
+        }
+
+        .invoice-container {
+            width: 100%;
+            background: white;
+        }
+
+        .header-bars {
+            display: flex;
+            height: 4px;
+            margin-bottom: 20px;
+        }
+
+        .bar-left {
+            flex: 1;
+            background: linear-gradient(to right, #d32f2f, #f57c00, #fbc02d);
+        }
+
+        .bar-right {
+            flex: 1;
+            background: linear-gradient(to right, #f57c00, #ec407a);
+        }
+
+        .logo-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            width: 100%;
+            height: auto;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: 300;
+            color: #000;
+            margin-top: 10px;
+        }
+
+        .thank-you-bar {
+            background: linear-gradient(to right, #ffa726, #ec407a);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            padding: 30px;
+            background: #f2f2f2;
+        }
+
+        .sidebar {
+            width: 100px;
+            margin-right: 30px;
+        }
+
+        .sidebar img {
+            width: 100%;
+            height: auto;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .invoice-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 40px;
+            font-size: 11px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .detail-row {
+            display: contents;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            text-align: right;
+            color: #000;
+        }
+
+        .kickstart {
+            margin: 20px 0;
+            font-size: 11px;
+        }
+
+        .kickstart a {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #333;
+        }
+
+        .payment-table {
+            width: 100%;
+            font-size: 11px;
+            margin-bottom: 20px;
+        }
+
+        .payment-table tr {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .payment-table .label {
+            color: #666;
+        }
+
+        .payment-table .value {
+            color: #000;
+        }
+
+        .payment-table .total {
+            font-weight: bold;
+            padding-top: 8px;
+        }
+
+        .details-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 10px;
+        }
+
+        .buyer-details, .seller-details {
+            flex: 1;
+        }
+
+        .buyer-details {
+            padding-right: 20px;
+        }
+
+        .seller-details {
+            text-align: right;
+        }
+
+        .details-title {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .details-section p {
+            margin: 3px 0;
+            color: #333;
+        }
+
+        .footer {
+            padding: 20px 30px;
+            border-top: 1px solid #333;
+            background: #f2f2f2;
+        }
+
+        .footer-greeting {
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .footer-bar {
+            height: 4px;
+            background: linear-gradient(to right, #00bcd4, #4caf50, #ffc107);
+            margin: 15px 0;
+        }
+
+        .footer-info {
+            font-size: 9px;
+            color: #666;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+        }
+    </style>
+</head>
+<body style="background: #FFF;">
+    <div class="invoice-container">
+        <div class="logo-section">
+            <img class="logo" src="file:///C:/Drive/Documents/Gmail%20-%20Fwd_%20cult.fit_%20Confirmation%20for%20OrderId%20_%204014199259_files/unnamed.png" alt="cult.fit">
+        </div>
+
+        <div class="thank-you-bar">
+            Thank you for choosing cult.fit
+        </div>
+
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <img src="file:///C:/Drive/Documents/Gmail%20-%20Fwd_%20cult.fit_%20Confirmation%20for%20OrderId%20_%204014199259_files/unnamed(1).png" alt="cult.fit icons">
+            </div>
+
+            <div class="main-content">
+                <div class="invoice-title">TAX INVOICE</div>
+
+                <div class="invoice-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Invoice Date</span>
+                        <span class="detail-value">25th November, 2025</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Invoice No</span>
+                        <span class="detail-value">0054869258</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Order No</span>
+                        <span class="detail-value">4012565458</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Pack Name</span>
+                        <span class="detail-value">12 Months cultpass Select</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">HSN Code</span>
+                        <span class="detail-value">999723</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Pack Validity</span>
+                        <span class="detail-value">25 Nov 2025 - 24 Nov 2026</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Center Name</span>
+                        <span class="detail-value">Cult Attapur</span>
+                    </div>
+                </div>
+
+                <div class="kickstart">
+                    • Free Kickstart Pack : 2 Personal Trainer Sessions <a href="#">T&C</a>
+                </div>
+
+                <div class="section-title">ADDITIONAL OFFERS</div>
+
+                <div class="section-title">PAYMENT DETAILS</div>
+
+                <table class="payment-table">
+                    <tr>
+                        <td class="label">Quantity</td>
+                        <td class="value">1</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Price</td>
+                        <td class="value">1 x 45500.00</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Discount</td>
+                        <td class="value">31920.00</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Taxable Value</td>
+                        <td class="value">13580.00</td>
+                    </tr>
+                    <tr>
+                        <td class="label">CGST @2.5%</td>
+                        <td class="value">339.5</td>
+                    </tr>
+                    <tr>
+                        <td class="label">SGST @2.5%</td>
+                        <td class="value">339.5</td>
+                    </tr>
+                    <tr>
+                        <td class="label">IGST @0%</td>
+                        <td class="value">0.00</td>
+                    </tr>
+                    <tr class="total">
+                        <td class="label">Total Payable</td>
+                        <td class="value">14259.00</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #333;">
+                        <td class="label">Upi</td>
+                        <td class="value">14259.00</td>
+                    </tr>
+                </table>
+
+                <div class="details-section">
+                    <div class="buyer-details">
+                        <div class="details-title">BUYER DETAILS</div>
+                        <p>Sai Kanimetta</p>
+                        <p>Phone : 8247728018</p>
+                        <p>Hyderabad</p>
+                        <p>Telangana</p>
+                        <p>Place of supply : Telangana</p>
+                        <p style="font-size: 9px; margin-top: 5px;">Tax is not payable on reverse charge back</p>
+                    </div>
+                    <div class="seller-details">
+                        <div class="details-title">SELLER DETAILS</div>
+                        <p>Cultfit Healthcare Private Limited</p>
+                        <p>3rd, B-2-618/10-11, Krisbe Amethyst, Road no. 1, Banjara Hills</p>
+                        <p>Business Hyderabad</p>
+                        <p>Hyderabad , PIN: 500034</p>
+                        <p>GSTIN : 36AAGCC5850A1ZQ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-greeting">
+                Regards,<br>
+                Cult.fit Team
+            </div>
+            <div class="footer-bar"></div>
+            <div class="footer-info">
+                Cultfit Healthcare Pvt Ltd, 3rd, B-2-618/10-11, Krisbe Amethyst, Road no. 1, Banjara Hills, Hyderabad 500034 IN<br>
+                CIN: U74999KA2016PTC085531, GST: 36AAGCC5850A1ZQ, SAC: 999723<br>
+                Please reach out to us on the cult.fit app for any concerns regarding your order.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

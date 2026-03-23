@@ -1,0 +1,119 @@
+<script type="text/javascript" src="./OTDCPWDetailEditView.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWDetailEditView.css?v=@DAMLINK_VERSION_TOKEN@"/>
+
+<template ot-template id="content" ot-view="OTDCPWDetailEditView">
+	<ot-resource class="ot-inspectorview" ot-resource-locator="verbose" ot-display-override='{"cascade" : "table", "tabularCascade" : "table"}'>
+		<div class="otdcpw-detail-header">
+			<div class="otdcpw-detail-thumbnail-icon">
+				<ot-rendition class="otdcpw-asset-thumbnail-icon" ot-disable-context-menu ot-rendition-format="img" ot-rendition-types="Thumbnail" ot-fallback='{"img" : "././style/img/contenttype/folder148.svg", "width" : 256, "height" : 256}'>
+				</ot-rendition>
+			</div>
+			<div style="display: flex;flex:1">
+				<div class="otdcpw-workspace-title" style="flex:1">
+					<input type="text" class="otdcpw-workspacetitle-editor" onchange="OTDCPWDetailMetadataEdit.setDirty(event);"/>
+					<div class="otdcpw-error-msg"></div>
+				</div>
+				<div class="otdcpw-detail-edit-actions">
+					<button type="button" class="otdcpw-detail-btn otdcpw-detail-btn-save ot-button" onclick="OTDCPWDetailEditView.handleSave(event);"><ot-i18n>Save Changes</ot-i18n></button>
+					<button type="button" class="otdcpw-detail-btn-secondary otdcpw-detail-btn-cancel ot-button secondary" onclick="OTDCPWDetailEditView.handleCancel(event);"><ot-i18n>Cancel</ot-i18n></button>
+				</div>
+			</div>
+		</div>
+		<div class="otdcpw-folder-status">
+			<div class="ot-inspectorview-asset-status-msg" ot-point-name="locked" id="locked">
+				<span id="InspectorStatusIconsId" class="ot-inspector-view-asset-status-img ot-img-set" ot-img="img" style="background-image: url(&quot;./style/img/status_lock.svg&quot;);"></span>
+				<span ot-text="text" class="ot-text-set"></span>
+			</div>
+		</div>
+		<ot-tabs clear-tabs content-area=".ot-inspectorview-tabcontent"></ot-tabs>
+		<div class="ot-inspectorview-content">
+			<div class="ot-inspectorview-tabcontent"  onclick="OTDCPWDetailEditView.tabClickListener(event)"></div>
+		</div>
+	</ot-resource>
+</template>
+<template id="OTDCPWDetailEdit" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWDetailEditView"
+		ot-view-props='{"name" : "OTDCPWDetailEditView", "type" : "OTDCPWDetailEditView"}'>
+	</ot-view>
+</template>
+<template id="OTDCPWDetailMetadataEdit_content" ot-template ot-view="OTDCPWDetailMetadataEdit">		
+	<div class="otdcpw-body" >		
+		<div class="otdcpw-left-nav">
+		</div>
+	</div>
+	<div class="otdcpw-footer" ></div>
+</template>
+<template ot-template id="content" ot-view="OTDCPWAssetsWrapperEdit">
+	<div class="ot-content">
+		<div class="ot-child-container"  style="display: flex; height:100%; width: 100%;">
+		</div>
+	</div>
+</template>
+<template ot-template ot-view="OTDCPWAssetsSidebarEdit" id="content1">
+	<div class="sidebar-collapse-control-wrapper" onclick="OTDCPWDetailEditView.collapseAndExpandSidebar()"> <span class="sidebar-collapse-control-icon"
+			title="Hide left panel"><ot-i18n ot-as-title="" ot-token="Hide left panel" parsed="true"></ot-i18n></span>
+	</div>
+	<div class="ot-card-body">		
+		<ot-accordion class="with-collapser" ot-platform="desktop,tablet"></ot-accordion>
+		<ot-view-collapser collapser-style="vertical-bar" ot-platform="desktop" resizable></ot-view-collapser>
+	</div>
+</template>
+<template ot-template id="content2" ot-view="OTDCPWAssetsFolderEditView">
+	<div class="otdcpw-asset-subfolder-view"></div>
+</template>
+<template id="OTDCPWAssetsEditView_content" ot-template ot-view="OTDCPWAssetsEditView">
+	<master template="content-master">
+		<content-area results-header>		
+			<div class="otdcpw-detail-assets-header">
+				<div class="otdcpw-detail-assets-title">
+					<ot-i18n parsed="true" ot-token="Assets">Assets</ot-i18n>
+				</div>
+				<!--Chicklet filters section-->
+				<div class="otdcpw-detail-assets-chicklets">
+					<ot-view-prop ot-property="chickletFilters" ot-parser="CollectionListView.parseFilters" class="ot-activity-tracker-filters"></ot-view-prop>
+				</div>
+			</div>	
+			<ot-layout class="ot-folder-asset-actions-holder" ot-platform="desktop">
+				<a class="ot-folder-asset-action-button ot-enabled ot-selection-button" onclick="otui.GalleryViewActions.showPageSelectionOptions(event, '#pageSelectionOptions');" onkeydown="otui.GalleryViewActions.switchPageSelection(event, '#pageSelectionOptions');"  tabindex="0">
+					<span id="selectionIndicator" class="ot-asset-select-toggle" onclick="SelectionManager.toggleSelectionState(event);" onkeydown=" SelectionManager.toggleSelectionState(event);"></span>
+					<span class="ot-page-select-text"></span>
+					<span class="ot-dropdown-arrow"></span>
+				</a>
+				<ot-hover id="pageSelectionOptions" class="ot-asset-selection-hover" template="pageSelectionOptions-hover"></ot-hover>
+				<ot-point ot-lookup="OTDCPWDetailViewHeader" class="ot-collection-list-action" ot-use-selection></ot-point>
+				<div class="ot-search-view-refresh" onclick="event.stopImmediatePropagation(); otui.Views.containing(this).reload(true)" title="Refresh">
+					<ot-i18n ot-as-title="" ot-token="Refresh" parsed="true"></ot-i18n>
+				</div>
+				<span class="ot-folder-asset-actions-separator"></span>
+				<ot-point ot-lookup="GalleryViewActions" ot-calculate-bounds-without-children class="ot-folder-asset-actions ot-galleryview-action" onviewresize="this.recalculateLater && this.recalculateLater()" ot-use-selection></ot-point>
+			</ot-layout>
+		</content-area>
+	</master>
+</template>
+<template id="OTDCPWDetailSecurityEdit_content" ot-template ot-view="OTDCPWDetailSecurityEdit">
+    <div><ot-i18n>Security View</ot-i18n></div>
+</template>
+<template ot-template ot-view="OTDCPWDetailSecurityEdit" id="content">
+	<div class="ot-inspector-security-details">
+		<ot-security-policy ot-mode="readonly" ot-security-policy-view="ASSIGNED" asset-inspector></ot-security-policy>
+	</div>
+</template>
+
+<template ot-template ot-view="OTDCPWDetailSecurityEdit" id="edit-content">
+	<div class="ot-inspector-security-details">
+		<ot-security-policy ot-mode="edit" ot-security-policy-view="ASSIGNED" asset-inspector></ot-security-policy>
+	</div>
+</template>
+
+<template ot-template ot-view="OTDCPWDetailSecurityEdit" id="noedit">
+	<div class="ot-inspector-permission-text"><ot-i18n>You do not have permission to edit the security policy for this asset.</ot-i18n></div>
+</template>
+
+<template id="OTDCPWVariantsDialog" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWVarintsView" 
+		ot-view-props='{"name" : "OTDCPWVarintsView", "type" : "OTDCPWVarintsView"}'>
+	</ot-view>
+</template>
+<template id="OTDCPWVarintsView_content" ot-template ot-view="OTDCPWVarintsView"></template>
+
+<script>otui.Templates.load()</script>

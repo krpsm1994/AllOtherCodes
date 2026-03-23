@@ -1,0 +1,175 @@
+@import (reference) "../../../style/format/variables.less";
+@import (reference) "../../../style/format/mixins.less";
+/* .ot-dialog[dialogname="OTDCPWCreate"] */
+.ot-dialog[dialogname="otdcpwcreate"] {
+    width: 51rem;
+    height: 40rem;
+}
+ot-view[ot-view-type="OTDCPWNewWorkspaceView"]
+	{
+		.ot-modal-dialog-body{
+			.ot-content {
+				overflow-y: hidden;
+			}
+		}
+		
+		.ot-touch-ui &
+		{
+			width: calc(~"100% - 0.5rem");
+			height: calc(~"100% - 0.5rem");
+		}
+
+		// .ot-modal-dialog-title{
+		// 	color: #333333;
+		// }
+		.ot-text-input{
+			width: 93%; 
+			margin: 0px !important;
+			height: 2rem;
+		}
+		.ot-text-input:not(.focused)[placeholder]{
+			font-style: normal;
+		}
+		.ot-foldername-mandatory-field{
+			color:#ec3625;
+			font-weight: bold;
+		}
+		
+		/*.ot-modal-dialog-footer-buttons{
+			margin-top: 1rem;
+			margin-bottom: 1rem;
+			margin-left: 1rem;
+            margin-right: 1rem;
+		}*/
+		.ot-modal-dialog-footer-buttons .ot-new-folder-header{
+			color: #333333;
+			font-size: 0.75rem;
+			font-weight: bold;
+		}
+		.ot-metadata-message-text{			
+			color: #999999;
+			font-size: 0.75rem;
+			padding-bottom: 1rem;
+		}
+		
+		ot-dialog-body{
+			display: block;
+			height: 100%;
+		}
+		ot-dialog-body ot-model{
+			display: inline-block;
+			width: calc(100% - 4rem);
+			margin-left: 1rem;
+			margin-right: 1rem;
+		}
+		ot-tabs{
+			margin: 0.5rem 0 1rem 0;
+			overflow-y: hidden;
+			padding-top: 0.5rem;
+			height: calc(100% - 0.5rem);
+		}
+		// .ot-tabs-content {
+		// 	height: calc(100% - 4rem);
+		// 	overflow-x: hidden;
+		// }
+	    .ot-tabs-content .ot-tab-content {
+			height: 100%;
+			overflow: hidden;
+		}
+				
+		.ot-new-folder-dialog .ot-tabs-content .ot-new-folder-metadata{
+		    overflow-y: auto;
+			width: 100%;
+			height: 80% !important;
+			display: inline-block;		
+		}
+
+		.ot-new-folder-metadata ot-model{
+			padding-top: 0px !important;
+		}
+
+		.ot-metadata-model-text {
+			font-weight: bold;
+			font-size: 0.875rem;
+		}
+		.ot-metadata-section-title .ot-metadata-model-name {
+			font-size: 0.875rem;
+		}
+		.ot-metadata-section-title .ot-metadata-section-message-text {
+			color: rgb(153, 153, 153);
+			font-size: 0.75rem;
+		}
+	
+		.ot-metadata-group ot-metadata .ot-metadata-content {
+			font-size: 0.75rem;
+			color: rgb(51, 51, 51);
+			margin-top: 8px;
+		}
+		.ot-error-msg {
+			color: #ec3625;
+			font-size: 0.75rem;
+			font-weight: bold;
+			margin-top: 8px;
+			text-align: left;
+		}
+		// ot-resource{
+		// 	height: calc(100% - 13.5rem);
+		// }
+	//	style="Height: calc( 100% - 13rem )
+		div[ot-in-error] .ot-text-input {
+			background-color: #fae9ea;
+			background-image: none;
+			border-color: #df3324;
+		}
+		.tt-menu, .tt-open{
+			max-height: 300px;
+			max-width: 70%;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+		.otdcpw-empty-message{
+			font-size: 0.75rem
+		}
+		.otdcpw-create-cat-title{
+			font-size: 0.75rem;
+			font-weight: bold;
+			color: #333333;
+			display: inline-block;
+			vertical-align: top;
+		}
+		.otdcpw-title{
+			padding: 1rem;
+			border: 1px solid #CCCCCC;
+		}
+		.otdcpw-title ot-i18n{
+			font-size: 0.75rem;
+		}
+		.otdcpw-main-catalog{
+			display: grid;
+			grid-template-columns: 30% 90%;
+			margin-left: 1rem;
+			padding-top: 4px;
+    		margin-top: 4px;
+		}
+		.otdcpw-pim-catalog ot-select{
+			width: 90%;
+		}
+		.otdcpw-pim-input{
+			width: 68%;
+		}
+		
+		.ot-new-folder-msg {
+   			 display: none;
+		}
+
+		.otdcpw-hide-content{
+			display:none; 
+	   }
+
+	}
+
+ot-view[ot-view-type="OTDCPWNewWorkspaceView"] .ot-tabs-content [otui-tabname="OTDCPWSecurityView"] ot-resource {
+	height: 97%;
+}
+
+

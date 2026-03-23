@@ -1,0 +1,87 @@
+<div class="otdcpw-uploadTaxonomyScreen main-content">
+  <div>
+    <h5 class="otdcpw-header">Upload Taxonomy</h5>
+  </div>
+  <div class="otdcpw-uploadForm">
+    <div class="otdcpw-grid-container">
+      <div class="otdcpw-grid-item"><span class="otdcpw-required">*</span>Taxonomy</div>
+      <div class="otdcpw-grid-item">
+        <div class="otdcpw-custom-dropdown">
+          <div class="otdcpw-selected-option" id="otdcpw-taxonomyDropdown" (click)="toggleTaxonomyDropdown()">
+            <span class="otdcpw-pad10" id="otdcpw-selectedTaxonomy">{{
+              selectedTaxonomy }}</span>
+            <span class="otdcpw-alignLeft otdcpw-pad10" id="otdcpw-selectedTaxonomyArrow">&#x2335;</span>
+          </div>
+          <div class="otdcpw-options" [ngClass]="{ 'otdcpw-display-none': !taxonomyDropdownOpen }">
+            <div id="otdcpw-taxonomyOptions" class="otdcpw-option" *ngFor="let taxonomy of taxonomies"
+              (click)="selectTaxonomy(taxonomy)">
+              {{ taxonomy }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="otdcpw-grid-container">
+      <div class="otdcpw-grid-item"><span class="otdcpw-required">*</span>Column Delimiter</div>
+      <div class="otdcpw-grid-item">
+        <div class="otdcpw-custom-dropdown">
+          <div class="otdcpw-selected-option" id="otdcpw-delimiterDropdown" (click)="toggledelimiterDropdown()">
+            <span class="otdcpw-pad10" id="otdcpw-selectedDelimiter">{{
+              selectedDelimiter }}</span>
+            <span class="otdcpw-alignLeft otdcpw-pad10" id="otdcpw-selectedDelimiterArrow">&#x2335;</span>
+          </div>
+          <div class="otdcpw-options" [ngClass]="{ 'otdcpw-display-none': !delimiterDropdownOpen }">
+            <div id="delimiterOptions" class="otdcpw-option" *ngFor="let delimiter of delimiters"
+              (click)="selectDelimiter(delimiter)">
+              {{ delimiter }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="otdcpw-grid-container">
+      <div class="otdcpw-grid-item"><span class="otdcpw-required">*</span>Source File</div>
+      <div class="otdcpw-grid-item">
+        <input type="file" (change)="onFileSelected($event)" #fileInput id="otdcpw-taxonomy-file"
+          [accept]="fileExtensions" />
+      </div>
+    </div>
+    <div class="otdcpw-grid-container">
+      <div class="otdcpw-grid-item"></div>
+      <div class="otdcpw-grid-item">
+        <button type="submit" id="otdcpw-save" class="btn btn-sm btn-primary otdcbuttons"
+          (click)="saveTaxonomy()">Upload</button>
+        <button type="button" id="otdcpw-clear" class="btn btn-sm btn-secondary otdcbuttons"
+          (click)="clear()">Clear</button>
+      </div>
+    </div>
+  </div>
+  <!-- Confirmation Modal for Grocery Taxonomy start >>>> Not using this as Grocery Taxonomy upload feature is not provided-->
+  <div #confirmationModal class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"
+    aria-labelledby="mdsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header otdc-header">
+          <h5 class="modal-title" id="mdsModalLabel">Confirmation</h5>
+          <button class="close otdc-X-icon" type="button" data-dismiss="modal" aria-label="Close"
+            (click)="closeConfirmationModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Please make sure you have reviewed Grocery Preferred attributes.<br>
+            Modifications to Grocery preferred attributes are not allowed after uploading the Taxonomy.<br>
+            New attributes can be added at any point of time.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="onAlreadyReviewed()">Already
+            Reviewed</button>
+          <button type="button" class="btn btn-primary" (click)="navigateToReview()">Review Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Confirmation Modal for Grocery Taxonomy end-->
+</div>

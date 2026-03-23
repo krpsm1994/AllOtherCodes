@@ -1,0 +1,142 @@
+<div class="container-fluid">
+    <div class="main-content">
+        <h4>Configuration Wizard</h4>
+        <div class="card-content">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <h5 class="card-header bg-white">
+                    Integration
+                </h5>
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <div class="card-body">
+                            <small class="card-title text-muted">Select</small>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="installationRadios"
+                                    id="commerceCloud" value="commerceCloud" checked (change)="handleChange($event)">
+                                <label class="form-check-label" for="commerceCloud">
+                                    SAP Commerce Cloud
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="installationRadios" id="s4Hana"
+                                    value="s4Hana" (change)="handleChange($event)">
+                                <label class="form-check-label" for="s4Hana">
+                                    SAP S/4 HANA
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <div id="card1" *ngIf="cardSelected.card1">
+                                <h5 class="card-title">Commerce Cloud Installation</h5>
+                                <p class="card-text">Perform Post installation steps, like creating DAMLink Hybris
+                                    related configurations.</p>
+                            </div>
+                            <div id="card3" *ngIf="cardSelected.card3">
+                                <h5 class="card-title">S/4 HANA Installation</h5>
+                                <p class="card-text">Perform Post installation steps, like creating DAMLink S4HANA
+                                    related configurations.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 offset-md-4">
+                        <button type="button" id="nextButton" class="btn btn-primary" data-bs-toggle="collapse"
+                        data-bs-target="#settings"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="card-content collapse settings" id="settings">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <h5 class="card-header bg-white">
+                        Settings
+                    </h5>
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <div class="card-body">
+                                <small class="card-title text-muted">Select</small>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="postInstallationRadios"
+                                        id="postInstall" value="postInstall" checked (change)="handleChange($event)">
+                                    <label class="form-check-label" for="postInstall">
+                                        System Id
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div>
+                                    <div id="postInstallInput" *ngIf="card1OptionSelected.postInstall">
+                                        <br />
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text required" id="systemIdText">System
+                                                    Id</span>
+                                            </div>
+                                            <input id="systemId" type="text" class="form-control"
+                                                placeholder="Enter System Id..." aria-label="System Id"
+                                                aria-describedby="System Id" required
+                                                [ngClass]="{'is-invalid': systemIdError}" required>
+                                            <div class="invalid-feedback">
+                                                {{validationError}}
+                                            </div>
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span
+                                                    class="{{cardSelected.card3?'input-group-text required':'input-group-text'}}"
+                                                    id="urlText">{{cardSelected.card1 ? "Connection URL" : "WSDL URL for
+                                                    binding"}}</span>
+                                            </div>
+                                            <input id="url" type="text" class="form-control"
+                                                placeholder="{{cardSelected.card1 ? 'E.g. https://hybris:port' : 'Enter WSDL URL for OTDC_DAM_INTERFACE Service...'}}"
+                                                aria-label="URL Id" aria-describedby="URL"
+                                                [ngClass]="{'is-invalid': urlError}">
+                                            <div class="invalid-feedback">
+                                                {{urlvalidationError}}
+                                            </div>
+                                        </div>
+                                        <div *ngIf="cardSelected.card1">
+                                            <h6 class="card-title">Optional Username and password of Commerce user
+                                                authorized to do SOAP Communication:</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="urlText">Username</span>
+                                                </div>
+                                                <input id="username" type="text" class="form-control"
+                                                    placeholder="Enter Username..." aria-label="Username"
+                                                    aria-describedby="Username" required
+                                                    [ngClass]="{'is-invalid': usernameError}">
+                                                <div class="invalid-feedback">
+                                                    {{usernamevalidationError}}
+                                                </div>
+                                            </div>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="urlText">Password</span>
+                                                </div>
+                                                <input id="password" type="password" class="form-control"
+                                                    placeholder="Enter Password..." aria-label="Password"
+                                                    aria-describedby="Password" required
+                                                    [ngClass]="{'is-invalid': passwordError}">
+                                                <div class="invalid-feedback">
+                                                    {{passwordvalidationError}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" (click)="updateSettings()">Update
+                                            Settings</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+@import (reference) "../../../../style/format/variables.less";
+@import (reference) "../../../../style/format/mixins.less";
+.ot-dialog[dialogname="otdcpwsyncdialog"] {
+    width: 51rem;
+    height: 40rem;
+}
+ot-view[ot-view-type="OTDCPWSyncView"]
+{
+	.ot-modal-dialog-body{
+		.ot-content {
+			overflow: hidden;
+		}
+		.ot-tabs-content{
+			height: 100%;
+		}
+		ot-model{
+			display: inline-block;
+			width: calc(100% - 4rem);
+			margin-left: 1rem;
+			margin-right: 1rem;
+		}
+	}
+	
+	.ot-touch-ui &
+	{
+		width: calc(~"100% - 0.5rem");
+		height: calc(~"100% - 0.5rem");
+	}
+
+	.ot-metadata-section-title{
+		display: none;
+	}
+
+	.otdcpw-create-cat-title{
+		font-size: 0.75rem;
+		font-weight: bold;
+		color: #333333;
+		display: inline-block;
+		vertical-align: top;
+	}
+	.otdcpw-main-catalog{
+		display: grid;
+		grid-template-columns: 30% 90%;
+		margin-left: 1rem;
+		padding-top: 4px;
+		margin-top: 4px;
+	}
+	.otdcpw-pim-catalog ot-select{
+		width: 90%;
+	}
+	.otdcpw-pim-input{
+		width: 68%;
+		margin: 0px !important;
+	}
+	.otdcpw-sync-main-txt{
+		font-size: 0.75rem;
+		font-weight: bold;
+		margin-left: 1rem;
+		padding-top: 4px;
+		margin-top: 4px;
+	}
+	.tt-menu, .tt-open{
+		max-height: 300px;
+		max-width: 70%;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+	.otdcpw-empty-message{
+		font-size: 0.75rem
+	}
+	.otdcpw-main-catalog-nodisplay{
+		display:none;
+	}
+}
+
+
+

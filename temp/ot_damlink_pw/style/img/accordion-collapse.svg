@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg focusable="false" viewBox="0 0 24 24" aria-hidden="true" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12,9H22a1,1,0,0,1,1,1h0a1,1,0,0,1-1,1H12a1,1,0,0,1-1-1h0A1,1,0,0,1,12,9Z"></path>
+  <path d="M12,13H22a1,1,0,0,1,1,1h0a1,1,0,0,1-1,1H12a1,1,0,0,1-1-1h0A1,1,0,0,1,12,13Z"></path>
+  <path d="M1.2,12a.68.68,0,0,0,1,0L4.32,9.76v5.52a.69.69,0,1,0,1.38,0V9.79L7.82,12a.68.68,0,0,0,1,0,.74.74,0,0,0,0-1L5,7,1.2,11A.74.74,0,0,0,1.2,12Z"></path>
+</svg>

@@ -1,0 +1,41 @@
+<script src="./OTDCPWSync.js?v=@DAMLINK_VERSION_TOKEN@" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWSync.css?v=@DAMLINK_VERSION_TOKEN@"/> 
+
+<template id="OTDCPWSyncView_content" ot-template  ot-view="OTDCPWSyncView">
+	<div class="ot-tabs-content">
+		<div class="ot-content">
+			<div class="otdcpw-sync-main-txt">
+				<ot-i18n>Syncing will overwrite all workspace data with SAP Commerce Cloud data</ot-i18n>
+			</div>
+			<div class="otdcpw-main-catalog otdcpw-main-catalog-nodisplay">
+				<div class="otdcpw-catalogcol1">
+					<div class="otdcpw-create-cat-title"><ot-i18n>Catalog Version</ot-i18n></div>
+					<div class="otdcpw-pim-catalog"></div>
+				</div>
+		
+				<div class="otdcpw-catalogcol2">
+					<div class="otdcpw-create-cat-title"><ot-i18n>Search Product in SAP Commerce Cloud</ot-i18n></div>
+					<input id="otdcpw-create-pim-input"class="otdcpw-pim-input ot-newfolder-form-element ot-text-input" oninput="OTDCPWSyncView.handlePimInputChange(event)"></input>
+				</div>		
+			</div>
+			<!--Removed attribute ot-edit-mode=edit on ot-resource to display the fields in non-editable mode-->
+			<ot-resource class="ot-new-folder-metadata" ot-resource-locator="verbose"  style="height: calc(100% - 11.7rem);">
+				<ot-model ot-display-editable="true" ot-group-template="ot-flat-metadata-group-template" ot-section-template="ot-metadata-folder-section-message"></ot-model>
+			</ot-resource>
+			<ot-dialog-footer ot-platform="desktop">
+				<div class="ot-modal-dialog-footer-buttons">
+					<button id="ot-newfolder-create-button" type="submit" class="ot-button ot-upload-modal-dialog-button" onclick="OTDCPWSyncView.handleSync(event)" disabled><ot-i18n>Sync</ot-i18n></button>
+					<button type="button" class="ot-button secondary" onclick="otui.DialogUtils.cancelDialog(this)"><ot-i18n>Cancel</ot-i18n></button>
+				</div>
+			</ot-dialog-footer>
+		</div>
+	</div>
+</template>
+
+<template id="otdcpwSyncDialog" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWSyncView" class="ot-new-folder-dialog "
+		ot-view-props='{"name" : "OTDCPWSyncView", "type" : "OTDCPWSyncView"}'>
+	</ot-view>
+</template>
+
+<script>otui.Templates.load();</script>

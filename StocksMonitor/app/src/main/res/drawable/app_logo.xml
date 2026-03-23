@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Hexagon outline -->
+    <path
+        android:pathData="M100,20 L160,50 L160,150 L100,180 L40,150 L40,50 Z"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Head profile outer circle -->
+    <path
+        android:pathData="M 53 85 A 22 22 0 0 1 97 85 A 22 22 0 0 1 53 85"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="2.5"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Head profile (side view) -->
+    <path
+        android:pathData="M60,70 Q60,60 70,60 L80,60 Q82,60 82,62 L82,75 Q82,80 78,82 L65,82 Q60,82 60,77 Z"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Dollar sign circle background -->
+    <path
+        android:pathData="M 63 95 A 12 12 0 0 1 87 95 A 12 12 0 0 1 63 95"
+        android:fillColor="#D4A017" />
+
+    <!-- Dollar symbol -->
+    <path
+        android:pathData="M75,88 L75,102 M73,91 Q71,91 71,93 Q71,95 73,96 L77,96 Q79,96 79,94 Q79,92 77,91 L73,91 Q71,91 71,93 M73,96 Q71,96 71,98 Q71,100 73,101 L77,101 Q79,101 79,100"
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- Text representation: STOCKS (simple vertical lines) -->
+    <path
+        android:pathData="M120,75 L120,105"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M130,75 L130,105"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M140,75 L140,105"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M150,75 L150,105"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <!-- Decorative line -->
+    <path
+        android:pathData="M120,85 L150,85"
+        android:strokeColor="#D4A017"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+
+</vector>

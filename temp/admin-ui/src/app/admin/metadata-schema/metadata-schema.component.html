@@ -1,0 +1,38 @@
+<div class="container-fluid">
+    <div class="main-content metadata-schema">
+        <h5>Create Metadata</h5>
+        <!-- Nav tabs -->
+        <div class="container-min-width">
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!-- Existing Metadata Schema Tab Content-->
+                <div class="tab-pane fade show active pb-3" id="existingMetadataSchemaTab" role="tabpanel"
+                    aria-labelledby="existingMetadataSchemaTab">
+                    <p class="text-justify font-italic" name="existingMetadataSchemaCaption"
+                        id="existingMetadataSchemaCaption">Select metadata present in the system. Validate or Edit it to
+                        create schema.</p>
+                    <div class="input-group input-group-sm mb-3">
+                        <select class="" id="createExistingSchemaSelection" #selectedSchema>
+                            <option disabled>Select...</option>
+                            <option *ngFor="let schema of schemaList; let i=index" [value]="schema"
+                                [selected]="schemaList[i] === 'HybItemRef.json'">{{schema}}</option>
+                        </select>
+                        <div class="ml-3 otdc-margin-start-10">
+                            <button type="button" id="createExistingSchemaBtn"
+                                class="btn btn-primary btn-sm align-right"
+                                [attr.disabled]="!dataFetched || !schemaContent ? 'true' : null"
+                                (click)="createSchema()">Create Schema</button>
+                            <button type="button" id="getExistingSchemaBtn" class="btn btn-primary btn-sm align-right"
+                                (click)="getSchema(selectedSchema.value)">Get Schema</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p *ngIf="isError" class="text-danger small mb-0">{{errorText}}</p>
+            <ngx-codemirror id="createExistingSchemaInpArea" name="createExistingSchemaconfigData"
+                [(ngModel)]="schemaContent" [options]="codeMirrorOptions" placeholder="File Name.."
+                (ngModelChange)="dataChanged($event)"></ngx-codemirror>
+        </div>
+    </div>
+</div>

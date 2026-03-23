@@ -1,0 +1,91 @@
+@import (css) "https://fonts.googleapis.com/css?family=Montserrat";
+
+#body-row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#sidebar-container {
+    min-height: calc(100vh - 4em - 1px);
+    padding: 0;
+
+
+    .list-group {
+
+        /* ----------| Menu item*/
+        a {
+            height: 50px;
+            color: white;
+        }
+
+        /* ----------| Submenu item*/
+        li.list-group-item {
+            background-color: #132644;
+        }
+
+        .list-group-item-action:hover, .list-group-item-action:focus {
+            background-color: #dae0e5 !important;
+        }
+
+        .sidebar-submenu {
+
+            /* ----------| Submenu item*/
+            a {
+                height: 40px;
+                padding-left: 30px;
+            }
+        }
+
+    }
+}
+
+.mapping-icon {
+    height: 23px;
+    width: 26px;
+}
+
+.sidebar-expanded {
+    width: 300px;
+}
+
+.sidebar-collapsed {
+    width: 60px;
+}
+
+.sidebar-submenu {
+    font-size: 0.9rem;
+}
+
+/* ----------| Separators */
+.sidebar-separator-title {
+    background-color: #132644;
+    height: 35px;
+}
+
+.sidebar-separator {
+    background-color: #132644;
+    height: 25px;
+}
+
+a.bg-dark {
+    background-color: #132644 !important;
+}
+
+.fa {
+    color: #132644;
+    font-size: 26px;
+}
+
+div>a>span.fa {
+    font-size: 0.9rem;
+}
+
+.image-icon-main {
+    height: 30px;
+    margin-right: 20px;
+}
+
+.image-icon-sub {
+    height: 25px;
+    margin-right: 20px;
+}

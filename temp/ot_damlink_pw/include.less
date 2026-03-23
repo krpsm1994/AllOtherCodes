@@ -1,0 +1,236 @@
+@import (reference) "../style/format/variables.less";
+@import (reference) "../style/format/mixins.less";
+
+.otdcpw-home-gear-displaysection {
+	padding: 0.25rem 1rem 0.75rem 1rem;
+}
+
+ot-metadata[ot-fields="OTDC.PW.ASSET.PIMVARIANT"] {
+
+	.ot-metadata-add,
+	.ot-text-input {
+		display: none !important;
+	}
+}
+
+
+
+ot-view[ot-view-type="OTDCBWHomeView"],
+ot-view[ot-view-type="OTDCPWHomeView"] {
+	.ot-collections-header-name {
+		display: inline-block;
+		padding-left: 1.5rem;
+		height: 3rem;
+		line-height: 3rem;
+		font-size: 1.5rem;
+		white-space: nowrap;
+
+		[ot-device-platform="tablet"] & {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	.ot-collections-view-refresh {
+		background-image: url('../style/img/refresh24.svg');
+		background-repeat: no-repeat;
+		vertical-align: middle;
+		background-size: 1.4rem 1.4rem;
+		display: inline-block;
+		height: 1.4rem;
+		width: 1.4rem;
+		margin-left: 0.5rem;
+		cursor: pointer;
+	}
+
+	.ot-Collections-actions-holder {
+		.display-flex();
+
+		&>ot-i18n {
+			display: block;
+		}
+
+		height: 2rem;
+		letter-spacing: calc(~"0.5rem - 1px");
+		white-space: nowrap;
+		align-items: center;
+		padding-left: 1rem;
+
+		[ot-device-platform="desktop"] & {
+			border-bottom: 1px solid @condensed_header_border;
+			border-top: 1px solid @condensed_header_border;
+		}
+
+		&>* {
+			letter-spacing: 0;
+			vertical-align: middle;
+		}
+	}
+
+	.ot-collections-tracker-chicklets {
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		padding-left: 1.5rem;
+		flex: 1;
+
+		[ot-device-platform="tablet"] & {
+			padding-left: 1rem;
+			padding-top: 0rem;
+			padding-bottom: 0rem;
+		}
+	}
+
+}
+
+.ot-collections-ratings-wrapper {
+	display: block;
+	padding: 0.5rem;
+}
+
+ot-main-header[ot-view-type="OTDCPWHomeView"],
+ot-main-header[ot-view-type="OTDCBWHomeView"] {
+	ot-point[ot-lookup="CollectionListHeaderActions"] {
+		display: block;
+		position: absolute;
+		width: 24px;
+		height: 24px;
+		right: 0;
+
+		button.ot-button.with-icon.more-dropdown:not([disabled]) {
+			position: absolute;
+			width: 24px;
+			min-width: 24px;
+			height: 24px;
+			right: 0;
+			top: 0;
+
+			span[ot-text="text"] {
+				background-image: url(../style/img/header/more24_li.svg);
+				vertical-align: top;
+			}
+		}
+	}
+}
+
+ot-global-action-bar[ot-view-type="OTDCPWHomeView"],
+ot-global-action-bar[ot-view-type="OTDCBWHomeView"] {
+	.ot-mobile-actions {
+		ot-point[ot-lookup="CollectionListActions"].ot-collection-list-header-hide {
+			display: none;
+		}
+	}
+}
+
+ot-view[ot-view-type="OTDCPWHomeView"],
+ot-view[ot-view-type="OTDCBWHomeView"] {
+	.ot-table-content[table-lookup="OTDCPWHomeView_table-cell"] {
+		ot-resource[resourcetype="collection"] {
+			.ot-table-element.ot-table-static[name="select"] {
+				width: 4rem;
+				padding-left: 1.5rem;
+			}
+
+			.ot-table-element.ot-table-static[name="type"] {
+				width: 3rem;
+			}
+
+			.ot-table-element.ot-table-static[name="asset"] {
+				width: 5rem;
+			}
+
+			.ot-table-element.ot-table-static[name="actions"] {
+				width: 4rem;
+				min-width: 3rem;
+			}
+
+			.ot-table-element.ot-table-static[name="status"] {
+				width: 6rem;
+			}
+
+			.ot-table-element.ot-table-static[name="createdDate"] {
+				width: 15rem;
+			}
+
+			.ot-table-element.last::after {
+				border-right: none;
+			}
+
+		}
+	}
+
+	.ot-breadcrumb-wrapper {
+		visibility: hidden !important;
+	}
+
+	.ot-pagination-layout-wrapper {
+		background-color: #F5F6F7;
+		margin-left: -25px;
+		margin-right: -7px;
+		margin-top: -10px;
+		border-bottom: 1px solid #CCC;
+	}
+
+	.ot-asset-masonry-tile:last-of-type{
+		margin-bottom: 70px;
+	}
+
+	.ot-asset-tile:last-of-type {
+		margin-bottom: 70px;
+	}
+
+	.sidebar-expand-control-icon {
+		margin-top: -5px;
+	}
+
+	button[title="Save search"] {
+		display: none;
+	}
+
+	.ot-card-body {
+		overflow-y: hidden;
+	}
+
+	.ot-results-section .ot-asset-tile.folder-tile {
+		height: fit-content;
+	}
+}
+
+ot-view[ot-view-type="OTDCPWSidebarView"] {
+	.as-sidebar();
+
+	.ot-facets-view {
+		width: 100%;
+	}
+}
+
+ot-select {
+	width: 15rem;
+}
+
+.ot-tabs-content {
+	height: calc(100% - 6rem);
+}
+
+.ot-folder-asset-actions-holder {
+	height: 2.5rem;
+}
+
+.ot-child-content,
+.ot-card-body {
+	width: 100%;
+	height: 100%;
+
+	.otdcpw-asset-subfolder-view {
+		height: 100%;
+
+		.otdcpw-preview-content {
+			height: 100%;
+			width: 100%;
+		}
+	}
+
+}
+
+.ot-facets-view {
+	width: 100%;
+}

@@ -1,0 +1,3 @@
+BLD	SAP.DAMIntegration:main:SAP_DAMIntegration	generate_ebc	Release	0	unknown	C:\Drive\GIT\SAP.DAMIntegration\main\obj\log\generate_ebcRelease.log	C:\Drive\GIT\SAP.DAMIntegration\main\pkg\SAP_DAMIntegration
+BLD	SAP.DAMIntegration:main:SAP_DAMIntegration	DAMConClean	Release	0	unknown	C:\Drive\GIT\SAP.DAMIntegration\main\obj\log\DAMConCleanRelease.log	C:\Drive\GIT\SAP.DAMIntegration\main\pkg\SAP_DAMIntegration\build
+BLD	SAP.DAMIntegration:main:SAP_DAMIntegration	DAMConCompile	Release	yes	unknown	C:\Drive\GIT\SAP.DAMIntegration\main\obj\log\DAMConCompileRelease.log	C:\Drive\GIT\SAP.DAMIntegration\main\pkg\SAP_DAMIntegration\build

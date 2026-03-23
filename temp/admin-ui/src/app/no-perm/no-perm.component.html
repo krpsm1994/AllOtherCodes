@@ -1,0 +1,24 @@
+<div class="wrapper">
+    <div class="ot-unauthorized">
+        <div class="center-container">
+            <img src="assets/images/OT_logo.svg" class="ot-logo mb10" alt="OT_logo_w_separator_only" />
+            <div class="ot-dam-logo">
+                <img src="assets/images/DAMLink-logo-witout-OT.svg" class="ot-logo" alt="DAM LOGO" />
+                <div class="ot-admin-ver-div">
+                    <img src="assets/images/Administration-low-opacity.svg" class="ot-logo-admin" alt="Admin Logo" />
+                    <span class="ot-dam-version">{{version}}</span>
+                </div>
+            </div>
+            <div class="taCenter">
+                <p>You're not authorized to continue.</p>
+                <p>Click logout, and re-login as Administrator.</p>
+                <button class="btn btn-primary" type="button" (click)="signout()">Logout</button>
+            </div>
+            <div class="footer">
+                <span class="login-copyright">
+                    Copyright © 2021 Open Text. All Rights Reserved.
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

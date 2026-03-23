@@ -1,0 +1,101 @@
+<script src="./OTDCPWMarkForAssignment.js?v=@DAMLINK_VERSION_TOKEN@" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWMarkForAssignment.css?v=@DAMLINK_VERSION_TOKEN@"/> 
+
+<template id="OTDCPWMarkForAssignmentDialog" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWMarkForAssignmentView" 
+		ot-view-props='{"name" : "OTDCPWMarkForAssignmentView", "type" : "OTDCPWMarkForAssignmentView"}'>
+	</ot-view>
+</template>
+
+<template id="OTDCPWMarkForAssignmentView_content" ot-template ot-view="OTDCPWMarkForAssignmentView">	
+	<div class="otdcpw-markforassign-container">
+		<div class="otdcpw-markforassign-stepper" id="otdcpw-markforassign-stepper">
+			<div class="otdcpw-markforassign-stepper-container">
+				<div class="otdcpw-markforassign-stepper-element">
+					<div class="otdcpw-markforassign-taCenter">
+						<div class="otdcpw-markforassign-stepper-svg otdcpw-markforassign-stepper-svg-active" id="otdcpw-markforassign-firstSvg"></div>
+						<span class="otdcpw-markforassign-stepper-icon-text otdcpw-markforassign-stepper-icon-text-bold" id="otdcpw-markforassign-selectProductsText">
+							<ot-i18n>Select product(s)</ot-i18n>
+						</span>
+					</div>
+					<span class="otdcpw-markforassign-stepper-element-hr-width otdcpw-markforassign-stepper-element-first-hr-margin">
+						<hr class="otdcpw-markforassign-stepper-hr-current-solid" id="otdcpw-markforassign-firstHrTag"></hr>
+					</span>
+				</div>
+				<div class="otdcpw-markforassign-stepper-element">
+					<span class="otdcpw-markforassign-stepper-element-hr-width otdcpw-markforassign-stepper-element-second-hr-margin">
+						<hr class="otdcpw-markforassign-stepper-hr-future-dashed"  id="otdcpw-markforassign-secondHrTag"></hr>
+					</span>
+					<div class="otdcpw-markforassign-taCenter">
+						<div class="otdcpw-markforassign-stepper-svg otdcpw-markforassign-stepper-svg-pending" id="otdcpw-markforassign-secondSvg"></div>
+						<span class="otdcpw-markforassign-stepper-icon-text" id="otdcpw-markforassign-pimAssignmentText">
+							<ot-i18n>Select PIM position(s)</ot-i18n>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="otdcpw-markforassign-select-products">
+			<label class="otdcpw-products-list-label"><ot-i18n>Product List</ot-i18n></label>
+			<textarea class="otdcpw-products-list-input"></textarea>
+			<label class="otdcpw-products-list-hint"><ot-i18n>Separate values with comma(,) or RETURN</ot-i18n></label>
+		</div>
+		<div class="otdcpw-markforassign-pim-assignment">
+			<div class="otdcpw-markforassign-global-pimposition-panel" id="otdcpw-markforassign-global-pimposition-panel">
+				<div class="otdcpw-markforassign-global-pimposition-label">
+					<ot-i18n>PIM position(s) applicable for all the asset(s)</ot-i18n>
+				</div>
+				<div class="otdcpw-markforassign-global-pimposition-dropdown otdcpw-mL20">
+					<!-- PIM position dropdown goes here -->
+				</div>
+				<div class="otdcpw-markforassign-global-pimposition-buttons-group otdcpw-mL20">
+					<!-- Apply and replace buttons for Global PIM Positions -->
+					<button type="submit" class="ot-button otdcpw-markforassign-global-pimposition-buttons" onclick="OTDCPWMarkForAssignmentView.onClickApply()"><ot-i18n>Apply</ot-i18n></button>
+					<button type="submit" class="ot-button otdcpw-markforassign-global-pimposition-buttons" onclick="OTDCPWMarkForAssignmentView.onClickReplace()"><ot-i18n>Replace</ot-i18n></button>
+				</div>
+			</div>
+			<div class="ot-workflowjobs-wrapper">
+				<div class="ot-table-content ot-workflow ot-workflowjobs-body-content"></div>
+			</div>
+		</div>
+	</div>
+	<ot-dialog-footer ot-platform="desktop">
+		<div class="ot-modal-dialog-footer-buttons">
+			<div class="otdcpw-markforassign-back-button" title="Back" onclick="OTDCPWMarkForAssignmentView.onClickBack(event)"><ot-i18n ot-as-title="" ot-token="Back" parsed="true"></ot-i18n></div>
+			<button id="otdcpwMarkForAssignNextBtn" class="ot-button ot-upload-modal-dialog-button" onclick="OTDCPWMarkForAssignmentView.onClickNext(event)"><ot-i18n>Next</ot-i18n></button>
+			<button id="otdcpwMarkForAssignFinishBtn" type="submit" class="ot-button ot-upload-modal-dialog-button" onclick="OTDCPWMarkForAssignmentView.onClickFinish(event)"><ot-i18n>Assign</ot-i18n></button>
+			<button type="button" class="ot-button secondary" onclick="otui.DialogUtils.cancelDialog(this)"><ot-i18n>Cancel</ot-i18n></button>
+		</div>
+	</ot-dialog-footer>
+</template>
+
+<template ot-template ot-view="OTDCPWMarkForAssignmentView" id="header" ot-platform="desktop">
+	<div name="thumbnail" style="width:10%"  class="ot-table-header-element"><ot-i18n ot-with-title>Thumbnail</ot-i18n></div>
+	<div name="name" style="width:25%" class="ot-table-header-element"><ot-i18n ot-with-title>Asset Name</ot-i18n></div>
+	<div name="mime_type" style="width:15%" class="ot-table-header-element"><ot-i18n ot-with-title>Mime Type</ot-i18n></div>
+	<div name="pim_position" style="width:45%" class="ot-table-header-element"><ot-i18n ot-with-title>PIM Position(s)</ot-i18n></div>
+</template>
+
+<!-- <template ot-template ot-view="OTDCPWMarkForAssignmentView" id="header" ot-platform="tablet">
+	<div name="job_name" style="width:20%" sortable="true" class="ot-table-header-element"><ot-i18n ot-with-title>Name</ot-i18n></div>
+	<div name="job_type" style="width:20%" sortable="true" class="ot-table-header-element"><ot-i18n ot-with-title>Type</ot-i18n></div>
+	<div name="status" style="width:20%" sortable="true" class="ot-table-header-element"><ot-i18n ot-with-title>Status</ot-i18n></div>
+	<div name="start_time" style="width:20%" sortable="true" datatype="date" sorted="desc" class="ot-table-header-element"><ot-i18n ot-with-title>Start time</ot-i18n></div>
+	<div name="end_time" style="width:20%" sortable="true"  datatype="date" class="ot-table-header-element"><ot-i18n ot-with-title>End time</ot-i18n></div>
+</template> -->
+
+<template id="OTDCPWMarkForAssignmentView_row" ot-template ot-view="OTDCPWMarkForAssignmentView">
+	<ot-resource class="ot-row-result ot-table-row ot-workflowjob-row">
+		<div name="thumbnail" style="width:10%" class="ot-workflowjob-thumbnails ot-table-element" ot-platform="desktop" oncontextmenu="return false;"></div>
+		<ot-metadata style="width:25%" class="ot-table-element" ot-fields="name" ot-db-value-translate ot-with-title></ot-metadata>
+		<ot-metadata style="width:15%" class="ot-table-element" ot-fields="mime_type" ot-db-value-translate ot-with-title></ot-metadata>
+		<div style="width:45%" class="otdcpw-pim-position ot-table-element" name="pim_position"></div>
+	</ot-resource>
+</template>
+
+<template ot-template id="thumbnailEntry" ot-view="OTDCPWMarkForAssignmentView">
+	<ot-resource class="ot-workflowjob-thumbnails-resource">
+		<ot-rendition ot-asset-rendition class="ot-workflowjob-thumbnail-entry" ot-rendition-types="thumbnail" ot-from-cache="false" ot-rendition-format="img" ot-static-height="48" ot-fallback='{"img" : "style/img/mime_type_unknown32.png", "width" : 48, "height" : 48}'></ot-rendition>
+	</ot-resource>
+</template>
+<script>otui.Templates.load();</script>

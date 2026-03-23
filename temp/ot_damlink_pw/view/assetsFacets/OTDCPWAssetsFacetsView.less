@@ -1,0 +1,53 @@
+@import (reference) "../../../style/format/variables.less";
+@import (reference) "../../../style/format/mixins.less";
+
+ot-view[ot-view-type="OTDCPWDetailView"],
+ot-view[ot-view-type="OTDCPWDetailEditView"],
+ot-view[ot-view-type="OTDCPWHomeView"],
+ot-view[ot-view-type="OTDCBWHomeView"] {
+
+    .otdcpw-detail-assets-chicklets,
+    .otdcpw-facets-chiclet-group,
+
+
+    .otdcpw-detail-assets-chicklets,
+    .otdcpw-facets-chiclet-group {
+        flex-wrap: wrap;
+    }
+
+    .otdcpw-detail-assets-chicklets {
+        width: 85%;
+    }
+
+    .otdcpw-facets-chiclet-group {
+        width: 100%;
+    }
+
+    .otdcpw-expand-chiclets-button {
+        background-color: transparent !important;
+        border: none;
+        margin: 5px 5px 0px 5px;
+        color: #333333;
+        padding: 0 1rem;
+        font-size: 0.875rem;
+        border-radius: 0;
+        min-width: 3rem;
+
+        span {
+            background-image: url('../../style/img/toolbar_more.svg');
+            height: 1.5rem;
+            width: 1.5rem;
+            display: block;
+        }
+    }
+
+    .otdcpw-selected {
+        box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.7);
+        border: 1px solid #CCC;
+    }
+
+    .ot-asset-results-wrapper {
+        height: calc(100% - 6.5rem) !important;
+    }
+
+}

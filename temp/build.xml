@@ -1,0 +1,1493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     11.02.2011 12:59:56                                                        
+
+     SAP CRM - DAM Integration    
+     Integration of a SAP CRM system and OT MediaManager
+                   
+     ralfh              
+     stefanol                                                  
+     ====================================================================== -->
+<project name="SAP CRM - DAM Integration" default="compile">
+    <description>
+    Integration of a SAP CRM sytem and OT MediaManager
+    </description>
+
+	<property environment="env" />
+    <property file="build.properties"/>
+
+    <!-- *** Locations *** -->
+    <!-- ***************** -->
+
+    <!-- The base build directory -->
+    <property name="base.dir" location="./.." />
+    <property name="build.dir"         location="build"/>
+	<property name="branch.dir" location="${base.dir}/../.."/>
+	<property name="media.dir" location="${branch.dir}/media"/>
+
+    <!-- The base output directories -->
+    <property name="out.temp.dir"      location="${build.dir}/temp"/>
+	<property name="vetted.lib.dir"      location="${build.dir}/vettedlib"/>
+    <property name="out.classes.dir"   location="${build.dir}/classes"/>
+    <property name="out.jboss.ear.dir"       location="${build.dir}/jboss.ear"/>
+	<property name="out.tomee.ear.dir"       location="${build.dir}/tomee.ear"/>
+	<!-- SAPDC-3544 -->
+	<property name="out.container.ear.dir"       location="${build.dir}/container.ear"/>
+	<property name="out.stubs.dir"     location="${build.dir}/stubs"/>
+    <property name="out.ux.dir"      location="${base.dir}/ux_html"/>
+    <property name="out.jars.dir"      location="${build.dir}/jars"/>
+    <property name="out.jars.16.dir"      location="${build.dir}/jars.16"/>
+	<property name="out.jboss.ejb.jar.dir"      location="${build.dir}/jboss.jar"/>
+	<property name="out.tomee.ejb.jar.dir"      location="${build.dir}/tomee.jar"/>
+    <property name="out.lib.dir"       location="${out.jars.dir}/lib"/>
+    <property name="out.lib.16.dir"       location="${out.jars.16.dir}/lib"/>
+    <property name="out.server.classes.dir"   location="${out.classes.dir}/server"/>
+    <property name="out.server.16.classes.dir"   location="${out.classes.dir}/server.16"/>
+    <property name="out.dist.dir"      location="${out.temp.dir}/dist"/>
+    <property name="out.dist.16.dir"      location="${out.temp.dir}/dist.16"/>
+    <property name="out.dist.ce.dir"      location="${out.temp.dir}/dist.ce"/> <!-- SAPDC-3544 -->
+
+    <property name="ws.dir"            location="${build.dir}/ws"/>
+    <property name="ws.wsdl.dir"       location="${ws.dir}/wsdl"/>
+    <property name="src.ws.stubs.dir"  location="${ws.dir}/stubs"/>
+    <property name="src.stubs.dir"     location="${out.stubs.dir}/src"/>
+    <property name="src.cl.stubs.dir"  location="${out.stubs.dir}/clsrc"/>
+    <property name="src.otdcws.stubs.dir"  location="${out.stubs.dir}/otdcws_src" />
+    <property name="classes.stubs.dir" location="${out.stubs.dir}/classes"/>
+    <property name="classes.clstubs.dir"  location="${out.stubs.dir}/clclasses"/>
+    <property name="classes.otdcws.dir"   location="${out.stubs.dir}/otdcws_classes" />
+    <property name="stubs.jar.file"    location="${out.stubs.dir}/lib/sap_stubs.jar"/>
+    <property name="clstubs.jar.file"  location="${out.stubs.dir}/lib/cl_stubs.jar"/>
+    <property name="otdcwsstubs.jar.file"  location="${out.stubs.dir}/lib/otdcws_stubs.jar" />
+
+    <property name="client.dir"        location="${build.dir}/client"/>
+    <property name="src.client.dir"    location="${client.dir}/src"/>
+    <property name="client.jar.file"   location="${client.dir}/client.jar"/>
+
+    <property name="src.dir"           location="${base.dir}/src"/>
+    <property name="ejb.src.dir"       location="${base.dir}/ejbsrc"/>
+    <property name="otmm16.src.dir"    location="${base.dir}/otmm16_src"/>
+
+    <property name="ejb.classes.dir"   location="${out.classes.dir}/ejb"/>
+    <property name="ejb.16.classes.dir"   location="${out.classes.dir}/ejb.16"/>
+    <property name="util.jar.file"     location="${out.jars.dir}/damlink_util.jar"/>
+    <property name="ws.jar.file"       location="${out.jars.dir}/damlink_ws.jar"/>
+    <property name="impl.jar.file"     location="${out.lib.dir}/damlink_impl.jar"/>
+    <property name="impl.16.jar.file"  location="${out.lib.16.dir}/damlink_impl.jar"/>
+    <property name="ssoresolver.jar.file"   location="${out.jars.dir}/damlink_ssoresolver.jar"/>
+    <property name="ssoresolver.16.jar.file"   location="${out.jars.16.dir}/damlink_ssoresolver.jar"/>
+    <property name="ot.log4j.jar.file" location="${out.jars.dir}/ot-log4j.jar"/>
+
+    <property name="ejb.jar.file.name" value="damlink_ejb"/>
+    <property name="ejb.jar.intf.name" value="damlink_ejb_intf"/>
+
+    <property name="webcontent.dir"    location="${base.dir}/res/WebContent"/>
+    <property name="earcontent.16.dir" location="${base.dir}/res/EarContent.16"/>
+    <property name="otmm.dir"          location="${base.dir}/res/otmm_config"/>
+    <property name="install.dir"       location="${base.dir}/res/install"/>
+    <property name="container.files.dir"       location="${base.dir}/res/container"/> <!-- SAPDC-3544 -->
+    <property name="requirejs.optimizer.dir" location="${base.dir}/res/damlink-ui/requirejs_optimizer"/>
+	<property name="damlinkui.dir" 		location="${base.dir}/res/WebContent/admin-ui"></property>
+
+    <property name="lib.dir"           location="${base.dir}/lib" />
+    <property name="wsdl.dir"          location="${base.dir}/res/wsdl/merged"/>
+
+    <property name="obj.dir"           location="${base.dir}/../../obj" />
+    <property name="release.dir"       location="${obj.dir}/RELEASE" />
+    <property name="java_jar.dir"      location="${release.dir}/java_jar" />
+    <property name="pbd.dir"           location="${base.dir}/res/pbd"/>
+    <property name="sldreg.dir"        value="${base.dir}/res/sap_sldreg"/>
+	
+	<!-- tomee otmm 20.2 jar SAPDC-3493 -->
+	<property name="otmm202.dir" 	   location="${vetted.lib.dir}/otmm202" />
+
+	<!-- MDS component removed -->
+	<!--property name="imconv.dir"	location="${env.OBJROOT}/SAP.DAM.MEDSRVR/${env.BRANCH_SAP_DAM_MEDSRVR}/dist/IMCONV/world" /-->
+	
+	<!-- <property name="imconv.dir"	location="C:/P4/SAP.DAM.MEDSRVR/SAP.DAM.MEDSRVR/main/obj/RELEASE/IMCONV/java_war" /> -->
+    <property name="otmmsetup.jar.file"   location="${out.lib.dir}/otmmsetup.jar"/>
+    <property name="otmmsetup.16.jar.file"   location="${out.lib.16.dir}/otmmsetup.jar"/>
+
+    <property name="otinstall.16.jar.file"   location="${out.jars.16.dir}/ot-install.jar"/>
+
+    <property name="ws.name"           value="DAMLinkService"/>
+
+	<property name="con.name"    value="ot-damlink"/>
+	<!-- values taken from build.properties ( see property file=... above) -->
+	<property name="con.version" value="0.0.0"/>
+	<property name="con.build"   value="0.0.0.0"/>
+	<property name="container.zip.name"    value="ot-damlink-ce"/> <!-- SAPDC-3544 -->
+
+    <!-- SAPDC-4172
+	<property name="damlink.abap.zip.prefix" value="damlink_abap_add-ons" />
+	<property name="damlink.abap.zip.name" value="${damlink.abap.zip.prefix}-${con.version}.zip"/>
+	<property name="damlink.abap.zip" location="${media.dir}/${damlink.abap.zip.name}"/>
+	<property name="damlink.abap.zip.dir" location="${out.temp.dir}/damlink_abap_add-ons"/> -->
+	
+    <import file="env.xml"/>
+    <!-- used to extract version number from IXMK BUILD env -->
+    <property name="build.number.regexp" value="(([^\.]+).([^\.]+).([^\.]+)).([^\.]+)"/>
+	
+	<property name="patch.number" value="-"/>
+
+    <!-- SAPDC-4689 -->
+    <path id="javax.lib">
+        <fileset dir="${vetted.lib.dir}/jakarta-xml-ws">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="apache-cxf.classpath">
+        <fileset dir="${lib.dir}/devlib/cxf-4.0.3">
+            <include name="**/*.jar"/>
+        </fileset>
+        <path refid="javax.lib" /> <!-- SAPDC-4689 -->
+    </path>
+	<!-- SAPDC-3610 -->
+     <path id="otmm203.classpath">
+        <fileset dir="${vetted.lib.dir}/otmm202">
+            <include name="*.jar"/>
+        	<exclude name="microprofile-config-api-1.3.jar"/>
+        </fileset>
+    </path>
+     <path id="otmm_rt.16.classpath">
+        <fileset dir="${lib.dir}/devlib/otmm-rt.16.2">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <!-- SAPDC-4080 -->
+    <path id="otmm_otdc.classpath">
+        <fileset dir="${lib.dir}/devlib/otdc">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="jboss.classpath">
+        <fileset dir="${lib.dir}/devlib/jboss-wildfly">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="jboss.16.classpath">
+        <fileset dir="${lib.dir}/devlib/jboss-wildfly">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="httpClient.classpath">
+        <fileset dir="${vetted.lib.dir}/httpClient">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="config.classpath">
+        <fileset dir="${vetted.lib.dir}/commons-configuration/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="resteasy.classpath">
+        <fileset dir="${vetted.lib.dir}/resteasy">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+	
+	<!-- Excel par -->
+	<!--path id="poi.classpath">
+        <fileset dir="${lib.dir}/poi">
+            <include name="*.jar"/>
+        </fileset>
+    </path-->
+	
+	<path id="locale.classpath">
+        <fileset dir="${vetted.lib.dir}/jersey">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+	
+    <!-- SAPDC-3658
+	<path id="xmlsecurity.classpath">
+        <fileset dir="${lib.dir}/xmlsecurity">
+            <include name="*.jar"/>
+        </fileset>
+    </path> -->
+
+    <path id="jackson.classpath">
+        <fileset dir="${vetted.lib.dir}/jackson">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="swagger.classpath">
+        <fileset dir="${vetted.lib.dir}/swagger">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="ant.classpath">
+        <fileset dir="${lib.dir}/devlib/ant">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+	
+	<!-- SAPDC-3776 -->
+	<path id="owasp.classpath">
+			<fileset dir="${vetted.lib.dir}/owasp">
+	            <include name="*.jar"/>
+	        </fileset>
+		</path>
+
+    <path id="compile.16.classpath">
+        <path refid="apache-cxf.classpath" />
+        <path refid="otmm_rt.16.classpath" />
+    	<!--path refid="poi.classpath" /-->
+        <path refid="otmm_otdc.classpath" /> <!-- SAPDC-4080 -->
+        <path refid="jboss.16.classpath" />
+        <path refid="config.classpath" />
+    	<path refid="resteasy.classpath"/>
+    	<path refid="locale.classpath"/>
+    	<!-- SAPDC-3658 <path refid="xmlsecurity.classpath" /> -->
+    	<path refid="jackson.classpath"/>
+    	<path refid="swagger.classpath"/>
+    	<path refid="httpClient.classpath"/>
+    	<path refid="owasp.classpath"/> <!-- SAPDC-3776 -->
+    	<path refid="javax.lib"/> <!-- SAPDC-4689 -->
+		<pathelement location="${stubs.jar.file}"/>
+        <pathelement location="${clstubs.jar.file}"/>
+        <pathelement location="${otdcwsstubs.jar.file}"/>
+        <fileset dir="${vetted.lib.dir}/SAP_UME/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${lib.dir}/SSO/lib"><!-- SAPDC-5268 -->
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${lib.dir}/devlib/jbossws-native-3.2.0">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="client.gen.cp">
+        <path refid="apache-cxf.classpath"/>
+        <pathelement location="${ws.jar.file}"/>
+        <pathelement location="${impl.16.jar.file}"/>
+        <pathelement location="${stubs.jar.file}"/>
+    </path>
+
+    <!-- XMLTask -->
+    <path id="xmltask.lib">
+        <fileset dir="${lib.dir}/devlib/xmltask">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="xmltask.lib" />
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${lib.dir}/devlib/ant/ant-contrib-1.0.jar" />
+
+    <!-- = = = = = = = = = = = = = = = = =
+        macrodef: java2wsdl
+       = = = = = = = = = = = = = = = = = -->
+    <macrodef name="java2wsdl">
+        <attribute name="wsdl.file"/>
+        <attribute name="java.class"/>
+        <attribute name="jar.file"/>
+        <attribute name="out.dir"/>
+        <sequential>
+            <java classname="org.apache.cxf.tools.java2ws.JavaToWS" fork="true" failonerror="true">
+                <arg value="-d"/>
+                <arg value="@{out.dir}"/>
+                <arg value="-o"/>
+                <arg value="@{wsdl.file}"/>
+                <arg value="-wsdl"/>
+                <arg value="-verbose"/>
+                <arg value="@{java.class}"/>
+                <classpath>
+                    <path refid="apache-cxf.classpath" />
+                    <pathelement path="@{jar.file}"/>
+                </classpath>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <!-- = = = = = = = = = = = = = = = = =
+        macrodef: wsdl2java
+       = = = = = = = = = = = = = = = = = -->
+    <macrodef name="wsdl2java">
+        <attribute name="wsdl.file" />
+        <sequential>
+            <java classname="org.apache.cxf.tools.wsdlto.WSDLToJava" fork="true">
+		<jvmarg value="-Djavax.xml.accessExternalSchema=all"/>
+                <arg value="-server"/>
+                <arg value="-d"/>
+                <arg value="${src.stubs.dir}"/>
+                <arg value="@{wsdl.file}"/>
+                <classpath refid="apache-cxf.classpath" />
+            </java>
+        </sequential>
+    </macrodef>
+
+    <!-- = = = = = = = = = = = = = = = = =
+        macrodef: wsdl2javaCl
+       = = = = = = = = = = = = = = = = = -->
+    <macrodef name="wsdl2javaCl">
+        <attribute name="wsdl.file" />
+        <attribute name="src.dir" />
+        <attribute name="databinding"/>
+        <sequential>
+            <java classname="org.apache.cxf.tools.wsdlto.WSDLToJava" fork="true">
+		<jvmarg value="-Djavax.xml.accessExternalSchema=all"/>
+                <arg value="-client"/>
+                <arg value="-d"/>
+                <arg value="@{src.dir}"/>
+                <arg value="-db"/>
+                <arg value="@{databinding}"/>
+                <arg value="-compile"/>
+                <arg value="@{wsdl.file}"/>
+                <classpath refid="client.gen.cp"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <!-- = = = = = = = = = = = = = = = = =
+          macrodef: wsdl2javaCl for OTDC
+         = = = = = = = = = = = = = = = = = -->
+    <macrodef name="wsdl2javaClOTDC">
+        <attribute name="wsdl.file" />
+        <attribute name="src.dir" />
+        <attribute name="databinding"/>
+        <sequential>
+        	<java classname="org.apache.cxf.tools.wsdlto.WSDLToJava" fork="true" >
+				<jvmarg value="-Djavax.xml.accessExternalSchema=all"/>
+                <arg value="-client"/>
+                <arg value="-d"/>
+				<arg value="@{src.dir}"/>
+                <arg value="-p"/>
+                <arg value="com.sap.otdc.ws"/>
+                <arg value="-db"/>
+                <arg value="@{databinding}"/>
+                <arg value="-compile"/>
+                <arg value="@{wsdl.file}"/>
+                <classpath refid="client.gen.cp"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <!-- = = = = = = = = = = = = = = = = =
+        macrodef: java2ws
+       = = = = = = = = = = = = = = = = = -->
+    <macrodef name="java2ws">
+        <attribute name="java.class"/>
+        <sequential>
+            <java classname="org.apache.cxf.tools.java2ws.JavaToWS" fork="true">
+                <classpath refid="client.gen.cp"/>
+                <arg value="-wsdl"/>
+                <arg value="-d"/>
+                <arg value="${client.dir}"/>
+                <arg value="@{java.class}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <!-- = = = = = = = = = = = = = = = = =
+        macrodef: pack.ejb.jar
+       = = = = = = = = = = = = = = = = = -->
+    <macrodef name="pack.ejb.jar">
+        <sequential>
+        	<!--
+            <jar file="${out.lib.dir}/${ejb.jar.file.name}.jar">
+                <metainf dir="../res/EjbContent/META-INF">
+                    <include name="persistence.xml"/>
+                </metainf>
+                <fileset dir="${ejb.classes.dir}">
+                    <include name="**/*.class"/>
+                </fileset>
+                <fileset dir="${classes.clstubs.dir}">
+                    <include name="**/*"/>
+                </fileset>
+                <fileset dir="${out.server.classes.dir}">
+                    <include name="**/jms/NotifierMDB*.class"/>
+                    <include name="**/sso/ISessionService.class"/>
+                    <include name="**/sso/*Bean*"/>
+                </fileset>
+            </jar>
+			-->
+            <jar file="${out.jboss.ejb.jar.dir}/${ejb.jar.file.name}.jar">
+                <metainf dir="../res/EjbContent.16/jboss/META-INF">
+                    <!-- <include name="persistence.xml"/> SAPDC-3009 -->
+                	<include name="ejb-jar.xml"/>
+                </metainf>
+                <fileset dir="${ejb.16.classes.dir}">
+                    <include name="**/*.class"/>
+                    <exclude name="com/opentext/sap/damint/base/*.class"/>
+                    <exclude name="com/opentext/sap/damint/exceptions/*.class"/>                	
+                    <exclude name="**/damint/util/SecurityUtil.class"/>
+                    <exclude name="**/damint/util/SAPLogonTicket*.class"/><!-- SAPDC-4080 -->
+					<exclude name="**/damint/util/AESUtil*.class"/><!-- SAPDC-5268 -->
+					<exclude name="**/damint/util/ManageSecretKey*.class"/><!-- SAPDC-5268 -->
+                </fileset>
+                <fileset dir="${classes.clstubs.dir}">
+                    <include name="**/*"/>
+                </fileset>
+                <fileset dir="${out.server.16.classes.dir}">
+                    <include name="**/jms/NotifierMDB*.class"/>
+                    <include name="**/sso/*Bean*"/>
+                </fileset>
+            </jar>
+            <jar file="${out.tomee.ejb.jar.dir}/${ejb.jar.file.name}.jar">
+                <metainf dir="../res/EjbContent.16/tomee/META-INF">
+                    <!-- <include name="persistence.xml"/> SAPDC-3009 -->
+                	<include name="ejb-jar.xml"/>
+                </metainf>
+                <fileset dir="${ejb.16.classes.dir}">
+                    <include name="**/*.class"/>
+                	<exclude name="com/opentext/sap/damint/base/*.class"/>
+                	<exclude name="com/opentext/sap/damint/exceptions/*.class"/>
+                    <exclude name="**/damint/util/SecurityUtil.class"/>
+                    <exclude name="**/damint/util/SAPLogonTicket*.class"/> <!-- SAPDC-4080 -->
+					<exclude name="**/damint/util/AESUtil*.class"/><!-- SAPDC-5268 -->
+					<exclude name="**/damint/util/ManageSecretKey*.class"/><!-- SAPDC-5268 -->
+                </fileset>
+                <fileset dir="${classes.clstubs.dir}">
+                    <include name="**/*"/>
+                </fileset>
+                <fileset dir="${out.server.16.classes.dir}">
+                    <include name="**/jms/NotifierMDB*.class"/>
+                    <include name="**/sso/*Bean*"/>
+                </fileset>
+            </jar>
+            <jar file="${out.lib.16.dir}/${ejb.jar.intf.name}.jar">
+                <fileset dir="${out.server.16.classes.dir}">
+                    <include name="**/sso/ISessionService.class"/>
+                    <include name="**/service/ex/*.*"/>
+                </fileset>
+                <fileset dir="${ejb.16.classes.dir}">
+                	<include name="com/opentext/sap/damint/base/*.class"/>
+                	<include name="com/opentext/sap/damint/exceptions/*.class"/>
+                    <include name="**/damint/util/SecurityUtil.class"/>
+                    <include name="**/damint/util/SAPLogonTicket*.class"/> <!-- SAPDC-4080 -->
+					<include name="**/damint/util/AESUtil*.class"/> <!-- SAPDC-5268 -->
+					<include name="**/damint/util/ManageSecretKey*.class"/><!-- SAPDC-5268 -->
+                </fileset>
+            </jar>
+        </sequential>
+    </macrodef>
+
+    <!-- = = = = = = = = = = = = = = = = =
+        macrodef: create.jboss.ear
+       = = = = = = = = = = = = = = = = = -->
+    <macrodef name="create.jboss.ear">
+        <sequential>
+            <ear destfile="${out.jboss.ear.dir}/${con.name}.ear" appxml="${earcontent.16.dir}/META-INF/application.xml">
+                <!-- ${out.jars.dir}/ot-log4j.jar -->
+                <fileset dir="${build.dir}/jboss.war">
+                    <include name="*.war"/>
+                </fileset>
+                <fileset dir="${out.jboss.ejb.jar.dir}">
+                    <include name="${ejb.jar.file.name}.jar"/>
+                </fileset>
+                <fileset dir="${out.jars.16.dir}">
+                    <include name="lib/*.jar"/>
+                    <exclude name="lib/${ejb.jar.intf.name}.jar"/>
+                    <exclude name="lib/${ejb.jar.file.name}.jar"/>
+                </fileset>
+                <fileset dir="${lib.dir}/SAP_UME">
+                    <include name="lib/*.*"/>
+                </fileset>
+            	<fileset dir="${lib.dir}/SSO">
+                    <include name="lib/*.*"/>
+                </fileset>
+                <fileset dir="${lib.dir}/apache">
+                    <include name="lib/*.jar"/>
+                </fileset>
+            	<!-- SAPDC-3658 <zipfileset dir="${lib.dir}/xmlsecurity" prefix="lib">
+                     <include name="*.jar"/>
+                </zipfileset> -->
+                <fileset dir="${out.stubs.dir}">
+                    <include name="lib/cl_stubs.jar"/>
+                    <include name="lib/otdcws_stubs.jar"/>
+                </fileset>
+                <fileset dir="${earcontent.16.dir}">
+                    <include name="META-INF/jboss-all.xml"/>
+                    <include name="META-INF/jboss-deployment-structure.xml"/>
+                </fileset>
+            </ear>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="create.tomee.ear">
+        <sequential>
+           <ear destfile="${out.tomee.ear.dir}/${con.name}.ear" appxml="${earcontent.16.dir}/META-INF/application.xml">
+                <!-- ${out.jars.dir}/ot-log4j.jar -->
+                <fileset dir="${build.dir}/tomee.war">
+                    <include name="*.war"/>
+                </fileset>
+                <fileset dir="${out.tomee.ejb.jar.dir}">
+                    <include name="${ejb.jar.file.name}.jar"/>
+                </fileset>
+                <fileset dir="${out.jars.16.dir}">
+                    <include name="lib/*.jar"/>
+                    <exclude name="lib/${ejb.jar.intf.name}.jar"/>
+                    <exclude name="lib/${ejb.jar.file.name}.jar"/>
+                </fileset>
+                <fileset dir="${lib.dir}/SAP_UME">
+                    <include name="lib/*.*"/>
+                </fileset>
+            	<fileset dir="${lib.dir}/SSO">
+                    <include name="lib/*.*"/>
+                </fileset>
+                <fileset dir="${lib.dir}/apache">
+                    <include name="lib/*.jar"/>
+                </fileset>
+            	<!-- SAPDC-3658 <zipfileset dir="${lib.dir}/xmlsecurity" prefix="lib">
+                     <include name="*.jar"/>
+                </zipfileset> -->     	
+                <fileset dir="${out.stubs.dir}">
+                    <include name="lib/cl_stubs.jar"/>
+                    <include name="lib/otdcws_stubs.jar"/>
+                </fileset>
+            </ear>
+        </sequential>
+    </macrodef>
+
+	<!-- SAPDC-3544 -->
+	<macrodef name="create.container.ear">
+	        <sequential>
+	            <ear destfile="${out.container.ear.dir}/${con.name}.ear" appxml="${earcontent.16.dir}/META-INF/application.xml">
+	                <fileset dir="${build.dir}/tomee.war">
+	                    <include name="*.war"/>
+	                </fileset>
+	                <fileset dir="${out.tomee.ejb.jar.dir}">
+	                    <include name="${ejb.jar.file.name}.jar"/>
+	                </fileset>
+	                <zipfileset dir="${out.jars.16.dir}/lib" prefix="lib">
+	                    <include name="*.jar"/>
+	                </zipfileset>
+	                <fileset dir="${lib.dir}/SAP_UME">
+	                    <include name="lib/*.*"/>
+	                </fileset>
+	            	<fileset dir="${lib.dir}/SSO">
+	                    <include name="lib/*.*"/>
+	                </fileset>
+	                <fileset dir="${lib.dir}/apache">
+	                    <include name="lib/*.jar"/>
+	                </fileset>
+	            	<!-- SAPDC-3658 <zipfileset dir="${lib.dir}/xmlsecurity" prefix="lib">
+	                     <include name="*.jar"/>
+	                </zipfileset> -->
+	                <fileset dir="${out.stubs.dir}">
+	                    <include name="lib/cl_stubs.jar"/>
+	                    <include name="lib/otdcws_stubs.jar"/>
+	                </fileset>
+	            </ear>
+	        </sequential>
+	    </macrodef>
+
+<!-- = = = = = = = = = = = = = = = = =
+        macrodef: create.dist.file
+       = = = = = = = = = = = = = = = = = -->
+<macrodef name="create.dist.file">
+    <sequential>
+        <delete dir="${out.dist.dir}" failonerror="true" />
+        <delete dir="${out.dist.dir}"/>
+        <mkdir dir="${out.dist.dir}"/>
+
+        <copy todir="${out.dist.dir}">
+            <filterchain>
+                <tokenfilter delimoutput="\n"/>
+            </filterchain>
+            <fileset dir="${otmm.dir}">
+                <include name="**/sap/**"/>
+                <include name="**/conf/**"/>
+                <include name="**/otmmsetup/**"/>
+            	<exclude name="**/sap/**/*.p12"/>
+            	<exclude name="**/sap/**/*.jks"/>
+            	<exclude name="**/sap/**/*.cer"/>
+            	<exclude name="**/sap/damlink_config.xml"/>
+            	<exclude name="**/sap/damlinkPWConfig.properties"/>
+            	<exclude name="**/sap/damlinkBWConfig.properties"/>
+            	<exclude name="**/sap/damlinkAIConfig.properties"/>
+            	<exclude name="**/sap/taxonomy.xls"/>
+            	<exclude name="**/sap/groceryPreferredAttrs.json"/>
+            	<exclude name="**/sap/folder_mapping.json"/>
+            </fileset>
+        </copy>
+        <copy todir="${out.dist.dir}">
+            <fileset dir="${otmm.dir}">
+                <include name="**/sap/**/*.p12"/>
+                <include name="**/sap/**/*.jks"/>
+                <include name="**/sap/**/*.cer"/>
+            </fileset>
+        </copy>
+        <copy todir="${out.dist.dir}/data/sap/lib" file="${ot.log4j.jar.file}"/>
+        <copy todir="${out.dist.dir}/data/sap/sld" file="${util.jar.file}"/>
+        <copy todir="${out.dist.dir}/data/sap/otmmsetup" file="${otmmsetup.jar.file}"/>
+        <copy todir="${out.dist.dir}/data/sap/otmmsetup" file="${lib.dir}/devlib/xmltask/xmltask.jar"/>
+        <copy todir="${out.dist.dir}/data/sap/otmmsetup" file="${lib.dir}/devlib/ant/ant-contrib-1.0.jar"/>
+        <copy todir="${out.dist.dir}/data/sap/pbd" failonerror="true">
+            <fileset dir="${pbd.dir}">
+                <include name="*.pbd"/>
+            </fileset>
+        </copy>
+        <copy todir="${out.dist.dir}/deploy/damlink" failonerror="true">
+            <fileset dir="${lib.dir}/SSO/lib"><!-- SAPDC-5268 -->
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    	<!-- file is copied at runtime and not during install.
+    	<unzip src="${imconv.dir}/ImConvServlet.war" dest="${out.dist.dir}/data/sap/">
+    		<patternset>
+    			<include name="WEB-INF/resources/imconv.properties"/>
+    		</patternset>
+    		<mapper type="flatten"/>
+    	</unzip> -->
+
+        <!-- creates ot-damlink-X.X.X.zip -->
+        <property name="dist.16.file.name" value="${con.name}-${con.version}.zip"/>
+        <property name="install.16.file.name" value="${con.name}-install.zip"/>
+        <delete dir="${out.dist.dir}/deploy"/>
+        <delete dir="${out.dist.dir}/ear/artesia.ear/war"/>
+        <copy todir="${out.dist.dir}/ear/artesia.ear/otmmux.war/ux-html/ot_damlink_bo_lookup">
+            <fileset dir="${out.ux.dir}/ot_damlink_bo_lookup">
+                <include name="*.*"/>
+                <include name="**/cs-locale/**"/>
+                <include name="**/damlink_lookup_list/**"/>
+            	<!-- ++SAPDC-4684 -->
+            	<include name="**/jquery/**"/>
+                <!-- <include name="**/extras/**"/> -->
+            	<include name="**/img/**"/>
+                <include name="**/typeahead/**"/>
+            </fileset>
+        </copy>
+		<copy todir="${out.dist.dir}/ear/artesia.ear/otmmux.war/ux-html/ot_damlink_pw">
+            <fileset dir="${out.ux.dir}/ot_damlink_pw">
+                <include name="*.*"/>
+                <include name="**/view/**"/>
+				<include name="**/manager/**"/>
+				<include name="**/style/**"/>
+            </fileset>
+            <filterchain>
+                <replacetokens>
+                    <token key="DAMLINK_VERSION_TOKEN" value="${con.build.modified}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+        <copy todir="${out.dist.dir}/damlink_intf" failonerror="true" overwrite="true">
+            <fileset dir="${out.jars.16.dir}/lib" includes="${ejb.jar.intf.name}.jar"/>
+            <fileset dir="${otmm.dir}/damlink_intf" includes="**/*.xml"/>
+            <fileset dir="${vetted.lib.dir}/SAP_UME/lib" includes="commons-lang3-3.18.0.jar"/>
+        </copy>
+        <copy todir="${out.dist.dir}/otmm-sap-logger" failonerror="true" overwrite="true">
+            <fileset dir="${out.jars.dir}" includes="ot-log4j.jar"/>
+            <fileset dir="${otmm.dir}/otmm-sap-logger" includes="**/*.xml"/>
+        </copy>
+        <copy todir="${out.dist.dir}/plugins/damlink" file="${ssoresolver.16.jar.file}" failonerror="true" overwrite="true">
+            <fileset dir="${lib.dir}/SSO/lib" includes="*.jar"/><!-- SAPDC-5268 -->
+        </copy>
+    	<!-- tomee otmm 20.2 jar SAPDC-3493 -->
+    	<copy todir="${out.dist.dir}/tomee-deployment/lib" failonerror="true" overwrite="true" verbose="true">
+    		<fileset dir="${otmm202.dir}" includes="*.jar"/>
+    	</copy>
+    	<!--echo message="imconv dir = ${imconv.dir}" /-->
+    	<!-- tomee otmm20.4 SAPDC-3771 -->
+    	<copy todir="${out.dist.dir}/tomee-deployment/204/plugins" failonerror="true" overwrite="true">
+            <fileset dir="${lib.dir}/SSO/lib" includes="*.jar"/><!-- SAPDC-5268 -->
+            <fileset dir="${out.jars.16.dir}/lib" includes="${ejb.jar.intf.name}.jar"/>
+            <fileset file="${ssoresolver.16.jar.file}"/>
+        </copy>
+    	<!-- tomee otmm20.4 SAPDC-3771 -->
+    	<copy todir="${out.dist.dir}/tomee-deployment/204/apps">
+            <fileset dir="${out.container.ear.dir}" includes="${con.name}.ear"/>
+		</copy>
+        <zip destfile="${build.dir}/${install.16.file.name}">
+            <zipfileset file="${out.jboss.ear.dir}/${con.name}.ear" prefix="jboss-deployment"/>
+            <zipfileset file="${otmm.dir}/update_plugins_module.xml" prefix="jboss-deployment"/>
+            <zipfileset file="${otmm.dir}/update_otmm.xml" prefix="jboss-deployment"/>
+        	<zipfileset file="${out.tomee.ear.dir}/${con.name}.ear" prefix="tomee-deployment"/>
+            <fileset dir="${out.dist.dir}"/>
+        </zip>
+        <zip destfile="${build.dir}/${dist.16.file.name}">
+            <zipfileset file="${build.dir}/${install.16.file.name}"/>
+            <zipfileset file="${install.dir}/*" excludes="*.template"/>
+            <zipfileset file="${lib.dir}/devlib/xmltask/xmltask.jar" prefix="devlib"/>
+            <zipfileset file="${lib.dir}/devlib/ant/ant-contrib-1.0.jar" prefix="devlib"/>
+            <zipfileset file="${vetted.lib.dir}/google/json-simple-1.1.1.jar" prefix="devlib"/>
+            <zipfileset file="${otinstall.16.jar.file}" prefix="devlib"/>
+	        <zipfileset file="${vetted.lib.dir}/httpClient/*.jar" prefix="devlib"/>
+	   		<zipfileset file="${base.dir}/readonly/FilterExample.zip" prefix="HookExamples"/>
+        </zip>
+	<copy todir="../../../media" file="${build.dir}/${dist.16.file.name}"/>
+    </sequential>
+</macrodef>
+
+<!-- = = = = = = = = = = = = = = = = = = = = =
+  macrodef: ce.create.dist.zip   ( SAPDC-3544 )
+ = = = = = = = = = = = = = = = = = = = = = -->
+<macrodef name="ce.create.dist.zip">
+    <sequential>
+
+        <delete dir="${out.dist.ce.dir}" includeemptydirs="true" failonerror="true" />
+        <delete dir="${container.files.dir}/custom/apps" failonerror="true" />
+        <delete dir="${container.files.dir}/custom/plugins" failonerror="true" />
+        <delete dir="${container.files.dir}/custom/ux-html" includeemptydirs="true" failonerror="true" />
+
+        <mkdir dir="${out.dist.ce.dir}"/>
+
+        <!-- creates ot-damlink-ce-X.X.X.zip -->
+        <property name="dist.ce.file.name" value="${container.zip.name}-${con.version}.zip"/>
+        <!-- SAPDC-4669 -->
+    	<copy todir="${container.files.dir}/custom/plugins" failonerror="true" overwrite="true">
+		<fileset dir="${lib.dir}/SSO/lib" includes="*.jar"/> <!-- SAPDC-5268 -->
+            <fileset dir="${out.jars.16.dir}/lib" includes="${ejb.jar.intf.name}.jar"/>
+            <fileset file="${ssoresolver.16.jar.file}"/>
+        </copy>
+        
+        <copy todir="${container.files.dir}/custom/ux-html/ot_damlink_bo_lookup">
+            <fileset dir="${out.ux.dir}/ot_damlink_bo_lookup">
+                <include name="*.*"/>
+                <include name="**/cs-locale/**"/>
+                <include name="**/damlink_lookup_list/**"/>
+            	<!-- ++SAPDC-4684 -->
+				<include name="**/jquery/**"/>
+                <!-- <include name="**/extras/**"/> -->
+                <include name="**/img/**"/>
+            	<!-- ++SAPDC-4424 -->
+                <include name="**/typeahead/**"/>
+            </fileset>
+        </copy>
+
+		<copy todir="${container.files.dir}/custom/ux-html/ot_damlink_pw">
+            <fileset dir="${out.ux.dir}/ot_damlink_pw">
+                <include name="*.*"/>
+                <include name="**/view/**"/>
+                <include name="**/manager/**"/>
+                <include name="**/style/**"/>
+            </fileset>
+            <filterchain>
+                <replacetokens>
+                    <token key="DAMLINK_VERSION_TOKEN" value="${con.build.modified}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+        
+        <copy todir="${container.files.dir}/custom/apps">
+            <fileset dir="${out.container.ear.dir}" includes="${con.name}.ear"/>
+		</copy>
+
+        <zip destfile="${build.dir}/${dist.ce.file.name}">
+            <fileset dir="${container.files.dir}" />
+		</zip>
+        <copy todir="../../../media" file="${build.dir}/${dist.ce.file.name}"/>
+	</sequential>
+</macrodef>
+
+<!-- = = = = = = = = = = = = = = = = =
+  macrodef: npminstall   ( SAPDC-3223 )       
+ = = = = = = = = = = = = = = = = = -->
+<macrodef name="npminstall">
+    <sequential>
+    	<exec executable="npm.cmd" failonerror="true" dir="${damlinkui.dir}" output="${obj.dir}/log/npmInstall.log">
+			<arg value="install"/>
+		</exec>
+    </sequential>
+</macrodef>
+	
+<!-- = = = = = = = = = = = = = = = = =
+  macrodef: war file generation   ( SAPDC-3493 )       
+ = = = = = = = = = = = = = = = = = -->
+
+<macrodef name="generatewar">
+	<attribute name="appserver"/>
+	<sequential>
+		<echo>Generating war of @{appserver}</echo>
+		<mkdir dir="${build.dir}/@{appserver}.war"/>
+		<if>
+			<equals arg1="@{appserver}" arg2="jboss"/>
+			<then>
+				<var name="jbossmplib" value="microprofile-config-api-1.4.jar"/>
+			</then>
+			<else>
+				<var name="jbossmplib" value="nonexistent.jar"/>
+			</else>
+		</if>
+		<war destfile="${build.dir}/@{appserver}.war/${con.name}.war" webxml="${webcontent.dir}/WEB-INF/web.xml">
+	        <lib dir="${out.jars.dir}">
+	            <include name="*.jar"/>
+	            <exclude name="damlink_ssoresolver.jar"/>
+	            <exclude name="ot-log4j.jar"/>
+	        </lib>
+	        <lib dir="${out.stubs.dir}/lib">
+	            <include name="sap_stubs.jar"/>
+	        </lib>
+	        <lib dir="${vetted.lib.dir}/resteasy">
+	            <include name="*.jar"/>
+	        </lib>
+			<lib dir="${vetted.lib.dir}/jersey">
+	            <include name="*.jar"/>
+	        </lib>
+			<!--lib dir="${lib.dir}/poi">
+	            <include name="*.jar"/>
+	        </lib-->
+	        <lib dir="${vetted.lib.dir}/swagger">
+	            <include name="*.jar"/>
+	        </lib>
+	        <lib dir="${vetted.lib.dir}/jackson">
+	            <include name="*.jar"/>
+	        </lib>
+	        <lib dir="${lib.dir}/devlib/xmltask">
+	            <include name="*.jar"/>
+	        </lib>
+			<!-- SAPDC-3776 -->
+			<lib dir="${vetted.lib.dir}/owasp">
+	            <include name="*.jar"/>
+	        </lib>
+			<lib dir="${vetted.lib.dir}/jboss/">
+				<include name="${jbossmplib}"/>
+			</lib>
+	    	<!-- Fix class loading issue arised because of jars update -->
+	    	<metainf file="${webcontent.dir}/META-INF/context.xml"></metainf>
+	        <fileset dir="${webcontent.dir}">
+	            <include name="swagger/**"/>
+	            <!-- <include name="c4c/**"/> SAPDC-3567 -->
+	            <include name="damlink-ui/**"/>
+	            <include name="index.jsp"/>
+	        </fileset>
+			<!-- SAPDC-3545 -->
+			<zipfileset dir="${otmm.dir}/data/sap" prefix="WEB-INF/resources/config">
+				<include name="damlink_config.xml"/>
+				<include name="damlinkPWConfig.properties"/>
+				<include name="damlinkBWConfig.properties"/>
+				<include name="damlinkAIConfig.properties"/>
+				<include name="taxonomy.xls"/>
+				<include name="folder_mapping.json"/>
+				<include name="groceryPreferredAttrs.json"/>
+			</zipfileset>
+			<!-- SAPDC-3616 -->
+			<zipfileset dir="${otmm.dir}/data/sap" prefix="WEB-INF/resources/sap">
+				<include name="otmmsetup/**"/>
+				<include name="languages/**"/>
+			</zipfileset>
+            <!-- SAPDC-4223 -->
+            <zipfileset file="${otmmsetup.jar.file}" prefix="WEB-INF/resources/sap/otmmsetup" />
+            <zipfileset file="${lib.dir}/devlib/xmltask/xmltask.jar" prefix="WEB-INF/resources/sap/otmmsetup" />
+            <zipfileset file="${lib.dir}/devlib/ant/ant-contrib-1.0.jar" prefix="WEB-INF/resources/sap/otmmsetup" />
+            <zipfileset dir="${damlinkui.dir}/dist/ui/browser" prefix="ui">
+                <include name="**"/>
+            </zipfileset>
+
+	    	<!--fileset dir="${damlinkui.dir}/dist">
+	    		<include name="ui/**"/>
+	    	</fileset-->
+			<!-- MDS component removed -->
+	    	<!-- put parts of ImConvServlet.war into ot-damlink.war -->
+	    	<!-- zipfileset src="${imconv.dir}/ImConvServlet.war">
+	            <include name="WEB-INF/lib/imconv.jar"/>
+	            <include name="WEB-INF/lib/aws*.jar"/>
+	            <include name="WEB-INF/lib/azure*.jar"/>
+	            <include name="WEB-INF/lib/httpclient*.jar"/>
+	            <include name="WEB-INF/lib/httpcore*.jar"/>
+	            <include name="WEB-INF/lib/joda-time*.jar"/>
+	            <include name="WEB-INF/resources/*"/>
+			</zipfileset-->
+		   </war>
+	</sequential>
+</macrodef>
+
+
+<!-- =================================
+        target: clean
+       ================================= -->
+<target name="clean" depends="" description="Cleans the build directory.">
+    <!--delete dir="${build.dir}" failonerror="false"/-->
+</target>
+
+<!-- =================================
+        target: compile
+       ================================= -->
+<target name="compile" depends="setup, genStubs" description="Integration of a SAP CRM system and OT MediaManager">
+	
+	<!--getLibsFromOTRepo/-->
+
+	<!-- Generation of the SAP EventNotification WebServices stubs -->
+    <wsdl2javaCl wsdl.file="${wsdl.dir}/SAPEventNotificationWS.wsdl" src.dir="${src.cl.stubs.dir}" databinding="jaxb"/>
+
+    <javac srcdir="${src.cl.stubs.dir}" destdir="${classes.clstubs.dir}" debug="on">
+        <classpath refid="apache-cxf.classpath"/>
+    </javac>
+
+    <jar file="${clstubs.jar.file}" basedir="${classes.clstubs.dir}" includes="**/*"/>
+
+    <!-- Generation of the SAP OTDC WebServices stubs -->
+	<!-- Apparently this call creates *java and *class files in src.otdcws.stubs.dir -->
+    <wsdl2javaClOTDC wsdl.file="${wsdl.dir}/SAPOTDCWS.wsdl" src.dir="${src.otdcws.stubs.dir}" databinding="jaxb" />
+
+	<!-- In case it doesnt, we compile to classes.otdcws.dir -->
+    <javac srcdir="${src.otdcws.stubs.dir}" destdir="${classes.otdcws.dir}" debug="on">
+        <classpath refid="apache-cxf.classpath" />
+    </javac>
+
+	<!-- the otdcws_stubs.jar file contains .java and .class files, class files either from first or second or both filesets -->
+	<!-- but this code leads to doubled class files in the nightly production:
+	<jar file="${otdcwsstubs.jar.file}" >
+        <fileset dir="${src.otdcws.stubs.dir}">
+            <include name="**/*"/>
+        </fileset>
+        <fileset dir="${classes.otdcws.dir}">
+             <include name="**/*"/>
+         </fileset>
+     </jar>
+    -->
+	<!-- this is the original code, which does not take any classes from classes.otdcws.dir, compiled above -->
+    <jar file="${otdcwsstubs.jar.file}" basedir="${src.otdcws.stubs.dir}" includes="**/*" />
+
+    <!-- Compiling EJB classes -->
+    <javac srcdir="${otmm16.src.dir}:${ejb.src.dir}" destdir="${ejb.16.classes.dir}" debug="on">
+        <classpath refid="compile.16.classpath"/>
+    </javac>
+
+	<echo message="compile.16.classpath = ${toString:compile.16.classpath}"/>
+	<echo message="ant.classpath = ${toString:ant.classpath}"/>
+    <javac srcdir="${otmm16.src.dir}:${src.dir}" destdir="${out.server.16.classes.dir}" debug="on" includeantruntime="false" includejavaruntime="false">
+        <classpath>
+            <path refid="compile.16.classpath"/>
+			<!-- SAPDC-3610 -->
+            <path refid="otmm203.classpath"/>
+        	<path refid="ant.classpath"/>
+            <pathelement path="${ejb.16.classes.dir}"/>
+        </classpath>
+    </javac>
+
+    <!-- Properties file copy -->
+    <copy todir="${out.server.classes.dir}">
+        <fileset dir="${src.dir}">
+            <include name="**/*.properties"/>
+        </fileset>
+    </copy>
+    <copy todir="${out.server.16.classes.dir}">
+        <fileset dir="${src.dir}">
+            <include name="**/*.properties"/>
+        </fileset>
+    </copy>
+
+    <!-- Third Party templates copy -->
+    <copy todir="${out.server.classes.dir}" failonerror="true">
+        <fileset dir="${sldreg.dir}">
+            <include name="ThirdParty*.properties"/>
+            <include name="ThirdPartySystem.template"/>
+        </fileset>
+    </copy>
+    <copy todir="${out.server.16.classes.dir}" failonerror="true">
+        <fileset dir="${sldreg.dir}">
+            <include name="ThirdParty*.properties"/>
+            <include name="ThirdPartySystem.template"/>
+        </fileset>
+    </copy>
+
+    <!-- Jar files production -->
+    <jar file="${util.jar.file}" basedir="${out.server.16.classes.dir}" includes="**/sap/sld/**"/>
+
+    <jar file="${ws.jar.file}" basedir="${out.server.16.classes.dir}" includes="**/se/**,**/rest/**,**/assetfilter/**,**/security/**,,**/otdc/**"/>
+
+    <!--<jar file="${impl.jar.file}" basedir="${out.server.classes.dir}"
+         excludes="**/se/**,**/rest/**,**/assetfilter/**,**/security/**,**/sso/**,**/otmmsetup/**,**/jms/NotifierMDB*,**/otdc/**"/>
+    <jar file="${impl.16.jar.file}" basedir="${out.server.16.classes.dir}"
+         excludes="**/se/**,**/rest/**,**/assetfilter/**,**/security/**,**/sso/**,**/otmmsetup/**,**/jms/NotifierMDB*,**/otdc/**"/>-->
+
+	<!-- TODO PENDING REVIEW: Removed ThirdPartySystem.template,ThirdPartySystem_DAMLINK.properties,ThirdPartySystem_MM.properties from jar file, which are not used anymore. Needs further review. 
+		And also removed META-INF\org\apache\logging\log4j\core\config\plugins\Log4j2Plugins.dat. This requies further review.-->
+	<jar file="${impl.jar.file}" basedir="${out.server.classes.dir}"
+	        includes="**/damint/constants/**,**/damint/data/**,**/damint/jboss/**,**/damint/jms/**,**/damint/jsp/**,**/damint/sap/**,**/damint/service/**,**/damint/ws/**,ThirdPartySystem.template,ThirdPartySystem_DAMLINK.properties,ThirdPartySystem_MM.properties,**/otinstall/**,**/sld/**" excludes="**/jms/NotifierMDB*"/>
+	<jar file="${impl.16.jar.file}" basedir="${out.server.16.classes.dir}"
+	        includes="**/damint/constants/**,**/damint/data/**,**/damint/jboss/**,**/damint/jms/**,**/damint/jsp/**,**/damint/sap/**,**/damint/service/**,**/damint/ws/**,ThirdPartySystem.template,ThirdPartySystem_DAMLINK.properties,ThirdPartySystem_MM.properties,**/otinstall/**,**/sld/**" excludes="**/jms/NotifierMDB*"/>
+	
+    <jar file="${ssoresolver.jar.file}" basedir="${out.server.classes.dir}" includes="**/sso/DamLinkResolver.class"/>
+    <jar file="${ssoresolver.16.jar.file}" basedir="${out.server.16.classes.dir}" includes="**/sso/DamLinkResolver.class"/>
+
+    <jar file="${otmmsetup.jar.file}" basedir="${out.server.classes.dir}" includes="**/otmmsetup/**">
+        <fileset dir="${src.dir}">
+            <include name="**/otmmsetup/*.json"/>
+        </fileset>
+    </jar>
+    <jar file="${otmmsetup.16.jar.file}" basedir="${out.server.16.classes.dir}" includes="**/otmmsetup/**">
+        <fileset dir="${src.dir}">
+            <include name="**/otmmsetup/*.json"/>
+        </fileset>
+    </jar>
+
+	<jar file="${otinstall.16.jar.file}">
+    	<fileset dir="${out.server.16.classes.dir}">
+			<include name="**/otinstall/**"/>
+	    </fileset>
+        <fileset dir="${out.server.16.classes.dir}">
+            <include name="**/damint/se/ConfigStoreClnt*"/>
+            <include name="**/damint/se/MonitorClnt*"/>
+        	<include name="**/damint/service/SystemInfo*"/>
+        </fileset>
+    </jar>
+
+    <jar file="${ot.log4j.jar.file}" > 
+    	<fileset dir="${out.server.16.classes.dir}"> 
+    		<include name="**/SapOTPatternLayout.class" />
+			<!-- SAPDC-3610 -->
+    		<include name="**/SAPOTPattern.class" />
+    		<include name="**/damint/jboss/*.class" />
+        </fileset>
+    </jar>
+
+    <pack.ejb.jar/>
+
+
+    <!--
+    Add version parameter to damlink-*-ui.html
+    -->
+    <property name="damlink.ui.static.dir" value="${webcontent.dir}/damlink-ui/static"/>
+    <property name="damlink.ui.version.param" value="?v=${con.build}"/>
+
+    <copy overwrite="true" file="${damlink.ui.static.dir}/damlink-smartedit-ui-template.html" tofile="${damlink.ui.static.dir}/damlink-smartedit-ui.html"/>
+    <copy overwrite="true" file="${damlink.ui.static.dir}/damlink-backoffice-ui-template.html" tofile="${damlink.ui.static.dir}/damlink-backoffice-ui.html"/>
+    <!-- <copy overwrite="true" file="${damlink.ui.static.dir}/damlink-c4c-ui-template.html" tofile="${damlink.ui.static.dir}/damlink-c4c-ui.html"/> SAPDC-3567 -->
+    <copy overwrite="true" file="${damlink.ui.static.dir}/damlink-ui-dev-template.html" tofile="${damlink.ui.static.dir}/damlink-ui-dev.html"/>
+    <copy overwrite="true" file="${damlink.ui.static.dir}/damlink-xecm-ui-template.html" tofile="${damlink.ui.static.dir}/damlink-xecm-ui.html"/>
+	<copy overwrite="true" file="${damlink.ui.static.dir}/damlink-sap-ui-template.html" tofile="${damlink.ui.static.dir}/damlink-sap-ui.html"/>
+    <copy overwrite="true" file="${damlink.ui.static.dir}/mds-config-template.html" tofile="${damlink.ui.static.dir}/mds-config.html"/>
+	
+    <if>
+        <isset property="con.build"/>
+        <then>
+            <echo>Replacing in damlink-smartedit-ui.html: @DAMLINK_VERSION_PARAMETER@ --> '${damlink.ui.version.param}'</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-smartedit-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/>
+
+            <echo>Replacing in damlink-backoffice-ui.html: @DAMLINK_VERSION_PARAMETER@ --> '${damlink.ui.version.param}'</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-backoffice-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/>
+
+        	<!-- SAPDC-3567 -->
+            <!-- <echo>Replacing in damlink-c4c-ui.html: @DAMLINK_VERSION_PARAMETER@  '${damlink.ui.version.param}'</echo> -->
+            <!-- <replace file="${damlink.ui.static.dir}/damlink-c4c-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/> -->
+
+            <echo>Replacing in damlink-ui-dev.html: @DAMLINK_VERSION_PARAMETER@ --> '${damlink.ui.version.param}'</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-ui-dev.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/>
+
+            <echo>Replacing in damlink-xecm-ui.html: @DAMLINK_VERSION_PARAMETER@ --> '${damlink.ui.version.param}'</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-xecm-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/>
+        	
+        	<echo>Replacing in damlink-sap-ui.html: @DAMLINK_VERSION_PARAMETER@ --> '${damlink.ui.version.param}'</echo>
+			<replace file="${damlink.ui.static.dir}/damlink-sap-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/>
+
+            <echo>Replacing in mds-config.html: @DAMLINK_VERSION_PARAMETER@ --> '${damlink.ui.version.param}'</echo>
+            <replace file="${damlink.ui.static.dir}/mds-config.html" token="@DAMLINK_VERSION_PARAMETER@" value="${damlink.ui.version.param}"/>
+        </then>
+        <else>
+            <echo>No version found. Replacing in damlink-smartedit-ui.html: @DAMLINK_VERSION_PARAMETER@ --> ''</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-smartedit-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/>
+
+            <echo>No version found. Replacing in damlink-backoffice-ui.html: @DAMLINK_VERSION_PARAMETER@ --> ''</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-backoffice-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/>
+
+        	<!-- SAPDC-3567 -->
+            <!-- <echo>No version found. Replacing in damlink-c4c-ui.html: @DAMLINK_VERSION_PARAMETER@  ''</echo> -->
+            <!-- <replace file="${damlink.ui.static.dir}/damlink-c4c-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/> -->
+
+            <echo>No version found. Replacing in damlink-ui-dev.html: @DAMLINK_VERSION_PARAMETER@ --> ''</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-ui-dev.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/>
+
+            <echo>No version found. Replacing in damlink-xecm-ui.html: @DAMLINK_VERSION_PARAMETER@ --> ''</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-xecm-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/>
+
+            <echo>No version found. Replacing in damlink-sap-ui.html: @DAMLINK_VERSION_PARAMETER@ --> ''</echo>
+            <replace file="${damlink.ui.static.dir}/damlink-sap-ui.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/>
+
+            <echo>No version found. Replacing in mds-config.html: @DAMLINK_VERSION_PARAMETER@ --> ''</echo>
+            <replace file="${damlink.ui.static.dir}/mds-config.html" token="@DAMLINK_VERSION_PARAMETER@" value=""/>
+        </else>
+    </if>
+
+    <!-- Run RequireJS Optimizer -->
+    <!-- too bad, doese not work, I always get the message "exec returned: 128" -->
+
+    <exec dir="${requirejs.optimizer.dir}" executable="cmd.exe" output="${obj.dir}/log/runOptimizer.log" failonerror="true" newenvironment="true">
+        <arg line="/c runOptimizer.bat"/>
+    </exec>
+
+    <!--<exec dir="${requirejs.optimizer.dir}" executable=".\node-v10.15.3-win-x86\node.exe" resolveexecutable="true" vmlauncher="false" failonerror="true">-->
+        <!--<arg line="r.js -o buildDev.js"/>-->
+    <!--</exec>-->
+	<!-- SAPDC-3223 -->
+	<echo>Installing Node Modules</echo>
+	<npminstall/>
+	<!-- SAPDC-3223 -->
+	<echo>Building production ready files</echo>
+	<exec dir="${damlinkui.dir}" executable="npm.cmd" output="${obj.dir}/log/buildNgApp.log" failonerror="true">
+		<arg value="run-script"/>
+		<arg value="buildprod"/>
+        <!--<env key="PATH" value="c:/program files (x86)/node22.21.1;${env.PATH}"/>-->
+	</exec>
+</target>
+
+<!-- =================================`
+        target: package
+       ================================= -->
+<target name="package" depends="compile" description="Packages the distribution">
+
+    <!-- war file generation -->
+    <generatewar appserver="jboss" />
+	<generatewar appserver="tomee" />
+
+    <!-- ear file generation -->
+    <create.jboss.ear/>
+    <create.tomee.ear/>
+	<create.container.ear/> <!-- SAPDC-3544 -->
+</target>
+
+<!-- =================================
+        target: ixmk.dist
+       ================================= -->
+<target name="ixmk.dist" depends="package" description="Distribution for ixmk">
+    <mkdir dir="${java_jar.dir}"/>
+
+    <copy todir="${java_jar.dir}">
+        <fileset dir="${out.jboss.ear.dir}">
+            <include name="**/*.ear"/>
+        </fileset>
+    </copy>
+</target>
+
+<!-- =================================
+        target: ixmk.setup
+       ================================= -->
+<target name="ixmk.setup" depends="" description="Creates the setup stuff for ixmk.">
+    <delete dir="${media.dir}"/>
+    <mkdir dir="${media.dir}"/>
+
+    <property name="dist.file.name" value="${con.name}-${con.version}.zip"/>
+    <property name="ce.dist.file.name" value="${container.zip.name}-${con.version}.zip"/> <!-- SAPDC-3544 -->
+    <propertyregex property="con.build.modified" input="${con.build}" regexp="\." replace="0" />
+
+    <create.dist.file/>
+	<ce.create.dist.zip/> <!-- SAPDC-3544 -->
+	
+    <codeseal.sign/>
+    <!-- SAPDC-4172 <delete dir="${damlink.abap.zip.dir}"/>
+    <mkdir dir="${damlink.abap.zip.dir}"/>
+    <copy todir="${damlink.abap.zip.dir}">
+        <fileset dir="${release.dir}\SAP_DAMIntegration" includes="**/*.SAR" />
+        <flattenmapper/>
+    </copy>
+    <zip destfile="${damlink.abap.zip}">
+        <zipfileset dir="${damlink.abap.zip.dir}" prefix="DAMLink ABAP Add-ons"/>
+    </zip> -->
+	<checksum algorithm="SHA-256" fileext=".SHA256">
+		<fileset dir="${media.dir}"/>
+	</checksum>
+</target>
+
+<macrodef name="codeseal.sign">
+    <sequential>
+        <echo>Codeseal Signing started</echo>
+        <exec executable="codeseal.cmd">
+            <arg line="sign ${media.dir}/${dist.file.name} ${media.dir}/${ce.dist.file.name}" />
+        </exec>
+        <echo>Codeseal signing completed</echo>
+    </sequential>
+</macrodef>
+
+<macrodef name="getLibsFromOTRepo">
+	<sequential>
+		<echo message="Downloading jersey libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jersey/core/jersey-client/3.1.11/jersey-client-3.1.11.jar" dest="${vetted.lib.dir}/jersey/jersey-client-3.1.11.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jersey/core/jersey-common/3.1.11/jersey-common-3.1.11.jar" dest="${vetted.lib.dir}/jersey/jersey-common-3.1.11.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jersey/ext/jersey-entity-filtering/3.1.11/jersey-entity-filtering-3.1.11.jar" dest="${vetted.lib.dir}/jersey/jersey-entity-filtering-3.1.11.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jersey/inject/jersey-hk2/3.1.11/jersey-hk2-3.1.11.jar" dest="${vetted.lib.dir}/jersey/jersey-hk2-3.1.11.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar" dest="${vetted.lib.dir}/jersey/angus-activation-2.0.2.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/eclipse/angus/angus-mail/2.0.3/angus-mail-2.0.3.jar" dest="${vetted.lib.dir}/jersey/angus-mail-2.0.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/ow2/asm/asm/9.8/asm-9.8.jar" dest="${vetted.lib.dir}/jersey/asm-9.8.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/hk2/hk2-locator/3.1.1/hk2-locator-3.1.1.jar" dest="${vetted.lib.dir}/jersey/hk2-locator-3.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/javassist/javassist/3.30.2-GA/javassist-3.30.2-GA.jar" dest="${vetted.lib.dir}/jersey/javassist-3.30.2-GA.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/hk2/osgi-resource-locator/2.4.0/osgi-resource-locator-2.4.0.jar" dest="${vetted.lib.dir}/jersey/osgi-resource-locator-2.4.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/eclipse/parsson/parsson/1.1.7/parsson-1.1.7.jar" dest="${vetted.lib.dir}/jersey/parsson-1.1.7.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded jersey libs from OT repo."/>
+	    
+		<echo message="Downloading httpclient libs from OT repo."/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-codec/commons-codec/1.18.0/commons-codec-1.18.0.jar" dest="${vetted.lib.dir}/httpClient/commons-codec-1.18.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar" dest="${vetted.lib.dir}/httpClient/httpclient-4.5.14.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar" dest="${vetted.lib.dir}/httpClient/httpcore-4.4.16.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded httpclient libs from OT repo."/>
+		
+		<echo message="Downloading commons-configuration\lib libs from OT repo."/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-beanutils/commons-beanutils/1.11.0/commons-beanutils-1.11.0.jar" dest="${vetted.lib.dir}/commons-configuration/lib/commons-beanutils-1.11.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar" dest="${vetted.lib.dir}/commons-configuration/lib/commons-collections4-4.5.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-configuration2/2.12.0/commons-configuration2-2.12.0.jar" dest="${vetted.lib.dir}/commons-configuration/lib/commons-configuration2-2.12.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-lang3-3.18.0.jar" verbose="true" usetimestamp="true"/>
+        <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-text/1.13.1/commons-text-1.13.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-text-1.13.1.jar" verbose="true" usetimestamp="true"/>
+        <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-digester3/3.2/commons-digester3-3.2.jar" dest="${vetted.lib.dir}/commons-configuration/lib/commons-digester3-3.2.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-logging/commons-logging/1.3.5/commons-logging-1.3.5.jar" dest="${vetted.lib.dir}/commons-configuration/lib/commons-logging-1.3.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-validator/commons-validator/1.9.0/commons-validator-1.9.0.jar" dest="${vetted.lib.dir}/commons-configuration/lib/commons-validator-1.9.0.jar" verbose="true" usetimestamp="true"/>
+	    <echo message="Downloaded commons-configuration\lib libs from OT repo."/>
+	    
+		<echo message="Downloading jackson libs from OT repo."/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/net/bytebuddy/byte-buddy/1.17.5/byte-buddy-1.17.5.jar" dest="${vetted.lib.dir}/jackson/byte-buddy-1.17.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/core/jackson-annotations/2.19.0/jackson-annotations-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-annotations-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/core/jackson-core/2.19.0/jackson-core-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-core-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/github/java-json-tools/jackson-coreutils/2.0/jackson-coreutils-2.0.jar" dest="${vetted.lib.dir}/jackson/jackson-coreutils-2.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/core/jackson-databind/2.19.0/jackson-databind-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-databind-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/dataformat/jackson-dataformat-cbor/2.19.0/jackson-dataformat-cbor-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-dataformat-cbor-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/dataformat/jackson-dataformat-xml/2.19.0/jackson-dataformat-xml-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-dataformat-xml-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.19.0/jackson-dataformat-yaml-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-dataformat-yaml-2.19.0.jar" verbose="true" usetimestamp="true"/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.19.0/jackson-datatype-jsr310-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-datatype-jsr310-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/jakarta/rs/jackson-jakarta-rs-base/2.19.0/jackson-jakarta-rs-base-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-jakarta-rs-base-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/jakarta/rs/jackson-jakarta-rs-json-provider/2.19.0/jackson-jakarta-rs-json-provider-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-jakarta-rs-json-provider-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.19.0/jackson-jaxrs-base-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-jaxrs-base-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.19.0/jackson-jaxrs-json-provider-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-jaxrs-json-provider-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/module/jackson-module-jakarta-xmlbind-annotations/2.19.0/jackson-module-jakarta-xmlbind-annotations-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-module-jakarta-xmlbind-annotations-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.19.0/jackson-module-jaxb-annotations-2.19.0.jar" dest="${vetted.lib.dir}/jackson/jackson-module-jaxb-annotations-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/github/java-json-tools/msg-simple/1.2/msg-simple-1.2.jar" dest="${vetted.lib.dir}/jackson/msg-simple-1.2.jar" verbose="true" usetimestamp="true"/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/yaml/snakeyaml/2.4/snakeyaml-2.4.jar" dest="${vetted.lib.dir}/jackson/snakeyaml-2.4.jar" verbose="true" usetimestamp="true"/>
+	    <echo message="Downloaded jackson libs from OT repo."/>
+	    
+		<echo message="Downloading resteasy libs from OT repo."/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/james/apache-mime4j-dom/0.8.12/apache-mime4j-dom-0.8.12.jar" dest="${vetted.lib.dir}/resteasy/apache-mime4j-dom-0.8.12.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/james/apache-mime4j-storage/0.8.12/apache-mime4j-storage-0.8.12.jar" dest="${vetted.lib.dir}/resteasy/apache-mime4j-storage-0.8.12.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/ibm/async/asyncutil/0.1.0/asyncutil-0.1.0.jar" dest="${vetted.lib.dir}/resteasy/asyncutil-0.1.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/codemodel/4.0.5/codemodel-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/codemodel-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-io/commons-io/2.19.0/commons-io-2.19.0.jar" dest="${vetted.lib.dir}/resteasy/commons-io-2.19.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/sun/istack/istack-commons-tools/4.2.0/istack-commons-tools-4.2.0.jar" dest="${vetted.lib.dir}/resteasy/istack-commons-tools-4.2.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/jandex/2.4.5.Final/jandex-2.4.5.Final.jar" dest="${vetted.lib.dir}/resteasy/jandex-2.4.5.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/jaxb-core-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/jaxb-jxc/4.0.5/jaxb-jxc-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/jaxb-jxc-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/jaxb-runtime-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/jaxb-xjc/4.0.5/jaxb-xjc-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/jaxb-xjc-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec/2.0.1.Final/jboss-jaxb-api_2.3_spec-2.0.1.Final.jar" dest="${vetted.lib.dir}/resteasy/jboss-jaxb-api_2.3_spec-2.0.1.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/logging/jboss-logging/3.6.1.Final/jboss-logging-3.6.1.Final.jar" dest="${vetted.lib.dir}/resteasy/jboss-logging-3.6.1.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/github/java-json-tools/json-patch/1.13/json-patch-1.13.jar" dest="${vetted.lib.dir}/resteasy/json-patch-1.13.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar" dest="${vetted.lib.dir}/resteasy/reactive-streams-1.0.4.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/sun/xml/bind/external/relaxng-datatype/4.0.5/relaxng-datatype-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/relaxng-datatype-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/sun/xml/bind/external/rngom/4.0.5/rngom-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/rngom-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/resteasy/resteasy-core/6.2.12.Final/resteasy-core-6.2.12.Final.jar" dest="${vetted.lib.dir}/resteasy/resteasy-core-6.2.12.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/resteasy/resteasy-core-spi/6.2.12.Final/resteasy-core-spi-6.2.12.Final.jar" dest="${vetted.lib.dir}/resteasy/resteasy-core-spi-6.2.12.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/resteasy/resteasy-jackson2-provider/6.2.12.Final/resteasy-jackson2-provider-6.2.12.Final.jar" dest="${vetted.lib.dir}/resteasy/resteasy-jackson2-provider-6.2.12.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/resteasy/resteasy-jaxb-provider/6.2.12.Final/resteasy-jaxb-provider-6.2.12.Final.jar" dest="${vetted.lib.dir}/resteasy/resteasy-jaxb-provider-6.2.12.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/resteasy/resteasy-multipart-provider/6.2.12.Final/resteasy-multipart-provider-6.2.12.Final.jar" dest="${vetted.lib.dir}/resteasy/resteasy-multipart-provider-6.2.12.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/resteasy/resteasy-servlet-initializer/6.2.12.Final/resteasy-servlet-initializer-6.2.12.Final.jar" dest="${vetted.lib.dir}/resteasy/resteasy-servlet-initializer-6.2.12.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/txw2-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/jaxb/xsom/4.0.5/xsom-4.0.5.jar" dest="${vetted.lib.dir}/resteasy/xsom-4.0.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/sun/istack/istack-commons-runtime/4.2.0/istack-commons-runtime-4.2.0.jar" dest="${vetted.lib.dir}/resteasy/istack-commons-runtime-4.2.0.jar" verbose="true" usetimestamp="true"/>
+	    <echo message="Downloaded resteasy libs from OT repo."/>
+	    
+		<echo message="Downloading SAP_UME/lib libs from OT repo."/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/hk2/external/aopalliance-repackaged/3.1.1/aopalliance-repackaged-3.1.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/aopalliance-repackaged-3.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/james/apache-mime4j-core/0.8.12/apache-mime4j-core-0.8.12.jar" dest="${vetted.lib.dir}/SAP_UME/lib/apache-mime4j-core-0.8.12.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-configuration2/2.12.0/commons-configuration2-2.12.0.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-configuration2-2.12.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-lang3-3.18.0.jar" verbose="true" usetimestamp="true"/>
+        <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-text/1.13.1/commons-text-1.13.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-text-1.13.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-logging/commons-logging/1.3.5/commons-logging-1.3.5.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-logging-1.3.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/hk2/hk2-api/3.1.1/hk2-api-3.1.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/hk2-api-3.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/glassfish/hk2/hk2-utils/3.1.1/hk2-utils-3.1.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/hk2-utils-3.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.activation-api-2.1.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.annotation-api-2.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.inject-api-2.0.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/json/jakarta.json-api/2.1.3/jakarta.json-api-2.1.3.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.json-api-2.1.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/json/bind/jakarta.json.bind-api/3.0.1/jakarta.json.bind-api-3.0.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.json.bind-api-3.0.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/ws/rs/jakarta.ws.rs-api/3.1.0/jakarta.ws.rs-api-3.1.0.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.ws.rs-api-3.1.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jakarta.xml.bind-api-4.0.2.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/javassist/javassist/3.30.2-GA/javassist-3.30.2-GA.jar" dest="${vetted.lib.dir}/SAP_UME/lib/javassist-3.30.2-GA.jar" verbose="true" usetimestamp="true"/>
+		<!--get src="https://artifactory.otxlab.net/artifactory/libs-release/javax/ws/rs/javax.ws.rs-api/2.1.1/javax.ws.rs-api-2.1.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/javax.ws.rs-api-2.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/spec/javax/annotation/jboss-annotations-api_1.3_spec/2.0.1.Final/jboss-annotations-api_1.3_spec-2.0.1.Final.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jboss-annotations-api_1.3_spec-2.0.1.Final.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec/2.0.2.Final/jboss-jaxrs-api_2.1_spec-2.0.2.Final.jar" dest="${vetted.lib.dir}/SAP_UME/lib/jboss-jaxrs-api_2.1_spec-2.0.2.Final.jar" verbose="true" usetimestamp="true"/-->
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar" dest="${vetted.lib.dir}/google/json-simple-1.1.1.jar" verbose="true" usetimestamp="true"/>
+	    <echo message="Downloaded resteasy libs from OT repo."/>
+	    
+		<echo message="Downloading apache\lib libs from OT repo."/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/ant/ant/1.10.15/ant-1.10.15.jar" dest="${vetted.lib.dir}/apache/lib/ant-1.10.15.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3.jar" dest="${vetted.lib.dir}/apache/lib/ant-contrib-1.0b3.jar" verbose="true" usetimestamp="true"/>
+	    <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar" dest="${vetted.lib.dir}/apache/lib/commons-collections4-4.5.0.jar" verbose="true" usetimestamp="true"/>
+	    <echo message="Downloaded apache\lib libs from OT repo."/>
+	
+	    <echo message="Copying internal libs"/>
+		<copy preservelastmodified="true" overwrite="true" todir="${vetted.lib.dir}/SAP_UME/lib" file="${lib.dir}/SAP_UME/lib/com.sap.security.api.jar"/>
+		<copy preservelastmodified="true" overwrite="true" todir="${vetted.lib.dir}/SAP_UME/lib" file="${lib.dir}/SAP_UME/lib/com.sap.security.core.jar"/>
+		<copy preservelastmodified="true" overwrite="true" todir="${vetted.lib.dir}/SAP_UME/lib" file="${lib.dir}/SAP_UME/lib/iaik_jce_full.jar"/>
+		<!--copy preservelastmodified="true" overwrite="true" todir="${vetted.lib.dir}/SAP_UME/lib" file="${lib.dir}/SAP_UME/lib/servlet-api-tomee8.jar"/-->
+	    <copy preservelastmodified="true" overwrite="true" todir="${vetted.lib.dir}/jersey" file="${lib.dir}/jersey/otmm-rest-representations.jar"/>
+		<echo message="Copied internal libs"/>
+		
+		<echo message="Downloading poi libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-compress/1.27.1/commons-compress-1.27.1.jar" dest="${vetted.lib.dir}/poi/commons-compress-1.27.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar" dest="${vetted.lib.dir}/poi/commons-math3-3.6.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/poi/poi/5.4.1/poi-5.4.1.jar" dest="${vetted.lib.dir}/poi/poi-5.4.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/poi/poi-ooxml/5.4.1/poi-ooxml-5.4.1.jar" dest="${vetted.lib.dir}/poi/poi-ooxml-5.4.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/poi/poi-ooxml-full/5.4.1/poi-ooxml-full-5.4.1.jar" dest="${vetted.lib.dir}/poi/poi-ooxml-full-5.4.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/xmlbeans/xmlbeans/5.3.0/xmlbeans-5.3.0.jar" dest="${vetted.lib.dir}/poi/xmlbeans-5.3.0.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded poi libs from OT repo."/>
+		
+		<echo message="Downloading swagger libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-configuration2/2.12.0/commons-configuration2-2.12.0.jar" dest="${vetted.lib.dir}/swagger/commons-configuration2-2.12.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-lang3-3.18.0.jar" verbose="true" usetimestamp="true"/>
+        <get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-text/1.13.1/commons-text-1.13.1.jar" dest="${vetted.lib.dir}/SAP_UME/lib/commons-text-1.13.1.jar" verbose="true" usetimestamp="true"/>
+        <get src="https://artifactory.otxlab.net/artifactory/libs-release/commons-logging/commons-logging/1.3.5/commons-logging-1.3.5.jar" dest="${vetted.lib.dir}/swagger/commons-logging-1.3.5.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/com/google/guava/guava/33.4.8-jre/guava-33.4.8-jre.jar" dest="${vetted.lib.dir}/swagger/guava-33.4.8-jre.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/ws/rs/jakarta.ws.rs-api/3.1.0/jakarta.ws.rs-api-3.1.0.jar" dest="${vetted.lib.dir}/swagger/jakarta.ws.rs-api-3.1.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/javassist/javassist/3.30.2-GA/javassist-3.30.2-GA.jar" dest="${vetted.lib.dir}/swagger/javassist-3.30.2-GA.jar" verbose="true" usetimestamp="true"/>
+		<!--get src="https://artifactory.otxlab.net/artifactory/libs-release/javax/ws/rs/javax.ws.rs-api/2.1.1/javax.ws.rs-api-2.1.1.jar" dest="${vetted.lib.dir}/swagger/javax.ws.rs-api-2.1.1.jar" verbose="true" usetimestamp="true"/-->
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/reflections/reflections/0.9.12/reflections-0.9.12.jar" dest="${vetted.lib.dir}/swagger/reflections-0.9.12.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/io/swagger/core/v3/swagger-annotations/2.2.31/swagger-annotations-2.2.31.jar" dest="${vetted.lib.dir}/swagger/swagger-annotations-2.2.31.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/io/swagger/core/v3/swagger-integration/2.2.31/swagger-integration-2.2.31.jar" dest="${vetted.lib.dir}/swagger/swagger-integration-2.2.31.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/io/swagger/core/v3/swagger-core/2.2.31/swagger-core-2.2.31.jar" dest="${vetted.lib.dir}/swagger/swagger-core-2.2.31.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/io/swagger/core/v3/swagger-jaxrs2-jakarta/2.2.31/swagger-jaxrs2-jakarta-2.2.31.jar" dest="${vetted.lib.dir}/swagger/swagger-jaxrs2-jakarta-2.2.31.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/io/swagger/core/v3/swagger-models/2.2.31/swagger-models-2.2.31.jar" dest="${vetted.lib.dir}/swagger/swagger-models-2.2.31.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/io/github/classgraph/classgraph/4.8.179/classgraph-4.8.179.jar" dest="${vetted.lib.dir}/swagger/classgraph-4.8.179.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded swagger libs from OT repo."/>
+		
+		<echo message="Downloading otmm202 libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar" dest="${vetted.lib.dir}/otmm202/commons-lang3-3.18.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar" dest="${vetted.lib.dir}/otmm202/log4j-api-2.24.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/apache/logging/log4j/log4j-core/2.24.3/log4j-core-2.24.3.jar" dest="${vetted.lib.dir}/otmm202/log4j-core-2.24.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/eclipse/microprofile/config/microprofile-config-api/3.1/microprofile-config-api-3.1.jar" dest="${vetted.lib.dir}/otmm202/microprofile-config-api-3.1.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded otmm202 libs from OT repo."/>
+		
+		<echo message="Downloading owasp libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/owasp/encoder/encoder/1.3.1/encoder-1.3.1.jar" dest="${vetted.lib.dir}/owasp/encoder-1.3.1.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded owasp libs from OT repo."/>
+	
+		<echo message="Downloading jakarta-xml-ws libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.activation-api-2.1.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.annotation-api-2.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/authorization/jakarta.authorization-api/2.1.0/jakarta.authorization-api-2.1.0.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.authorization-api-2.1.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.inject-api-2.0.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/json/bind/jakarta.json.bind-api/3.0.1/jakarta.json.bind-api-3.0.1.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.json.bind-api-3.0.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/json/jakarta.json-api/2.1.3/jakarta.json-api-2.1.3.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.json-api-2.1.3.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/mail/jakarta.mail-api/2.1.2/jakarta.mail-api-2.1.2.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.mail-api-2.1.2.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/servlet/jakarta.servlet-api/6.1.0/jakarta.servlet-api-6.1.0.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.servlet-api-6.1.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.validation-api-3.1.1.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/ws/rs/jakarta.ws.rs-api/3.1.0/jakarta.ws.rs-api-3.1.0.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.ws.rs-api-3.1.0.jar" verbose="true" usetimestamp="true"/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar" dest="${vetted.lib.dir}/jakarta-xml-ws/jakarta.xml.bind-api-4.0.2.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded jakarta-xml-ws libs from OT repo."/>
+		
+		<echo message="Downloading jboss libs from OT repo."/>
+		<get src="https://artifactory.otxlab.net/artifactory/libs-release/org/eclipse/microprofile/config/microprofile-config-api/3.1/microprofile-config-api-3.1.jar" dest="${vetted.lib.dir}/jboss/microprofile-config-api-3.1.jar" verbose="true" usetimestamp="true"/>
+		<echo message="Downloaded jboss libs from OT repo."/>
+	
+	</sequential>
+</macrodef>
+
+<!-- - - - - - - - - - - - - - - - - -
+        target: setup
+       - - - - - - - - - - - - - - - - - -->
+<target name="setup">
+	<mkdir dir="${vetted.lib.dir}" />
+	<mkdir dir="${vetted.lib.dir}/jersey" />
+	<mkdir dir="${vetted.lib.dir}/httpClient" />
+    <mkdir dir="${vetted.lib.dir}/commons-configuration/lib" />
+    <mkdir dir="${vetted.lib.dir}/jackson" />
+    <mkdir dir="${vetted.lib.dir}/resteasy" />
+    <mkdir dir="${vetted.lib.dir}/SAP_UME/lib" />
+    <mkdir dir="${vetted.lib.dir}/apache/lib" />
+    <mkdir dir="${vetted.lib.dir}/google" />
+	<mkdir dir="${vetted.lib.dir}/poi" />
+	<mkdir dir="${vetted.lib.dir}/swagger" />
+	<mkdir dir="${vetted.lib.dir}/otmm202" />
+	<mkdir dir="${vetted.lib.dir}/owasp" />
+	<mkdir dir="${vetted.lib.dir}/jakarta-xml-ws" />
+	<mkdir dir="${vetted.lib.dir}/jboss" />
+	
+    <mkdir dir="${out.temp.dir}" />
+    <mkdir dir="${out.server.classes.dir}"/>
+    <mkdir dir="${out.server.16.classes.dir}"/>
+    <mkdir dir="${out.jboss.ear.dir}"/>
+    <mkdir dir="${out.tomee.ear.dir}"/>
+    <mkdir dir="${out.container.ear.dir}"/> <!-- SAPDC-3544 -->
+    <mkdir dir="${out.stubs.dir}"/>
+    <mkdir dir="${out.lib.dir}"/>
+    <mkdir dir="${out.lib.16.dir}"/>
+    <mkdir dir="${out.jboss.ejb.jar.dir}"/>
+    <mkdir dir="${out.tomee.ejb.jar.dir}"/>
+
+    <mkdir dir="${src.stubs.dir}"/>
+    <mkdir dir="${out.stubs.dir}/lib"/>
+    <mkdir dir="${ws.wsdl.dir}"/>
+    <mkdir dir="${src.cl.stubs.dir}"/>
+    <mkdir dir="${classes.stubs.dir}"/>
+    <mkdir dir="${classes.clstubs.dir}"/>
+    <mkdir dir="${classes.otdcws.dir}"/>
+    <mkdir dir="${ejb.classes.dir}"/>
+    <mkdir dir="${ejb.16.classes.dir}"/>
+    <mkdir dir="${src.client.dir}"/>
+
+    <!-- Producing the properties files to be uploaded to the SLD server at customer site. -->
+    <property name="thirdparty.dam.file.name" value="ThirdPartySystem_DAMLINK.properties"/>
+    <property name="thirdparty.dam.file.path" value="${sldreg.dir}/${thirdparty.dam.file.name}"/>
+    <property name="thirdparty.dam.tmpl.file.name" value="${sldreg.dir}/ThirdPartySystem.properties.template"/>
+
+    <!-- Clean up possible existing output file -->
+    <delete file="${thirdparty.dam.file.path}" failonerror="false"/>
+
+    <!-- Editing the DAM SLD properties file to provide the right version information -->
+    <copy file="${thirdparty.dam.tmpl.file.name}" tofile="${thirdparty.dam.file.path}" >
+        <filterchain>
+            <replacetokens>
+                <token key="productVersion" value="${con.version}"/>
+                <token key="componentVersion" value="${con.build}"/>
+            </replacetokens>
+        </filterchain>
+    </copy>
+
+    <!-- Edit the version.properties file to provide the right version information -->
+    <copy file="${install.dir}/version.properties.template" tofile="${install.dir}/version.properties" >
+        <filterchain>
+            <replacetokens>
+                <token key="versionNumber" value="${con.version}"/>
+                <token key="buildNumber" value="${con.build}"/>
+            </replacetokens>
+        </filterchain>
+    </copy>
+</target>
+
+<!-- - - - - - - - - - - - - - - - - -
+        target: stubs.uptodate
+       - - - - - - - - - - - - - - - - - -->
+<target name="stubs.uptodate">
+    <uptodate property="stubs.uptodate" targetfile="${stubs.jar.file}">
+        <srcfiles dir="${wsdl.dir}" includes="*.*"/>
+    </uptodate>
+</target>
+
+<!-- - - - - - - - - - - - - - - - - -
+        target: genStubs
+       - - - - - - - - - - - - - - - - - -->
+<target name="genStubs" depends="stubs.uptodate" unless="stubs.uptodate">
+    <wsdl2java wsdl.file="${wsdl.dir}/_DigitalAssetCRMAllowedDigitalAssetTypesQueryResponse_Out.wsdl"/>
+    <wsdl2java wsdl.file="${wsdl.dir}/_DigitalAssetCRMAllowedPropertiesQueryResponse_Out.wsdl"/>
+    <wsdl2java wsdl.file="${wsdl.dir}/_DigitalAssetCRMVersionBasicDataByElementsQueryResponse_Out.wsdl"/>
+    <wsdl2java wsdl.file="${wsdl.dir}/_DigitalAssetCRMVersionBasicDataByIDQueryResponse_Out.wsdl"/>
+
+    <javac srcdir="${src.stubs.dir}" destdir="${classes.stubs.dir}" debug="on">
+        <classpath refid="apache-cxf.classpath"/>
+    </javac>
+
+    <jar file="${stubs.jar.file}" basedir="${classes.stubs.dir}" includes="**/*.class" />
+</target>
+
+<target name="zcopy" depends="package" description="copy jars over installed OTMM">	
+	<property name="otmmdir" location="${env.TEAMS_HOME}" />
+    <copy preservelastmodified="true" overwrite="true" todir="${otmmdir}/ear/artesia/lib" file="${out.jars.16.dir}/lib/damlink_impl.jar"/>
+    <copy preservelastmodified="true" overwrite="true" todir="${otmmdir}/ear/artesia/ot-damlink/WEB-INF/lib" file="${out.jars.dir}/damlink_ws.jar"/>
+    <copy preservelastmodified="true" overwrite="true" todir="${otmmdir}/ear/artesia" file="${build.dir}/tomee.jar/damlink_ejb.jar"/>
+    <copy preservelastmodified="true" overwrite="true" todir="${otmmdir}/ear/artesia/lib" file="${out.jars.16.dir}/lib/otmmsetup.jar"/>
+    <copy preservelastmodified="true" overwrite="true" todir="${otmmdir}/ear/artesia/lib" file="${out.jars.16.dir}/lib/damlink_ejb_intf.jar"/>
+    <copy preservelastmodified="true" overwrite="true" todir="${otmmdir}/data/sap/lib" file="${out.jars.dir}/ot-log4j.jar"/>
+</target>
+	
+<target name="patch" depends="init-release-number">
+    <ant dir="patch" antfile="build.xml" inheritall="false" inheritrefs="false" >
+        <property name="patch.number" value="${patch.number}"/>
+        <property name="version.number" value="${release.number}"/>
+    </ant>
+</target>	
+	
+<!-- - - - - - - - - - - - - - - - - - 
+  target: init-release-number                      
+ - - - - - - - - - - - - - - - - - -->
+<target name="init-release-number">
+    <propertyregex property="release.number" input="${build.number}" regexp="${build.number.regexp}" select="\1"/>
+    <echo message="release.number= ${release.number}"/> 
+</target>	
+	
+</project>

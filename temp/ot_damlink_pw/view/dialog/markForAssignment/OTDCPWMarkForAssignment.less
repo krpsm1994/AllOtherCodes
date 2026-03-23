@@ -1,0 +1,275 @@
+@import (reference) "../../../../style/format/variables.less";
+@import (reference) "../../../../style/format/mixins.less";
+
+ot-view[dialogname="otdcpwmarkforassignmentdialog"] {
+	width: 70%;
+	height: 80%;
+}
+ot-view[ot-view-type="OTDCPWMarkForAssignmentView"]
+{
+	.ot-modal-dialog-body{
+		.ot-content {
+			overflow-y: hidden;
+		}
+	}
+	
+	.ot-touch-ui &
+	{
+		width: calc(~"100% - 0.5rem");
+		height: calc(~"100% - 0.5rem");
+	}
+
+	.ot-modal-dialog-footer-buttons .ot-new-folder-header{
+		color: #333333;
+		font-size: 0.75rem;
+		font-weight: bold;
+	}
+
+	.ot-modal-dialog-footer{
+		z-index: 6000;
+		position: relative;
+		bottom: 30px;
+	}
+	
+	ot-dialog-body{
+		display: block;
+		height: 100%;
+	}
+
+	ot-resource{
+		display: flex;
+	}
+
+	.ot-workflowjobs-wrapper{
+		height: calc(~"100% - 18rem");
+    	width: 100%;
+	}
+
+	.ot-workflowjobs-body-content{
+		height: 100%;
+	}
+
+	.otdcpw-pim-position{
+		white-space: normal !important;
+	}
+
+	.ot-tabular-chiclets-section {
+		margin-top: 0.5rem;
+	}
+
+	.ot-tabular-chiclets-section ot-chiclet {
+		margin-right: 0.5rem;
+		margin-top: 0.5rem;
+		word-break: break-word;
+	}
+
+	.ot-table-element ot-select{
+		max-width: 60% !important;
+	}
+
+	.ot-workflowjob-row {
+		cursor: default;
+		padding: 0 1rem;
+	}
+
+	.otdcpw-error-msg{
+        color: #ec3625;
+        font-size: 0.75rem;
+        line-height: 0.75rem;
+        font-weight: bold;
+        margin-top: 8px;
+        text-align: left;
+    }
+
+	
+	.otdcpw-markforassign-select-products{
+		padding: 16px;
+		margin: 4px;
+		height: 90%;
+		width: 90%;
+		padding-top: 15px;
+
+		.otdcpw-products-list-input {
+			width: 80%;
+   			height: 70%;
+			margin-left: 15px;
+		}
+		
+		.otdcpw-products-list-input:focus {
+			outline:none;
+			border: 2px rgb(51,51,51) solid;
+		}
+
+		.otdcpw-products-list-label{
+			display: inline-block;
+    		vertical-align: top;
+		}
+
+		.otdcpw-products-list-hint{
+			display: block;
+			font-size: 0.75rem;
+			margin-left: 110px;
+		}
+	}
+
+	.otdcpw-markforassign-container{
+		height: 100%;
+    	width: 100%;
+	}
+
+	.otdcpw-markforassign-back-button {
+		height: 2rem;
+		width: 2.5rem;
+		cursor: pointer;
+		background-image: url(../../../style/img/action_back32.svg);
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: 28px 28px;
+		float: left;
+	}
+	
+	.otdcpw-markforassign-stepper {
+		font-size: 14pt;
+		margin-top: 30px;
+		padding-bottom: 20px;
+    	border-bottom: 2px solid #d5d5d5;
+	}
+	
+	@-moz-document url-prefix() {
+		.otdcpw-markforassign-stepper {
+		   text-align: -moz-center;
+		 }
+	 }
+  
+	 /* For Chrome and other WebKit-based browsers */
+	 @media screen and (-webkit-min-device-pixel-ratio:0) {
+		.otdcpw-markforassign-stepper {
+		   text-align: -webkit-center;
+		 }
+	 }
+
+	.otdcpw-markforassign-stepper-container {
+		width: 84%;
+		display: flex;
+		font-family: Opentext Sans;
+	}
+
+	.otdcpw-markforassign-taCenter {
+		text-align: center;
+	}
+
+	.otdcpw-markforassign-stepper-element {
+		width: 50%;
+		display: flex;
+	}
+
+	.otdcpw-markforassign-stepper-icon-text {
+		display: block;
+		text-align: initial;
+		margin-top: 12px;
+		width: max-content;
+	}
+
+	.otdcpw-markforassign-stepper-icon-text-bold{
+		font-weight: 800;
+	}
+
+	.otdcpw-markforassign-stepper-element-hr-width {
+		width: 100%;
+		z-index: -1;
+	}
+
+	.otdcpw-markforassign-stepper-element-first-hr-margin {
+		margin-left: -60px;
+		z-index:6000;
+	}
+
+	.otdcpw-markforassign-stepper-element-second-hr-margin {
+		margin-right: -83px;
+		z-index:6000;
+	}
+
+	.otdcpw-markforassign-stepper-hr-current-solid {
+		border: 1px solid #2E3D98;
+		height: 0px;
+		margin-top: revert;
+		margin-bottom: revert;
+	}
+
+	.otdcpw-markforassign-stepper-hr-current-dashed {
+		border: 1px dashed #2E3D98;
+		height: 0px;
+		margin-top: revert;
+		margin-bottom: revert;
+	}
+
+	.otdcpw-markforassign-stepper-hr-future-dashed {
+		border: 1px dashed #666666;
+		height: 0px;
+		margin-top: revert;
+		margin-bottom: revert;
+	}
+
+	.otdcpw-markforassign-stepper-hr-completed {
+		border: 1px solid #067D14;
+		height: 0px;
+		margin-top: revert;
+		margin-bottom: revert;
+	}
+
+	.otdcpw-markforassign-stepper-svg{
+		height: 20px;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+
+	.otdcpw-markforassign-stepper-svg-active {
+		background-image: url(../../../style/img/step_active.svg);
+		z-index: 6000;
+		position: relative;
+	}
+
+	.otdcpw-markforassign-stepper-svg-pending {
+		background-image: url(../../../style/img/step_pending.svg);
+		z-index: 6000;
+		position: relative;
+	}
+
+	.otdcpw-markforassign-stepper-svg-completed {
+		background-image: url(../../../style/img/step_completed20.svg);
+		z-index: 6000;
+		position: relative;
+	}
+
+	.otdcpw-markforassign-global-pimposition-panel {
+		display: flex;
+		padding-left: 25px;
+		padding-top: 13px;
+		padding-bottom: 5px;
+	}
+
+	.otdcpw-mL20 {
+		margin-left: 20px;
+	}
+
+	.otdcpw-markforassign-global-pimposition-buttons {
+		cursor: pointer;
+		color: #232e72 !important;
+    	background-color: #ffffff !important;
+		border: 1px solid #232e72;
+	}
+
+	.otdcpw-markforassign-global-pimposition-dropdown {
+		width: 30%;
+	}
+
+	.otdcpw-maxWidth100 {
+		width: 100%;
+	}
+
+	.otdcpw-markforassign-global-pimposition-label{
+		padding-top: 7px;
+		font-size: 11pt;
+	}
+
+}

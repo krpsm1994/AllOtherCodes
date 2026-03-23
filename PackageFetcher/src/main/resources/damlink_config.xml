@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <mediamanager>
+    <!-- field id of the Media Manager field used for the SAP status -->
+    <statusfieldid>ARTESIA.FIELD.CONTENT</statusfieldid>
+    <!-- list of model ids of Media Manager models made available in SAP -->
+    <allowedmodels>
+      <modelid>ARTESIA.MODEL.DEFAULT</modelid>
+    </allowedmodels>
+    <!-- update interval in seconds for rereading available field and models in the MediaManager -->
+    <updateinterval>60</updateinterval>
+    <!-- if true the MediaManager edit properties UI is started upon CRM user 
+			clicks on asset content (if he has permissions) otherwise the asset inspector 
+			is started. -->
+    <editonviewing>false</editonviewing>
+    <!-- DAM admin user -->
+    <user>tsuper</user>
+  </mediamanager>
+  <certificates>
+    <!-- update interval in seconds for rescan of available SAP certificates -->
+    <updateinterval>30</updateinterval>
+  </certificates>
+  <security>
+    <!-- live time in seconds of the security token for WS Basic authentication -->
+    <tokenlifetime>1800</tokenlifetime>
+    <!-- Number of bits (from left) that are used in the token IP check (For IPv4). -->
+    <ipv4tokenmask>32</ipv4tokenmask>
+    <!-- Number of bits (from left) that are used in the token IP check (For IPv6). -->
+    <ipv6tokenmask>128</ipv6tokenmask>
+    <!-- URL encryption key. Normally this is set automatically. -->
+    <urlenckey>69b4c14991806be2068f95932287e282</urlenckey>
+    <!-- WSDL Basic Authentication Login ID -->
+    <wsdllogin/>
+    <!-- WSDL Basic Authentication Login Password -->
+    <wsdlpass/>
+    <encryptionkey/>
+  </security>
+  <!-- Configuration for the SAP OTDC Services (AddOns) -->
+  <otdcservices>
+    <!-- Set 'active' to true to activate the connection -->
+    <connection active="true" id="Hybris_LastVersion_commerce1" url="https://commerce1.example.com:9002/otmmaddon/OTDC_DAM_INTERFACE?wsdl">
+      <security>
+        <usernametoken>
+          <username>admin</username>
+          <password>Sai : 0.4722172069621746</password>
+        </usernametoken>
+      </security>
+      <events>10001</events>
+    </connection>
+    <connection active="true" id="Hybris_LastVersion_commerce2" url="https://commerce2.example.com:9002/otmmaddon/OTDC_DAM_INTERFACE?wsdl">
+      <security>
+        <usernametoken>
+          <username>admin</username>
+          <password>Sai : 0.basha</password>
+        </usernametoken>
+      </security>
+      <events>10001</events>
+    </connection>
+    <!--<connection active="true" id="Hybris_Purge_commerce1" url="https://commerce1.example.com:9002/otmmaddon/OTDC_DAM_INTERFACE?wsdl">
+          	<security>
+              <usernametoken>
+            		<username></username>
+            		<password></password>
+            	</usernametoken>
+            </security>
+            <events>30006</events>
+        </connection>
+        <connection active="true" id="Hybris_Search_commerce1" url="https://commerce1.example.com:9002/otmmaddon/OTDC_DAM_INTERFACE?wsdl">
+        	<security>
+              <usernametoken>
+            		<username></username>
+            		<password></password>
+            	</usernametoken>
+            </security>
+            <events/>
+        </connection>
+		 -->
+  </otdcservices>
+  <!-- Configuration for all Event Listener. -->
+  <eventlisteners>
+    <!-- The SAP Event Listener to notify MM object changes to the SAP system. -->
+    <!-- This listener notifies SAP systems according to the connection IDs 
+			configured in the searchconfigs/notificationconfigs below. -->
+    <eventlistener>
+      <class>com.opentext.sap.damint.service.OTDCEventNotifier</class>
+      <!-- Set this to true to activate the Listener -->
+      <active>true</active>
+      <params>
+        <!-- Comma separated list of event IDs to process with this listener -->
+        <!-- Event IDs, in EVENT_CTXTS, IS_ENABLED_EXTERNAL=Y :
+					10001	Asset Checked-in
+					30005	Asset Deleted
+					30006	Asset Purged
+					30007	User Deleted
+					80008	Metadata Updated
+					110011	Asset Undeleted
+				-->
+        <events>10001,30005,30006,30007,80008,110011</events>
+      </params>
+    </eventlistener>
+  </eventlisteners>
+  <searchconfigs>
+    <!-- The damfieldid must be the one defined in the ObjectEditorExtensions.xml -->
+    <!-- This field id represents the one where the lookup button will appear. -->
+    <searchconfig connectionid="SAPhostA" damfieldid="OPENTEXT.FIELDS.MATERIAL NUMBER" id="materialname" istabular="false" objecttype="Material">
+      <searchfields>
+        <searchfield datatype="string" id="nr" name="Material Number" sapid="MATERIALNR">
+          <operators>
+            <operator id="CP" name="contains pattern"/>
+            <operator id="EQ" name="equals"/>
+          </operators>
+          <value/>
+        </searchfield>
+        <searchfield datatype="string" id="desc" name="Material Description" sapid="MATERIALSHORTDESC">
+          <operators>
+            <operator id="CP" name="contains pattern"/>
+          </operators>
+          <value/>
+        </searchfield>
+      </searchfields>
+      <resultfields>
+        <resultfield damid="OPENTEXT.FIELDS.MATERIAL NUMBER" datatype="string" id="nr" issapkey="true" name="Material number" sapid="MATERIALNR" visible="true"/>
+        <resultfield damid="OPENTEXT.FIELDS.MATERIAL DESCRIPTION" datatype="string" id="desc" name="Material description" sapid="MATERIALSHORTDESC" visible="true"/>
+        <resultfield damid="OPENTEXT.FIELDS.MATERIAL VENDOR NUMBER" datatype="string" id="manuf" name="Vendor Number" sapid="VENDOR" visible="true"/>
+        <resultfield damid="OPENTEXT.FIELDS.MATERIAL VENDOR NAME" datatype="string" id="manuf_desc" name="Vendor Name" sapid="VENDOR_DESC" visible="true"/>
+      </resultfields>
+    </searchconfig>
+    <!-- Example to set additional metadata from a subclass FlowerProduct of Product with
+			additional properties BotanicalName, CommonName(localized), Colour and Height.
+			The corresponding OTMM Model can be found in otmm_config/data/sap/otmmsetup/Flower.json.
+			  
+		<searchconfig connectionid="Hybris_Search_flower" damfieldid="FLOWER.BOTNAME" id="flower"
+			istabular="false" objecttype="FlowerProduct">
+			<typeahead min-length="3" max-number-of-suggestions="50" />
+			<searchfields>
+				<searchfield datatype="string" id="BotanicalName" name="BotanicalName"
+					sapid="BotanicalName">
+					<operators>
+						<operator id="BG" name="begins with" />
+						<operator id="CP" name="contains pattern" />
+						<operator id="EQ" name="equals" />
+						<operator id="EN" name="ends with" />
+						<operator id="BotanicalName" name="typeahead" />
+					</operators>
+					<value />
+				</searchfield>
+				<searchfield datatype="string" id="CommonName" name="CommonName"
+					sapid="CommonName">
+					<operators>
+						<operator id="BG" name="begins with" />
+						<operator id="CP" name="contains pattern" />
+						<operator id="EQ" name="equals" />
+						<operator id="EN" name="ends with" />
+						<operator id="CommonName" name="typeahead" />
+					</operators>
+					<value />
+				</searchfield>
+				<searchfield datatype="string" id="Colour" name="Colour"
+					sapid="Colour">
+					<operators>
+						<operator id="BG" name="begins with" />
+						<operator id="CP" name="contains pattern" />
+						<operator id="EQ" name="equals" />
+						<operator id="EN" name="ends with" />
+						<operator id="Colour" name="typeahead" />
+					</operators>
+					<value />
+				</searchfield>
+				<searchfield datatype="String" id="Height" name="Height"
+					sapid="Height">
+					<operators>
+						<operator id="BG" name="begins with" />
+						<operator id="CP" name="contains pattern" />
+						<operator id="EQ" name="equals" />
+						<operator id="EN" name="ends with" />
+						<operator id="Height" name="typeahead" />
+					</operators>
+					<value />
+				</searchfield>
+			</searchfields>
+			<resultfields>
+				<resultfield damid="FLOWER.BOTNAME"
+					datatype="string" id="BotanicalName" issapkey="false" name="Botanical Name"
+					sapid="BotanicalName" visible="true" />
+				<resultfield damid="FLOWER.COMNAME"
+					datatype="string" id="CommonName" issapkey="false" name="Common Name"
+					sapid="CommonName" visible="true" ismultilanguage="true">
+					<resultlanguage name="Allg.Name" damid="FLOWER.COMNAME" code="de" />
+					<resultlanguage name="Common Name" damid="FLOWER.COMNAME" code="en_US" />
+				</resultfield>
+				<resultfield damid="FLOWER.COLOUR"
+					datatype="string" id="Colour" issapkey="false" name="Colour"
+					sapid="Colour" visible="true" />
+				<resultfield damid="FLOWER.HEIGHT"
+					datatype="string" id="Height" issapkey="false" name="Height"
+					sapid="Height" visible="true" />
+			</resultfields>
+		</searchconfig>
+		 -->
+  </searchconfigs>
+  <notificationconfigs>
+    <!-- Atleast one notificationconfig entry must be present for the connection wizard to generate default configuration. -->
+    <notificationconfig connectionid="dummy" id="dummy1"/>
+    <!--
+		The value tags must NOT be empty (it should contain at least one char.) 
+		-->
+    <!-- <notificationconfig connectionid="Hybris_LastVersion_commerce1" damfieldid="HYBRIS.TABLE.PRODUCT.PRODUCT INFO" id="commerce1-1" istabular="true">
+            <filterfields>
+                <filterfield id="id1" ismandatory="true" name="Hybris Item PK">
+                    <operators>
+                        <operator id="MP" name="matches pattern"/>
+                    </operators>
+                    <value>.+</value>
+                </filterfield>
+                <filterfield id="id2" ismandatory="true" name="Hybris System ID">
+                    <operators>
+                        <operator id="EQ" name="equals"/>
+                        <operator id="IE" name="is empty"/>
+                    </operators>
+                    <value>commerce1_systemid</value>
+                </filterfield>
+            </filterfields>
+            <datafields>
+                <datafield damid="HYBRIS.FIELD.PRODUCT.PRODUCT ID" datatype="string" id="id1" name="Hybris Item ID"/>
+                <datafield damid="HYBRIS.FIELD.PRODUCT.PRODUCT TAG NAME" datatype="string" id="id2" name="Hybris Assignment Label"/>
+                <datafield damid="HYBRIS.FIELD.PRODUCT.PRODUCT ATTRIBUTE NAME" datatype="string" id="id3" name="Hybris Attribute Name"/>
+                <datafield damid="HYBRIS.FIELD.PRODUCT.PRODUCT CATALOG NAME" datatype="string" id="id4" name="Hybris Catalog Mnemonic"/>
+                <datafield damid="HYBRIS.FIELD.PRODUCT.PRODUCT PK" datatype="string" id="id5" name="Hybris Item PK"/>
+                <datafield damid="HYBRIS.FIELD.PRODUCT.SYSTEM ID" datatype="string" id="id6" name="Hybris System ID"/>
+            </datafields>
+        </notificationconfig>
+        <notificationconfig connectionid="Hybris_LastVersion_commerce1" damfieldid="ARTESIA.CATEGORY.ASSET" id="commerce1-2" istabular="false">
+            <filterfields>
+                <filterfield id="id2" ismandatory="true" name="Is Latest Version">
+                    <operators>
+                        <operator id="EQ" name="equals"/>
+                    </operators>
+                    <value>Y</value>
+                </filterfield>
+            </filterfields>
+            <datafields>
+                <datafield damid="ARTESIA.FIELD.CONTENT TYPE" datatype="string" id="id1" name="Content Type"/>
+                <datafield damid="ARTESIA.FIELD.MIME TYPE" datatype="string" id="id2" name="Mime Type"/>
+                <datafield damid="ARTESIA.FIELD.IS LATEST VERSION" datatype="string" id="id3" name="Is Latest Version"/>
+                <datafield damid="ARTESIA.FIELD.MODEL" datatype="string" id="id4" name="Model"/>
+            </datafields>
+        </notificationconfig>
+        <notificationconfig connectionid="Hybris_Purge_commerce1" damfieldid="HYBRIS.TABLE.PRODUCT.PRODUCT INFO" id="commerce1-3" istabular="true">
+            <filterfields>
+                <filterfield id="id1" ismandatory="true" name="Hybris Item PK">
+                    <operators>
+                        <operator id="MP" name="matches pattern"/>
+                    </operators>
+                    <value>.+</value>
+                </filterfield>
+            </filterfields>
+        </notificationconfig> -->
+  </notificationconfigs>
+  <metadataMapping>
+    <!-- Following are the sample BO attribute mappings for Plant Maintenance scenario -->
+    <boAttributeMapping id="materialname" objectType="BUS1001006">
+      <fields>
+        <field damFldId="OTDCBW.BO.DESC" dataType="string" mappingFldId="MATERIALDESCRIPTION"/>
+        <field damFldId="OTDCBW.MATERIAL.INDUSTRY" dataType="string" mappingFldId="INDUSTRY"/>
+        <field damFldId="OTDCBW.MATERIAL.TYPE" dataType="string" mappingFldId="MATERIALTYPE"/>
+        <field damFldId="OTDCBW.MATERIAL.GROUP" dataType="string" mappingFldId="MATERIALGROUP"/>
+        <field damFldId="OTDCBW.MATERIAL.VENDOR" dataType="string" mappingFldId="VENDOR"/>
+        <field damFldId="OTDCBW.MATERIAL.VENDORDESC" dataType="string" mappingFldId="VENDORDESCRIPTION"/>
+      </fields>
+    </boAttributeMapping>
+    <boAttributeMapping id="equipment" objectType="EQUI">
+      <fields>
+        <field damFldId="OTDCBW.BO.DESC" dataType="string" mappingFldId="EQUIPDESCRIPTION"/>
+        <field damFldId="OTDCBW.EQUIPMENT.CAT" dataType="string" mappingFldId="EQUIPMENTCATEGORY"/>
+        <field damFldId="OTDCBW.EQUIPMENT.TYPE" dataType="string" mappingFldId="EQUIPMENTTYPE"/>
+        <field damFldId="OTDCBW.EQUIPMENT.MANUF" dataType="string" mappingFldId="MANUFACTURER"/>
+        <field damFldId="OTDCBW.EQUIPMENTSPEC.MODEL" dataType="string" mappingFldId="EQUIPMODEL"/>
+        <field damFldId="OTDCBW.EQUIPMENTSPEC.SERIALNUM" dataType="string" mappingFldId="EQUIPSERIALNUMBER"/>
+        <field damFldId="OTDCBW.EQUIPMENTSPEC.MANUFYEAR" dataType="string" mappingFldId="EQUIPMANUFYEAR"/>
+      </fields>
+    </boAttributeMapping>
+    <boAttributeMapping id="maintorder" objectType="BUS2007">
+      <fields>
+        <field damFldId="OTDCBW.BO.DESC" dataType="string" mappingFldId="MAINTENANCEORDERDESCRIPTION"/>
+        <field damFldId="OTDCBW.MAINTORDER.EQUIPDESC" dataType="string" mappingFldId="SHORTTEXT"/>
+        <field damFldId="OTDCBW.MAINTORDER.NOTIF" dataType="string" mappingFldId="NOTIFICATION"/>
+        <field damFldId="OTDCBW.MAINTORDER.EQUIP" dataType="string" mappingFldId="EQUIPMENT"/>
+        <field damFldId="OTDCBW.MAINTORDER.MAINWRKCNTR" dataType="string" mappingFldId="MAINWRKCNTR"/>
+        <field damFldId="OTDCBW.MAINTORDER.RESPONSIBLE" dataType="string" mappingFldId="RESPONSIBLE"/>
+        <field damFldId="OTDCBW.MAINTORDER.PRIORITY" dataType="string" mappingFldId="PRIORITY"/>
+        <field damFldId="OTDCBW.MAINTORDER.STARTDATE" dataType="date" mappingFldId="BASICSTARTDATE"/>
+        <field damFldId="OTDCBW.MAINTORDER.ENDDATE" dataType="date" mappingFldId="ORDERFINISHDATE"/>
+        <field damFldId="OTDCBW.MAINTORDER.TYPE" dataType="string" mappingFldId="ORDERTYPE"/>
+        <field damFldId="OTDCBW.PLANT.NUMBER" dataType="string" mappingFldId="PLANT"/>
+      </fields>
+    </boAttributeMapping>
+    <boAttributeMapping id="maintnotification" objectType="BUS2038">
+      <fields>
+        <field damFldId="OTDCBW.BO.DESC" dataType="string" mappingFldId="MAINTENANCENOTIFICATIONDESCRIPTION"/>
+        <field damFldId="OTDCBW.MAINTNOTIF.MALFUNDATE" dataType="string" mappingFldId="MALFUNCTSTART"/>
+        <field damFldId="OTDCBW.MAINTNOTIF.DATE" dataType="date" mappingFldId="NOTIFICATIONDATE"/>
+        <field damFldId="OTDCBW.MAINTNOTIF.EQUIP" dataType="string" mappingFldId="EQUIPMENT"/>
+        <field damFldId="OTDCBW.MAINTNOTIF.REPBY" dataType="string" mappingFldId="REPORTEDBY"/>
+        <field damFldId="OTDCBW.MAINTNOTIF.TYPE" dataType="string" mappingFldId="TYPE"/>
+      </fields>
+    </boAttributeMapping>
+    <boAttributeMapping id="funcloc" objectType="BUS0010">
+      <fields>
+        <field damFldId="OTDCBW.BO.DESC" dataType="string" mappingFldId="FUNCLOCDESCRIPTION"/>
+        <field damFldId="OTDCBW.FUNCLOC.CAT" dataType="string" mappingFldId="FUNCLOCCATEGORY"/>
+        <field damFldId="OTDCBW.FUNCLOC.STREET" dataType="string" mappingFldId="FUNCLOCSTREET"/>
+        <field damFldId="OTDCBW.FUNCLOC.POSTALCODE" dataType="string" mappingFldId="FUNCLOCPOSTALCODE"/>
+      </fields>
+    </boAttributeMapping>
+  </metadataMapping>
+</configuration>

@@ -1,0 +1,95 @@
+@import (reference) "../../../../style/format/variables.less";
+@import (reference) "../../../../style/format/mixins.less";
+
+ot-view[dialogname="otdcpwassigntoprodwrapperdialog"] {
+	width: 90%;
+	height: 90%;
+}
+
+ot-view[ot-view-type="OTDCPWAssignToProdWrapper"]{
+	.ot-child-container{
+		display: flex;
+		height: 100%;
+		width: 100%;
+	}
+	ot-view[ot-view-type="OTDCPWSidebarView"]{
+		min-width: 20%;
+		.ot-child-content, .ot-card-body{
+			height: 100%;
+			width: 100%;
+		}
+		ot-accordion.with-collapser{
+			width: 100%;
+		}
+		//Hide vertical collapser
+		ot-view-collapser{
+			display: none;
+		}
+	}
+	ot-view[ot-view-type="OTDCPWAssignToProductView"]{
+		// width: 75%;
+		flex: 1; 
+		.ot-child-content{
+			height: 100%;
+			width: 100%;
+		}
+		.ot-selection-button {
+			width: 65% !important;
+		}
+		.ot-page-select-text {
+			padding-right: unset !important;
+		}
+
+		.ot-dropdown-arrow {
+			right: 10px;
+			left: 20px;
+			float: unset;
+		}
+
+		.ot-table-header {
+			display: flex;
+		}
+
+		.ot-workflowjobs-wrapper{
+			height: 100%;
+			width: 100%;
+			.otdcpw-facets-clear-cont{
+				margin: 0.5rem;
+			}
+			.otdcpw-atp-header{
+				display: flex;
+				height: 3rem;
+				.otdcpw-atp-title{
+					color: #333333;
+					padding-left: 1rem;
+					font-weight: normal;
+					font-size: 1.25rem;
+					margin: 0.5rem;
+				}
+			}
+		}
+
+		.ot-workflowjobs-body-content{
+			//Minus the height of header and footer of both dialog and view
+			height: calc((((100% - 3rem) - 2rem) - 3.5rem) - 3.5rem);
+			.ot-table-header{
+				padding-right: 2rem;
+			}
+		}
+
+		.ot-workflowjob-row {
+			cursor: default;
+			padding: 0 1rem;
+		}
+
+		ot-resource{
+			display:flex;
+		}
+
+		.ot-folder-asset-action-button{
+			margin: 0rem;
+			padding: 0rem;
+			display: block;
+		}
+	}
+}

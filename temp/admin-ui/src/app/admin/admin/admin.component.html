@@ -1,0 +1,21 @@
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="pragma" content="no-cache">
+<div class="wrapper">
+    <div [hidden]="!isLoading" class="loaderWrapper">
+        <div class="loader">
+            <output class="spinner">
+                <span class="sr-only">Loading...</span>
+            </output>
+        </div>
+        <p class="loaderText">{{loadingText}}</p>
+    </div>
+    <div class="toolbar">
+        <app-menubar></app-menubar>
+    </div>
+    <div class="sidebar">
+        <app-sidebar></app-sidebar>
+    </div>
+    <div class="content scrollbar" [ngClass]="{'content-expanded': !isMobileDevice}">
+        <router-outlet></router-outlet>
+    </div>
+</div>

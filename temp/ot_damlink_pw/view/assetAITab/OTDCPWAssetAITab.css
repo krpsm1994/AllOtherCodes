@@ -1,0 +1,206 @@
+ot-view[ot-view-type="InspectorView"],
+ot-view[ot-view-type="InspectorEditView"] {
+    .otdcpw-accordion {
+        margin: 0 2rem;
+        max-width: 100%;
+    }
+
+    .otdcpw-border-bottom {
+        border-bottom: 1px solid #000000;
+    }
+
+    .otdcpw-accordion-header {
+        cursor: pointer;
+        display: flex;
+    }
+
+    .otdcpw-accordion-content {
+        display: none;
+        font-size: 16px;
+    }
+
+    .otdcpw-accordion-header-title {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-weight: 800;
+        width: 98%;
+        font-size: 18px;
+        padding-left: 5px;
+    }
+
+    .otdcpw-accordion-up {
+        margin-top: 15px;
+        transform: rotate(+90deg);
+        width: 30px;
+        text-align: center;
+        height: min-content;
+    }
+
+    .otdcpw-accordion-down {
+        transform: rotate(-90deg);
+        height: min-content;
+        width: 30px;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    .otdcpw-aitags-table,
+    .otdcpw-aitags-table-thead,
+    .otdcpw-aitags-table-tbody {
+        width: 100%;
+        color: #333333;
+        font-size: 14px;
+        font-family: Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .otdcpw-aitags-table-thead {
+        background-color: #f4f4f4;
+
+    }
+
+    .otdcpw-aitags-table-tbody-tr {
+        border-bottom: 1px solid #ccc;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .otdcpw-aitags-table-th {
+        padding-top: 10px;
+        font-weight: bold;
+        padding-left: 10px;
+        border-bottom: 1px solid #000000;
+    }
+
+    .otdcpw-aitags-table-tbody-td {
+        border-bottom: 1px solid #CCC;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 10px;
+    }
+
+    .otdcpw-align-left {
+        text-align: left;
+    }
+
+    .otdcpw-align-right {
+        text-align: right;
+        padding-right: 10px;
+    }
+
+    .otdcpw-align-right-with-margin{
+        text-align: right;
+        padding-right: 10px;
+        margin-right: 30px;
+    }
+
+    .otdcpw-width40 {
+        width: 40%;
+        word-wrap: break-word;
+    }
+
+    .otdcpw-width20 {
+        width: 20%;
+        word-wrap: break-word;
+    }
+
+    .otdcpw-settings-panel {
+        background-color: #F4F4F4;
+        height: 48px;
+    }
+
+    .otdcpw-accordion-collapse-icon {
+        cursor: pointer;
+        background-image: url(../../style/img/accordion-collapse.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 28px 28px;
+        height: 48px;
+        width: 48px;
+        display: block;
+        float: right;
+    }
+
+    .otdcpw-accordion-open-icon {
+        cursor: pointer;
+        background-image: url(../../style/img/accordion-open.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 28px 28px;
+        height: 48px;
+        width: 48px;
+        display: block;
+        float: right;
+    }
+
+    .otdcpw-no-results {
+        text-align: center;
+        font-weight: 800;
+        margin-top: 1rem;
+    }
+
+    .otdcpw-generate-ai-tags-button {
+        display: block;
+        margin: 1rem;
+    }
+
+    .otdcpw-noAiTags {
+        vertical-align: middle;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+    }
+
+    .otdcpw-noTagsIcon {
+        background-image: url(../../style/img/noAiTagsIcon.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 220px 220px;
+        height: 220px;
+    }
+
+    .otdcpw-noTagsText {
+        margin-top: 0px;
+        text-align: center;
+    }
+
+    .otdcpw-buttonsPanel {
+        width: 75%;
+    }
+
+    .otdcpw-accordion-group {
+        text-align: right;
+        margin-right: 2rem;
+    }
+
+    .otdcpw-buttonsPanelButon {
+        margin: 4px 10px;
+        border: none;
+        background-color: #F4F4F4;
+        padding: 5px 10px;
+        height: 40px;
+    }
+
+    .otdcpw-buttonsPanelButon:hover {
+        background-color: #FFFFFF;
+    }
+
+    .otdc-margin {
+        margin-top: 10px;
+    }
+
+    .otdcpw-hex-color{
+        width: 20px !important;
+        display: inline-block;
+        border: 1px solid #CCC;
+        height: 13px;
+        margin-left: 10px;
+        border-radius: 5px;
+        vertical-align: bottom;
+    }
+
+    .otdc-aitags-table-show-more-less {
+        cursor: pointer;
+        color: rgb(41 71 251) !important;
+    }
+
+}

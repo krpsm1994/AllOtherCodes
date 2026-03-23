@@ -1,0 +1,23 @@
+<nav class="navbar navbar-expand-lg">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item dropdown">
+            <a class="nav-link" href="javascript:void(0)" onKeyPress="javascript:void(0)" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img class="profile-img" src="assets/images/li_header_user42.svg" alt="Profile Icon"/>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end bg-secondary" aria-labelledby="navbarDropdown" style="position: absolute !important;
+            background-color: rgba(65, 64, 66, 0.98) !important; outline: none !important; background-repeat: no-repeat !important;
+            right: 0rem !important; border-radius: 10px !important; border-top-right-radius: unset !important; top: 2.9em !important;
+            min-width: 8rem !important; left: auto !important; margin-right: 25px;">
+                <a class="dropdown-item username" href="javascript:void(0)">{{username}}
+                    <span class="lastlogin" *ngIf = "lastLoginDate != ''">
+                        {{'Last Login: '+lastLoginDate}}
+                    </span>
+                </a>
+                <li aria-hidden="true" class="divider"></li>
+                <a class="dropdown-item" *ngIf="systemDetails != null && systemDetails.supportLabel && systemDetails.supportURL" target="_blank" [href]="systemDetails.supportURL">{{systemDetails.supportLabel}}</a>
+                <li *ngIf="systemDetails != null && systemDetails.supportLabel && systemDetails.supportURL" aria-hidden="true" class="divider"></li>
+                <a class="dropdown-item" href="javascript:void(0)" (click)="signout()">Sign Out</a>
+            </div>
+        </li>
+    </ul>
+</nav>

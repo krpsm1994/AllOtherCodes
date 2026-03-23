@@ -1,0 +1,50 @@
+#ot-config-tab-content {
+    height: 76vh;
+}
+
+#save,
+#cancel {
+    margin: 5px;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+.btn-right-align {
+    float: inline-end;
+}
+
+.CodeMirror {
+    border: 1px solid black !important;
+    height: calc(100vh - 11em - 1px) !important;
+}
+
+.otdc-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between !important;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: .3rem;
+    border-top-right-radius: .3rem;
+}
+
+.otdc-X-icon {
+    border: 0px;
+    background: #FFFFFF;
+    font-size: x-large;
+}
+
+@media (min-width: 500px) {
+    .urlText {
+        float: right;
+        padding-top: 16px;
+    }
+}
+
+@media (max-width: 766px) {
+    .urlText {
+        display: none;
+    }
+}

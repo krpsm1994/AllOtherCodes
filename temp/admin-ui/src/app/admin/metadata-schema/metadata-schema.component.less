@@ -1,0 +1,40 @@
+#createExistingSchemaInpArea {
+    height: 76vh;
+}
+
+.container-min-width {
+    min-width: 510px;
+    height: calc(100vh - 8em - 1px);
+}
+
+.tab-content {
+    button {
+
+        &#createExistingSchemaBtn,
+        &#createNewSchemaBtn {
+            margin-right: 10px;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    .invalid {
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 80%;
+        color: #dc3545;
+    }
+}
+
+.metadata-schema {
+    .CodeMirror {
+        border: 1px solid black !important;
+        height: calc(100vh - 15em - 1px) !important;
+    }
+}
+
+.otdc-margin-start-10 {
+    margin-left: 10px !important;
+}

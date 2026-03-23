@@ -1,0 +1,60 @@
+@import (reference) "../../../../style/format/variables.less";
+@import (reference) "../../../../style/format/mixins.less";
+
+.ot-dialog[dialogname="otdcpwresyncconfirmdialog"] {
+	width: 47rem;
+    // height: 14rem;
+}
+ot-view[ot-view-type="OTDCPWResyncConfirmView"]
+{
+	.ot-modal-dialog-body{
+		.ot-content {
+			overflow-y: hidden;
+		}
+	}
+	
+	.ot-touch-ui &
+	{
+		width: calc(~"100% - 0.5rem");
+		height: calc(~"100% - 0.5rem");
+	}
+
+	.ot-modal-dialog-footer-buttons .ot-new-folder-header{
+		color: #333333;
+		font-size: 0.75rem;
+		font-weight: bold;
+	}
+	.ot-metadata-message-text{			
+		color: #999999;
+		font-size: 0.75rem;
+	}
+	
+	ot-dialog-body{
+		display: block;
+		height: 100%;
+	}
+	ot-dialog-body ot-model{
+		display: inline-block;
+		width: calc(100% - 4rem);
+		margin-left: 1rem;
+		margin-right: 1rem;
+	}
+
+	.otdcpw-resyncconfirm-container{
+		padding: 16px;
+    	margin: 4px;
+		display: flex;
+	}
+
+	.otdcpw_oAlert_icon{
+		background-image: url('../../../../style/img/notification/notification_question24.svg');
+		background-repeat: no-repeat;
+		min-width: 2em;
+		min-height: 2em;
+		margin-right: 1rem;
+		background-clip: content-box;
+		display: inline-block;
+		vertical-align: top;
+	}
+
+}

@@ -1,0 +1,29 @@
+<script src="./OTDCPWResyncConfirm.js?v=@DAMLINK_VERSION_TOKEN@" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWResyncConfirm.css?v=@DAMLINK_VERSION_TOKEN@"/> 
+
+<template ot-template id="otdcpw-resyncconfirm-content" ot-view="OTDCPWResyncConfirmView">
+   <div class="ot-content">        
+		<ot-dialog-body>
+			<div class="otdcpw-resyncconfirm-container">
+				<div class="otdcpw_oAlert_icon" icon="Confirm"> </div>
+				<div class="otdcpw-resyncconfirm-text">
+					<span><ot-i18n>Syncing will overwrite the workspace metadata with SAP Commerce Cloud data</ot-i18n></span>
+				</div>
+			</div>
+		</ot-dialog-body>
+		<ot-dialog-footer ot-platform="desktop">
+			<div class="ot-modal-dialog-footer-buttons">
+				<button id="ot-newfolder-create-button" type="submit" class="ot-button ot-upload-modal-dialog-button" onclick="OTDCPWResyncConfirmView.onClickContinue(event)"><ot-i18n>Continue</ot-i18n></button>
+				<button type="button" class="ot-button secondary" onclick="otui.DialogUtils.cancelDialog(this)"><ot-i18n>Cancel</ot-i18n></button>
+			</div>
+		</ot-dialog-footer>
+   </div>
+</template>
+
+<template id="OTDCPWResyncConfirmDialog" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWResyncConfirmView" class="ot-new-folder-dialog "
+		ot-view-props='{"name" : "OTDCPWResyncConfirmView", "type" : "OTDCPWResyncConfirmView"}'>
+	</ot-view>
+</template>
+
+<script>otui.Templates.load();</script>

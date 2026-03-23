@@ -1,0 +1,161 @@
+<script src="./OTDCPWFacetsView.js?v=@DAMLINK_VERSION_TOKEN@" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="OTDCPWFacetsView.css?v=@DAMLINK_VERSION_TOKEN@"/>
+
+<template id="content" ot-template ot-view="OTDCPWFacetsView">
+    <div class="ot-facets-view">
+        <div class="ot-facets-root">
+            <div class="ot-facet"></div>
+            <div class="ot-facets-display-more-holder" style="display:none;">
+                <ot-i18n class="ot-facets-display-more">There are more filters to be displayed.</ot-i18n>
+                <ot-i18n class="ot-facets-display-more-button" onclick="OTDCPWFacetsView.displayMoreFacets(event);">Show More</ot-i18n>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="content_phone" ot-template ot-view="OTDCPWFacetsView">
+    <div>
+        <ot-dialog-header>
+            <div class="ot-modal-dialog-header-buttons">
+                <ot-i18n class="ot-link bold ot-remove-all">Clear filters</ot-i18n>
+                <ot-i18n class="ot-link" onclick="otui.DialogUtils.cancelDialog(this);">Cancel</ot-i18n>
+            </div>
+        </ot-dialog-header>
+        <ot-dialog-body>
+            <div class="ot-facets-view">
+                <div class="ot-facets-root">
+                    <div class="ot-facet"></div>
+                    <div class="ot-facets-display-more-holder" style="display:none;">
+                        <ot-i18n class="ot-facets-display-more">There are more filters to be displayed.</ot-i18n>
+                        <ot-i18n class="ot-facets-display-more-button" onclick="OTDCPWFacetsView.displayMoreFacets(event);">Show More</ot-i18n>
+                    </div>
+                </div>
+                <!--<div class="ot-phone-search-facets-footer">-->
+                <!--<ot-view-prop ot-property="searchString"></ot-view-prop>-->
+                <!--<ot-i18n class="ot-link" onclick="">Open all</ot-i18n>-->
+                <!--</div>-->
+            </div>
+        </ot-dialog-body>
+    </div>
+</template>
+
+<template id="FacetsBase" ot-template ot-view="OTDCPWFacetsView">
+    <div class="ot-facets-base-holder">
+        <div class="ot-facets-base-header" onclick="OTDCPWFacetsView.toggleFacet(event)">
+            <span class="ot-facets-base-title"></span>
+            <span class="ot-facets-base-collapser"></span>
+        </div>
+        <div class="ot-facets-base-content"></div>
+        <div class="ot-facets-base-more" onclick="var parentContainer = this.parentNode; OTDCPWFacetsView.expandFacetValueList(event, parentContainer)" ot-facet-showing="false"><ot-i18n>Show more...</ot-i18n></div>
+        <div class="ot-facets-base-static"></div>
+    </div>
+</template>
+<template id="FacetsBaseColor" ot-template ot-view="OTDCPWFacetsView">
+    <div class="ot-facets-base-holder">
+        <div class="ot-facets-base-header" onclick="OTDCPWFacetsView.toggleFacet(event)">
+            <span class="ot-facets-base-title"></span>
+            <span class="ot-facets-base-collapser"></span>
+        </div>
+        <div class="ot-facets-base-content">
+
+        </div>
+    </div>
+</template>
+<template id="facets-color" ot-template ot-view="OTDCPWFacetsView">
+    <div class="ot-color-div">
+        <div class="ot-color-inner-circle"> </div>
+    </div>
+</template>
+
+<template-group id="facet-type" ot-view="OTDCPWFacetsView">
+	<template id="facet-type#simple" ot-template ot-view="OTDCPWFacetsView">
+		<div class="ot-facet-simple">
+			<span>
+				<input type="" class="ot-facet-simple-checkbox">
+				<label class="ot-facet-simple-label"></label>
+			</span>
+			<span class="ot-facet-simple-total"></span>
+		</div>
+	</template>
+	<template id="facet-type#numericRange" ot-template ot-view="OTDCPWFacetsView">
+		<div ot-norepeat="numericRangeInput" class="ot-facet-numeric-range">
+			<span>
+				<input type="" class="ot-facet-simple-checkbox">
+				<label class="ot-facet-simple-label"></label>
+			</span>
+			<span class="ot-facet-simple-total"></span>
+			<div id="numericRangeInput" class="ot-facet-filesize-range-holder" ot-insert=".ot-facets-base-static">
+				<ot-i18n class="ot-facet-filesize-label">From</ot-i18n>
+				<input id="startValue" type="text" class="ot-text-input ot-facet-filesize" onkeyup="FacetsView.fileSizeInputChange(event)">
+				<ot-i18n class="ot-facet-filesize-label">To</ot-i18n>
+				<input id="endValue" type="text" class="ot-text-input ot-facet-filesize" onkeyup="FacetsView.fileSizeInputChange(event)">
+				<ot-i18n id="numericRangeApply" disabled="true" class="ot-button secondary ot-facet-filesize-apply">Apply</ot-i18n>
+			</div>
+		</div>
+	</template>
+	<template id="facet-type#numericInterval" ot-template ot-view="OTDCPWFacetsView">
+		<div ot-norepeat="numericIntervalInput" class="ot-facet-simple">
+			<span>
+				<input type="" class="ot-facet-simple-checkbox">
+				<label class="ot-facet-simple-label"></label>
+			</span>
+			<span class="ot-facet-simple-total"></span>
+			<div id="numericIntervalInput" class="ot-facet-filesize-range-holder" ot-insert=".ot-facets-base-static">
+				<ot-i18n class="ot-facet-filesize-label">From</ot-i18n>
+				<input id="startValue" type="text" class="ot-text-input ot-facet-filesize" onkeyup="FacetsView.fileSizeInputChange(event)">
+				<ot-i18n class="ot-facet-filesize-label">To</ot-i18n>
+				<input id="endValue" type="text" class="ot-text-input ot-facet-filesize" onkeyup="FacetsView.fileSizeInputChange(event)">
+				<ot-i18n id="numericRangeApply" disabled="true" class="ot-button secondary ot-facet-filesize-apply">Apply</ot-i18n>
+			</div>
+		</div>
+	</template>
+	<template id="facet-type#dateInterval" ot-template ot-view="OTDCPWFacetsView">
+		<div ot-norepeat="dateIntervalInput" class="ot-facet-simple">
+			<span>
+				<input type="" class="ot-facet-simple-checkbox">
+				<label class="ot-facet-simple-label"></label>
+			</span>
+			<span class="ot-facet-simple-total"></span>
+			<master template="facet-date-range"></master>
+		</div>
+	</template>
+	<template id="facet-date-range" ot-template>
+		<div id="dateIntervalInput" class="ot-facet-date-range-holder" ot-insert=".ot-facets-base-static">
+			<ot-i18n class="ot-facet-datepicker-label">Date Range</ot-i18n>
+			<ot-datepicker id="startDate" job_due_date_start class="ot-facet-datepicker"
+						   onchange="FacetsView.dateInputChange(event)"
+						   onkeyup="FacetsView.dateInputChange(event)"></ot-datepicker>
+			<div id="startDateWarning" class="ot-facet-datepicker-date-warning-message"></div>
+			<ot-i18n class="ot-facet-datepicker-label">To</ot-i18n>
+			<ot-datepicker id="endDate" job_due_date_end class="ot-facet-datepicker"
+						   onchange="FacetsView.dateInputChange(event)"
+						   onkeyup="FacetsView.dateInputChange(event)"></ot-datepicker>
+			<div id="endDateWarning" class="ot-facet-datepicker-date-warning-message"></div>
+			<ot-i18n id="dateRangeApply" disabled="true" class="ot-button secondary ot-facet-datepicker-apply">Apply</ot-i18n>
+		</div>
+	</template>
+	<template id="facet-type#dateRange" ot-template ot-view="OTDCPWFacetsView">
+		<div ot-norepeat="dateRangeInput" class="ot-facet-date-range">
+			<span>
+				<input type="" class="ot-facet-simple-checkbox">
+				<label class="ot-facet-simple-label"></label>
+			</span>
+			<span class="ot-facet-simple-total"></span>
+			<div id="dateRangeInput" class="ot-facet-date-range-holder" ot-insert=".ot-facets-base-static">
+				<ot-i18n class="ot-facet-datepicker-label">Date Range</ot-i18n>
+				<ot-datepicker id="startDate" class="ot-facet-datepicker" onchange="FacetsView.dateInputChange(event)" onkeyup="FacetsView.dateInputChange(event)"></ot-datepicker>
+				<ot-i18n class="ot-facet-datepicker-label">To</ot-i18n>
+				<ot-datepicker id="endDate" class="ot-facet-datepicker" onchange="FacetsView.dateInputChange(event)" onkeyup="FacetsView.dateInputChange(event)"></ot-datepicker>
+				<ot-i18n id="dateRangeApply" disabled="true" class="ot-button secondary ot-facet-datepicker-apply">Apply</ot-i18n>
+			</div>
+		</div>
+	</template>
+	<template id="facet-type#cascading" ot-template ot-view="OTDCPWFacetsView">
+		<div class="ot-facet-cascading" class="ot-facet-cascading">
+			<span class="ot-facet-cascading-label"></span>
+			<span class="ot-facet-simple-total"></span>
+		</div>
+	</template>
+</template-group>
+
+<script src="../../../ui/import.js"></script>

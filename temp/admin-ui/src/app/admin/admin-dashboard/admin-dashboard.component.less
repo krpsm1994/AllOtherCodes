@@ -1,0 +1,24 @@
+.card-content {
+    padding-top: 1em;
+}
+
+span.required:after {
+    content: '*';
+    color: red;
+}
+
+#nextButton {
+    &:not([aria-expanded="true"]) {
+        &:after {
+            content: "Next Step";
+        }
+    }
+
+    &:after {
+        content: "Hide";
+    }
+
+    &.disabled {
+        pointer-events: none;
+    }
+}

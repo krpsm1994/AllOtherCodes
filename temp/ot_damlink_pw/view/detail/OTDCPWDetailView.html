@@ -1,0 +1,224 @@
+<link rel="import" href="../dialog/sync/OTDCPWSync.html" />
+<link rel="import" href="../dialog/resyncConfirm/OTDCPWResyncConfirm.html" />
+<script type="text/javascript" src="../OTDCPWDetailViewHeader.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<script type="text/javascript" src="./OTDCPWDetailView.js?v=@DAMLINK_VERSION_TOKEN@"></script>
+<link rel="stylesheet" type="text/css" href="./OTDCPWDetailView.css?v=@DAMLINK_VERSION_TOKEN@" />
+
+<template ot-template id="content" ot-view="OTDCPWDetailView">
+	<ot-resource class="ot-inspectorview" ot-resource-locator="verbose"
+		ot-display-override='{"cascade" : "table", "tabularCascade" : "table"}'>
+		<div class="otdcpw-detail-header">
+			<div class="otdcpw-detail-thumbnail-icon">
+				<ot-rendition class="otdcpw-asset-thumbnail-icon" ot-disable-context-menu ot-rendition-format="img"
+					ot-rendition-types="Thumbnail"
+					ot-fallback='{"img" : "././style/img/contenttype/folder148.svg", "width" : 256, "height" : 256}'>
+				</ot-rendition>
+			</div>
+			<div style="display: flex;flex:1">
+				<div style="flex:1" class="otdcpw-workspace-name"></div>
+				<div class="otdcpw-detail-edit-actions">
+					<div class="otdcpw-detail-icon-sync-container" id="otdcpw-sync-button">
+						<span ot-img="img" class="otdcpw-detail-icon-nonsync" aria-label="Sync" title="Sync"
+							onclick="OTDCPWDetailView.onClickSync(event);"></span>
+					</div>
+					<div class="otdcpw-detail-icon-edit-container">
+						<span ot-img="img" class="ot-img-set otdcpw-detail-icon-edit" aria-label="Edit" title="Edit"
+							onclick="OTDCPWDetailView.onClickEdit(event);"></span>
+					</div>
+					<div>
+						<span tabindex="0" class="otdcpw-detail-icon-close"
+							onkeydown="if(event.which === 13) { OTDCPWDetailView.onClickCancel(event); }"
+							onclick="OTDCPWDetailView.onClickCancel(event);">
+							<ot-i18n ot-aria-label>Close</ot-i18n>
+							<ot-i18n ot-as-title>Close</ot-i18n>
+						</span>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="otdcpw-folder-status">
+			<div class="ot-inspectorview-asset-status-msg" ot-point-name="locked" id="locked">
+				<span id="InspectorStatusIconsId" class="ot-inspector-view-asset-status-img ot-img-set" ot-img="img"
+					style="background-image: url(&quot;./style/img/status_lock.svg&quot;);"></span>
+				<span ot-text="text" class="ot-text-set"></span>
+			</div>
+		</div>
+		<ot-tabs clear-tabs content-area=".ot-inspectorview-tabcontent"></ot-tabs>
+		<div class="ot-inspectorview-content">
+			<div class="ot-inspectorview-tabcontent" onclick="OTDCPWDetailView.tabClickListener(event)"></div>
+		</div>
+	</ot-resource>
+</template>
+<template id="OTDCPWDetail" ot-template>
+	<ot-view ot-freeflow ot-view-type="OTDCPWDetailView"
+		ot-view-props='{"name" : "OTDCPWDetailView", "type" : "OTDCPWDetailView"}'>
+	</ot-view>
+</template>
+<template id="OTDCPWDetailMetadataView_content" ot-template ot-view="OTDCPWDetailMetadataView">
+	<div class="otdcpw-body">
+		<div class="otdcpw-left-nav">
+		</div>
+	</div>
+	<div class="otdcpw-footer"></div>
+</template>
+<template ot-template id="content" ot-view="OTDCPWAssetsViewWrapper">
+	<div class="ot-content">
+		<div class="ot-child-container" style="display: flex; height:100%; width: 100%;">
+		</div>
+	</div>
+</template>
+<template ot-template ot-view="OTDCPWAssetsSidebarView" id="content1">
+	<div class="sidebar-collapse-control-wrapper" onclick="OTDCPWDetailView.collapseAndExpandSidebar()"> <span class="sidebar-collapse-control-icon"
+			title="Hide left panel"><ot-i18n ot-as-title="" ot-token="Hide left panel" parsed="true"></ot-i18n></span>
+	</div>
+	<div class="ot-card-body">
+		<ot-accordion class="with-collapser" ot-platform="desktop,tablet"></ot-accordion>
+		<ot-view-collapser collapser-style="vertical-bar" ot-platform="desktop" resizable></ot-view-collapser>
+	</div>
+</template>
+<template ot-template id="content2" ot-view="OTDCPWAssetsFolderView">
+	<div class="otdcpw-asset-subfolder-view"></div>
+</template>
+<template id="OTDCPWAssetsView_content" ot-template ot-view="OTDCPWAssetsView">
+	<master template="content-master">
+		<content-area results-header>
+			<div class="otdcpw-detail-assets-header">
+				<div class="otdcpw-detail-assets-title">
+					<ot-i18n parsed="true" ot-token="Assets">Assets</ot-i18n>
+				</div>
+				<!--Chicklet filters section-->
+				<div class="otdcpw-detail-assets-chicklets">
+					<ot-view-prop ot-property="chickletFilters" ot-parser="CollectionListView.parseFilters"
+						class="ot-activity-tracker-filters"></ot-view-prop>
+				</div>
+			</div>
+			<ot-layout class="ot-folder-asset-actions-holder" ot-platform="desktop">
+				<a class="ot-folder-asset-action-button ot-enabled ot-selection-button"
+					onclick="otui.GalleryViewActions.showPageSelectionOptions(event, '#pageSelectionOptions');"
+					onkeydown="otui.GalleryViewActions.switchPageSelection(event, '#pageSelectionOptions');"
+					tabindex="0">
+					<span id="selectionIndicator" class="ot-asset-select-toggle"
+						onclick="SelectionManager.toggleSelectionState(event);"
+						onkeydown=" SelectionManager.toggleSelectionState(event);"></span>
+					<span class="ot-page-select-text"></span>
+					<span class="ot-dropdown-arrow"></span>
+				</a>
+				<ot-hover id="pageSelectionOptions" class="ot-asset-selection-hover"
+					template="pageSelectionOptions-hover"></ot-hover>
+				<ot-point ot-lookup="OTDCPWDetailViewHeader" class="ot-collection-list-action"
+					ot-use-selection></ot-point>
+				<div class="ot-search-view-refresh"
+					onclick="event.stopImmediatePropagation(); otui.Views.containing(this).reload(true)"
+					title="Refresh">
+					<ot-i18n ot-as-title="" ot-token="Refresh" parsed="true"></ot-i18n>
+				</div>
+				<span class="ot-folder-asset-actions-separator"></span>
+				<ot-point ot-lookup="GalleryViewActions" ot-calculate-bounds-without-children
+					class="ot-folder-asset-actions ot-galleryview-action"
+					onviewresize="this.recalculateLater && this.recalculateLater()" ot-use-selection></ot-point>
+			</ot-layout>
+		</content-area>
+	</master>
+</template>
+<template id="OTDCPWDetailSecurityView_content" ot-template ot-view="OTDCPWDetailSecurityView">
+	<div><ot-i18n>Security View</ot-i18n></div>
+</template>
+<template ot-template ot-view="OTDCPWDetailSecurityView" id="content">
+	<div class="ot-inspector-security-details">
+		<ot-security-policy ot-mode="readonly" ot-security-policy-view="ASSIGNED" asset-inspector></ot-security-policy>
+	</div>
+</template>
+
+<template ot-template ot-view="OTDCPWDetailSecurityView" id="edit-content">
+	<div class="ot-inspector-security-details">
+		<ot-security-policy ot-mode="edit" ot-security-policy-view="ASSIGNED" asset-inspector></ot-security-policy>
+	</div>
+</template>
+
+<template ot-template ot-view="OTDCPWDetailSecurityView" id="noedit">
+	<div class="ot-inspector-permission-text"><ot-i18n>You do not have permission to edit the security policy for this asset.</ot-i18n></div>
+</template>
+
+<template ot-template id="content" ot-view="OTDCPWRelatedWorkspacesView">
+	<div class="otdcpw-related-workspaces-tab-content">
+		<div class="otdcpw-no-botype-message">
+			<ot-i18n>Business object type is not found in workspace metadata or workspace is not in sync.</ot-i18n>
+		</div>
+		<div class="otdcpw-related-workspaces-selection-container">
+			<div class="otdcpw-bo-type-wrapper">
+				<label class="otdcpw-bo-type-label"><ot-i18n>Business Object Type</ot-i18n></label>
+				<div class="otdcpw-bo-type-dropdown">
+					<div class="otdcpw-bo-type-selected" onclick="OTDCPWRelatedWorkspacesView.toggleDropdown(event)">
+						<span class="otdcpw-bo-type-selected-text"></span>
+						<span class="otdcpw-bo-type-arrow"></span>
+					</div>
+					<div class="otdcpw-bo-type-options" style="display: none;">
+						<!-- BO Type Options will be dynamically populated here-->
+					</div>
+				</div>
+			</div>
+			<div class="otdcpw-bo-fetch-button-wrapper">
+				<button class="otdcpw-bo-fetch-button uxa-button uxa-primary uxa-small"
+					onclick="OTDCPWRelatedWorkspacesView.fetchRelatedWorkspaces(event)">
+					<ot-i18n>Fetch Workspaces</ot-i18n>
+				</button>
+			</div>
+		</div>
+		<div class="otdcpw-related-workspaces-empty-message">
+			<ot-i18n>Please select a business object type and click "Fetch Workspaces".</ot-i18n>
+		</div>
+		<div class="otdcpw-no-results" style="display: none;">
+			<ot-i18n>No related workspaces found.</ot-i18n>
+		</div>
+		<div class="otdcpw-related-workspaces-container">
+			<div class="otdcpw-related-workspaces-table">
+				<!-- Related workspaces will be displayed here -->
+				<div class="otdcpw-table-container">
+					<table class="otdcpw-table-header">
+						<thead>
+							<tr>
+								<th class="col-boid" title="Business object ID"><ot-i18n>Business object ID</ot-i18n>
+								</th>
+								<th class="col-boname" title="Business object Name"><ot-i18n>Business object
+										Name</ot-i18n></th>
+								<th class="col-bodescription" title="Description"><ot-i18n>Description</ot-i18n></th>
+							</tr>
+						</thead>
+					</table>
+					<table class="otdcpw-table-body" tabindex="0" aria-label="Related workspaces data">
+						<tbody class="otdcpw-related-workspaces-tbody">
+							<!-- Rows will be dynamically populated here -->
+						</tbody>
+					</table>
+				</div>
+				<div class="otdcpw-pagination-container">
+					<div class="otdcpw-pagination">
+						<button class="otdcpw-pagination-btn" id="otdcpw-prev-page" onclick="OTDCPWRelatedWorkspacesView.goToPreviousPage(event)">
+							<img class="otdcpw-pagination-icon" src="ot_damlink_pw/style/img/action_left_bracket.svg" alt="Previous" />
+						</button>
+						<div class="otdcpw-pagination-info">
+							<span class="otdcpw-pagination-label"><ot-i18n>Page</ot-i18n></span>
+							<input type="number" class="otdcpw-pagination-input" id="otdcpw-current-page" value="1" min="1" aria-label="Page number" onchange="OTDCPWRelatedWorkspacesView.goToPage(event, this.value)" />
+							<span class="otdcpw-pagination-divider">/</span>
+							<span class="otdcpw-pagination-total" id="otdcpw-total-pages"></span>
+						</div>
+						<button class="otdcpw-pagination-btn" id="otdcpw-next-page" onclick="OTDCPWRelatedWorkspacesView.goToNextPage(event)">
+							<img class="otdcpw-pagination-icon"src="ot_damlink_pw/style/img/action_right_bracket.svg" alt="Next" />
+						</button>
+						<div class="otdcpw-pagination-size">
+							<select class="uxa-select otdcpw-pagination-select" id="otdcpw-page-size" aria-label="Items per page" onchange="OTDCPWRelatedWorkspacesView.changePageSize(event,this.value)">
+								<option value="25">25 <ot-i18n>per page</ot-i18n></option>
+								<option value="50" selected>50 <ot-i18n>per page</ot-i18n></option>
+								<option value="100">100 <ot-i18n>per page</ot-i18n></option>
+								<option value="200">200 <ot-i18n>per page</ot-i18n></option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>otui.Templates.load()</script>
