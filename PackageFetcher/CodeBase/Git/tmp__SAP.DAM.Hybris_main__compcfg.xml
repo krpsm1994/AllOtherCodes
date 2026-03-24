@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE ReleasableComponent SYSTEM "ixreleasecomp.dtd">
+
+<ReleasableComponent name="SAP.DAM.Hybris" 
+                     externalName="SAP Hybris Digital Asset Management by OpenText"
+                     version="25.4.0" 
+                     production="master"  gitProject="true" artifactory="true" >
+
+    <Package name="SAP_DAM_HYBRIS"/>
+
+    <BuildEnv name="Java">
+        <!-- These tools are now set from .gitlab-ci.yml -->
+        <!--<BuildTool name="JDK"           version="21.0.8_9" />
+        <BuildTool name="ANT"           version="1.10.13" />
+        <BuildTool name="HYBRIS"        version="2211-jdk21.0" />-->
+
+		
+		
+		<CustomEnv name="HYBRISPATH" />
+		
+    </BuildEnv>
+	
+</ReleasableComponent>

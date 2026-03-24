@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<!-- Production configuration of Releasable Component "SAP.DAMIntegration" -->
+<!-- $Id: //products/main/config/les.elservice/compcfg.xml#80 $ -->
+
+<!DOCTYPE ReleasableComponent SYSTEM "ixreleasecomp.dtd">
+
+<ReleasableComponent name="SAP.DAMIntegration" externalName="DAMLink for SAP Solutions"
+                     companyName="Open Text Corporation"
+                     version="25.4.0"
+                     production="master" gitProject="true" artifactory="true"
+                     synctime="20:00" >
+
+	<!-- MDS component removed -->
+    <!-- We want to put ImConvServlet.war into ot-damlink*.zip -->		     
+    <!-- ReqComponent name="SAP.DAM.MEDSRVR" branch="main" buildmode="copylatest" platform="MSWin32" /-->
+
+    <!-- Required Production environment -->
+    <BuildEnv name="Build">
+		<BuildTool name="JDK" version="21.0.2"/>
+        <BuildTool name="ANT" version="1.7.0"/>
+        <BuildTool name="NODEJS" version="21.6.1"/>
+
+        <CustomEnv name="HYBRISPATH" />
+        
+    </BuildEnv>
+
+    <!-- Root production package(s) -->
+    <Package name="SAP_DAMIntegration" />
+
+    <!-- Distribution configurations and variables -->
+
+	<AlphaRelease build="16.2.0.294" releaseOnErrors="yes" dist="all" />
+	<AlphaRelease build="16.2.0.301" releaseOnErrors="yes" dist="all" />
+
+	<!-- First Alpha Build for DAM 16.2.1 -->
+	<AlphaRelease build="16.2.1.458" releaseOnErrors="yes" dist="all" />
+</ReleasableComponent >

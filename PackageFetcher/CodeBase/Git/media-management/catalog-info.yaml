@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  namespace: digital-media # A namespace to help avoid conflicts. Can be your team name or organization unit
+  name: otmm # The name of this component
+  title: Media Management # [Optional] A more human readable name
+  description: Digital Asset Management (DAM) product # [Optional] A short description of your component
+spec:
+  type: website # The type of component, typically `backend`, `website`, or `library`
+  owner: group:pht-team/otmm-moderator # An entity reference to your PHT Group
+  domain: product/2ed5934a-a417-11e9-af75-00505682bce9 # An entity reference to the BU, LoB, or PHT Product that this Component is part of
+  lifecycle: production

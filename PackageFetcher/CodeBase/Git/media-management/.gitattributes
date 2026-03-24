@@ -1,0 +1,6 @@
+# Set CRLF of LF line endings based on file type
+*			text=auto
+*.sh        text eol=lf
+*.template  text eol=lf
+*.conf        text eol=lf
+**/linux/**/* text eol=lf

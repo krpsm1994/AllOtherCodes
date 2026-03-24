@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Fuel Receipt Generator</title>
+    <link rel="stylesheet" href="billGenerator.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="billGenerator.js"></script>
+</head>
+
+<body>
+
+    <div id="Template1" style="display: block;">
+        <div class="container"
+            style="width: 100%;box-shadow: inset 0 0em 0em rgb(0 0 0 / 10%), 0.3em 0.3em 1em rgb(0 0 0 / 30%);padding: 50px;">
+            <div class="watermark" style="display: block;"></div>
+
+            <div class="row rowBorder">
+                <div class="col-lg-12">
+                    <h3> Fuel Receipt</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 bold logo-section">
+                    <img src="https://billgenerator.org/assets/img/fuel/Bharat.png" alt="Logo" class="billlogo"
+                        id="selectedLogo1">
+                </div>
+                <div class="col-lg-6 colRight">
+                    <h5 class="bold">Receipt Details</h5>
+                    <p class="">Receipt Number: <span class="mx-1 invoice_no">74124243</span></p>
+                    <p class="">Date: <span class="mx-1 fuel_bill_date">12 Jan 2026</span></p>
+                    <p class="">Time: <span class="mx-1 fuel_bill_time">12:34:24</span></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <h5 class="bold">Billed To</h5>
+                    <p>Customer Name:<span class="mx-1 customer_name">Sai Chander Kanimetta</span></p>
+                    <p>Vehicle Number:<span class="mx-1 vehicle_number">TG07N7557</span></p>
+                    <p>Vehicle Type:<span class="mx-1 vehicle_type">PETROL</span></p>
+
+                </div>
+                <div class="col-lg-6 colRight">
+                    <h5 class="bold">Fuel Station Details</h5>
+                    <p class="">Fuel Station Name:<span class="mx-1 fuel_station_name">Telangana state agro karshak
+                            petrol pump</span> </p>
+                    <p class="">Fuel Station Address:<span class="mx-1 fuel_station_address">Premavathipet,
+                            Rajendranagar, Hyderabad, Telangana 500030</span>
+                    </p>
+                    <p class=""><span class="mx-1 gstinpt"></span>
+                        <span class=" cin_number"></span>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 colRight">
+                    <h5 class="bold">Payment Method</h5>
+                    <p><span class=" payment_method">Online</span></p>
+                </div>
+            </div>
+            <div class="row" style="display: block;">
+                <div class="col-lg-12">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">Receipt Summary</h5>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td> <strong> Fuel Rate</strong> </td>
+                                <td> <strong> Quantity</strong> </td>
+                                <td class="text-end"> <strong> Total Amount</strong> </td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>₹ <span class="fuel_rate">107.46</span></td>
+                                <td><span class="fuel_quantity">31.69</span> lt.</td>
+                                <td class="text-end">₹ <span class="fuel_total_amount">3405.41</span></td>
+                            </tr>
+                            <tr>
+                                <td> </td>
+                                <td> </td>
+                                <td class="text-end"><strong> Total: </strong>₹ <span
+                                        class="fuel_total_amount">3405.41</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 bottom">
+                    <p> <strong> Thank you ! For Fuelling With Us !</strong></p>
+                    <p> For any queries and complaint visit our customer care </p>
+                    <p> Save fuel, secure the future!</p>
+                    <p> Time:<span class="mx-1 fuel_bill_time">12:34:24</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

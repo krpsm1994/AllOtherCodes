@@ -1,0 +1,13 @@
+IMP 09.03.26 11:57:45 ------------------------------------------------------
+IMP 09.03.26 11:57:45 Started C:/Drive/CodeBase/Git/Production/master/pkg/BUILD/bin/ixmk_2.pl
+IMP 09.03.26 11:57:45 with arguments "setup"
+IMP 09.03.26 11:57:45 ------------------------------------------------------
+IMP 09.03.26 11:57:45 Processing component SAP.DAMIntegration (main), package SAP_DAMIntegration...
+IMP 09.03.26 11:57:45 ------------------------------------------------------
+IMP 09.03.26 11:57:45 Project directory setup...
+IMP 09.03.26 11:57:45 Configuration 'Release' (build log: 'C:\Drive\CodeBase\Git\SAP.DAMIntegration\main\obj\log\DAMConSetupRelease.log')...
+IMP 09.03.26 11:59:19    ok
+IMP 09.03.26 11:59:19 Done with releasable component SAP.DAMIntegration (main), package SAP_DAMIntegration.
+IMP 09.03.26 11:59:19 
+IMP 09.03.26 11:59:19 No errors have occurred processing SAP.DAMIntegration:main.
+IMP 09.03.26 11:59:20 Total execution time of "ixmk setup": 00:01:37

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!-- Production configuration of Releasable Component "SAP.DAMS4HANA" -->
+<!-- $Id$ -->
+
+<!DOCTYPE ReleasableComponent SYSTEM "ixreleasecomp.dtd">
+
+<ReleasableComponent name="SAP.DAMS4HANA" externalName="DAMLink for SAP S4HANA Solution"
+                     companyName="Open Text Corporation"
+                     version="25.4.0"
+                     production="master" gitProject="true" artifactory="true"
+                     synctime="20:00" >
+
+    <!-- Required Production environment -->
+    <BuildEnv name="Build">
+		<BuildTool name="JDK" version="1.8.0" patchlevel="74"/>
+        <BuildTool name="ANT" version="1.7.0"/>
+    </BuildEnv>
+	
+	<!-- Root production package(s) -->
+    <Package name="SAP_DAMS4HANA" />
+	
+</ReleasableComponent >

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+
+    build.xml - Master buildfile for all Media Management artifacts. 
+
+    Command Summary:
+
+        ant pacakge-all            Builds all server side artifacts (does not build installers)
+        ant javadocs-public        Builds pulbic java docs
+        ant package-extensionkit   Builds the Media Manager Client Extension Kit
+
+-->
+
+<project name="masterbuild" default="package" basedir=".">
+
+    <!-- =================================================================== -->
+    <!-- Add environment variables into the property "env".  This has to be -->
+    <!-- done before any other xml files are included.                      -->
+    <!-- =================================================================== -->
+    <property environment="env"/>
+
+    <!-- Load config file -->
+    <import file="./build.cfg"/>
+    <import file="./artifactory/conf/cots_urls.cfg"/>
+    
+    <!-- These modules contain the target implementations -->
+    <import file="./ant/compile.xml"/>
+    <import file="./artifactory/cots-libraries.xml"/>
+    <import file="./ant/package.xml"/>
+    <import file="./ant/javadocs.xml"/>
+    <import file="./ant/test.xml"/>
+    <import file="./ant/installer.xml"/>
+    <import file="./ant/deliver.xml"/>
+    <import file="./ant/servicepack.xml"/>
+	<import file="./ant/localization.xml"/> 	
+    <import file="./ant/productoptions.xml"/> 	
+	<import file="./ant/patch/patch.xml"/>
+	<import file="./ant/hotfix.xml"/>
+    <import file="./ant/docker.xml"/>
+	<import file="./ant/otdn.xml"/>
+    <import file="./ant/upgrade_scripts.xml"/>
+    <import file="./ant/upgrade_version.xml"/>
+	<import file="./ant/patch/update_patch_version.xml"/>
+</project>

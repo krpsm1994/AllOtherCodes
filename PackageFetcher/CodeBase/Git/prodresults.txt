@@ -1,0 +1,1 @@
+SETUP	SAP.DAMIntegration:main:SAP_DAMIntegration	DAMConSetup	Release	0	unknown	C:\Drive\CodeBase\Git\SAP.DAMIntegration\main\obj\log\DAMConSetupRelease.log	C:\Drive\CodeBase\Git\SAP.DAMIntegration\main\pkg\SAP_DAMIntegration\build

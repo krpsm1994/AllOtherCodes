@@ -1,0 +1,805 @@
+default:
+  tags:
+    - ubmwlotmm-git2
+  image: docker:stable
+  services:
+    - name: docker:dind
+      alias: docker
+
+variables:
+  ANT_OPTS: "-Xms2048m -Xmx8096m" 
+  DMTS_ARTIFACTORY_URL: ""
+  DMTS_DELIVERY_FILE: "dmts_%system_project_version%"
+  J2D_D3D: "false"
+  ANT_HOME: "C:\\devtools\\apache-ant-1.10.9"
+  PATH: "C:\\Program Files\\jfrog;C:\\jdk-21.0.2;C:\\jdk-21.0.2\\bin;C:\\Program Files\\Fortify\\Fortify_SCA_and_Apps_20.2.0\\bin;C:\\Perl64\\site\\bin;C:\\Perl64\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\
+    v1.0\\;C:\\Program Files\\SlikSvn\\bin;C:\\devtools\\gradle-4.6\\bin;C:\\Program Files (x86)\\Windows Kits\\8.1\\Windows Performance Toolkit\\;C:\\Program Files\\Microsoft SQL Server\\110\\Tools\\Binn\\;C:\\Program Files (x86)\\Microsoft
+    SDKs\\TypeScript\\1.0\\;C:\\Program Files\\Git\\cmd;C:\\devtools\\nvm;C:\\Users\\archiv\\AppData\\Local\\Microsoft\\WindowsApps;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\devtools\\apache-ant-1.10.9\\bin;C:\\devtools\\flex_sdk_4.6.0.23201\\4.6.0\\
+    bin;C:\\devtools\\gradle-4.6\\bin;C:\\Program Files\\SlikSvn\\bin;D:\\devtools\\mkisofs;C:\\devtools\\nvm;C:\\devtools\\nodejs\\v22.19.0;C:\\devtools\\nodejs;C:\\Users\\archiv\\AppData\\Roaming\\npm"
+  ALPINE_LINUX_IMAGE: "artifactory.otxlab.net/docker-hardened/alpine:3.202302.796692"
+  FLEX_HOME: "C:\\devtools\\flex_sdk_4.6.0.23201\\4.6.0"
+  GRADLE_HOME: "C:\\devtools\\gradle-4.6" 
+  ORACLE_LINUX_IMAGE: "artifactory.otxlab.net/docker-hardened/openjdk11:11.0.17_8.202301.753503-ol8-jre"
+  ORACLE_LINUX_SLIM_IMAGE: "artifactory.otxlab.net/docker-hardened/openjdk11:11.0.18_10.202302.800086-ol8-slim-jdk"
+  PHANTOMJS_CDNURL: "https://artifactory.opentext.net/artifactory/github-generic/Medium/phantomjs/releases/download/v2.1.1"
+  TOMCAT_BASE_IMAGE: "artifactory.otxlab.net/docker-hardened/tomcat9:9.0.71.202301.773173-tomcat9-openjdk11-ol9-slim"
+  TOMCAT_VERSION: "9.0.71"
+  JAVA_MEM_OPTIONS: "-DXms=1024m -DXmx=16312m"
+  JAVA_TOOL_OPTIONS: "-Dfile.encoding=iso-8859-1"
+  
+  ARTIFACTORY_URL: "https://artifactory.otxlab.net/artifactory"
+  ARTIFACTORY_REPO_NAME: "dx-otmm-generic-dev"
+  COTS_UTILITIES_DIR: "$CI_BUILDS_DIR/devtools/cots_utilities/vetted_repo"
+  
+  # pipeline_name will be dynamically assigned to the pipeline based on how it was triggered
+  pipeline_name: ""
+
+  # Value for build_type will be dynamically assigned to "latest" for dev builds and "released" for release builds
+  build_type: ""
+
+  # Value for "build" will be dynamically assigned to "" for dev build and for release build it can be rc1/rc2/rc3..
+  build: ""
+
+  # Update this variable if any release other than .4 is a VM release
+  exceptional_vm_release: "24.1"
+
+# Below variables with prefix system_ are used in ant targets
+  # This variables are 1st converted to dot.notation and stored in ant.properties file
+  # this file is then passed to ant targets
+  system_build_number: "$CI_PIPELINE_ID"
+
+  system_include_office_addin: "false"
+  system_include_product_options: "true" 
+
+  system_patch_file_name: "MM%projectVersion%-update-00%system_patch_version%"
+  system_is_patch_file_name: "IS%projectVersion%-update-00%system_patch_version%"
+  system_adaptive_media_patch_file_name: "AMD%projectVersion%-update-00%system_patch_version%"
+  system_search_patch_file_name: "SEARCH%projectVersion%-update-00%system_patch_version%"
+  system_sm_patch_file_name: "SM%projectVersion%-update-00%system_patch_version%"
+
+  system_hotfixmgr_delivery_file_name: "opentext_support_manager_%system_project_version%"
+  system_IS_delivery_file_name: "opentext_integration_service_%system_project_version%"
+  system_messaging_delivery_file_name: "opentext_messaging_service_%system_project_version%"
+
+  system_otmm_version: $system_project_version.$system_patch_version
+
+# Below variables are externalized and can be modified during manual or schedule triggering of pipeline
+  system_project_version:
+    value: ""
+    options:
+      - ""
+    description: "Give the value of major version. Expected format is 'YY.Q'"
+
+  system_patch_version:
+    value: "0"
+    options:
+      - "0"
+    description: "Give valid patch number."
+
+  system_enable_patch_build:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if system_patch_version is greater than 0"  
+
+  system_include_patch_otmm:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if otmm patch is required"  
+
+  system_include_patch_amd:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if amd patch is required"   
+
+  system_include_patch_is:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if is patch is required"  
+
+  system_include_patch_search:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if search patch is required"  
+
+  system_include_patch_sm:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if sm patch is required"  
+
+  system_include_patch_msgservice:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Set the value to 'true' if msgservice patch is required"  
+    
+  JAVA_HOME:
+    value: "C:\\jdk-21.0.2"
+    options:
+      - "C:\\jdk-21.0.2"
+    description: "Set JAVA_HOME path"
+
+  BDscan_project_version: 
+    value: ""
+    options:
+      - ""
+    description: "Project version used for BlackDuck scan"
+
+# Below variables are used for cloud pipeline
+  DOCKER_IMAGES:
+    value: ""
+    options:
+      - ""
+    description: "List of images to be included in build. Allowed values:otmm,index,amd,solr,apache,config,integration,postgres. Default value is 'all' if left empty."
+
+  DOCKER_PULL_IMAGES:
+    value: ""
+    options:
+      - ""
+    description: "USED ONLY FOR RC BUILDS. This variable has to be updated with the images from the below list which need to be pulled in from previous rc builds. expected values - otmm,index,amd,solr,apache,config,integration,dh,postgres,dmtsservice,dmtsimage,dmtsvideo"
+
+  DMTS_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "Enter DMTS version in YY.Q.p format."
+
+  DMTS_PREV_RC:
+    value: ""
+    options:
+      - ""
+    description: "Enter previous RC number(for example rc*), helm chart will be downloaded from ${DMTS_VERSION}/${DMTS_PREV_RC}."
+
+  MEDIA_AVIATOR_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "Enter Media Aviator version in YY.Q.p format."
+
+  MEDIA_AVIATOR_PREV_RC:
+    value: ""
+    options:
+      - ""
+    description: "Enter previous RC number(for example RC*), helm chart will be downloaded from ${MEDIA_AVIATOR_VERSION}/${MEDIA_AVIATOR_PREV_RC}."
+
+  AMD_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  APACHE_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  DH_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  DMTS_IMAGE_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  DMTS_SERVICE_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  DMTS_VIDEO_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  IS_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  OTMM_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+  SEARCH_TAG_VERSION:
+    value: ""
+    options:
+      - ""
+    description: "This will be set only for patch release. Refer the Patch epic to get the tag value"
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible 
+  name: '$pipeline_name'
+  rules:
+    - if: $BDscan_project_version != ""
+      variables:
+        pipeline_name: 'Blackduck scan for $BDscan_project_version'
+    - if: $system_project_version == "" && $CI_PIPELINE_SOURCE == "push"
+      variables:
+        pipeline_name: 'Verify compilation: $CI_COMMIT_MESSAGE'
+    # Supported pattern for CI_COMMIT_BRANCH are:
+    # 251_DEV
+    # 251_UP1_DEV
+    # 251_UP10_DEV
+    # 251_UP1.1_DEV
+    # 251_UP10.5_DEV   
+    - if: ($CI_COMMIT_BRANCH =~ /^[0-9]{3}(_UP[0-9]+(\.[0-9]+)?)?_DEV$/ || $CI_COMMIT_BRANCH == "master")
+      variables:
+        pipeline_name: 'Dev build for $system_otmm_version'
+        build_type: 'latest'
+        build: ''
+    - if: $CI_COMMIT_TAG != null
+      variables:
+        pipeline_name: 'Release build for $system_otmm_version'
+        build_type: 'released'
+
+# Define a hidden job for verify compilation rules
+# This set of rules will allow a job to run on every checkin to dev branch or master branch
+.compilation_rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"
+      when: never
+    - if: $CI_COMMIT_BRANCH =~ /^[0-9]{3}(_UP[0-9]+(\.[0-9]+)?)?_DEV$/ || $CI_COMMIT_BRANCH == "master"
+      when: on_success
+
+# Define a hidden job for general rules
+# This set of rules will allow a job to run when it is schedule or manually triggered
+.general_rules:
+  rules:
+    - if: $BDscan_project_version != ""
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $build_type == "latest"
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == 'web'
+      when: on_success
+
+# Define a hidden job for Release build rules
+# This set of rules will allow a job to run for a tag when triggered manually
+.release_build_rules:
+  rules:
+    - if: $BDscan_project_version != ""
+      when: never
+    - if: ($CI_COMMIT_TAG != null && $CI_PIPELINE_SOURCE == "web")
+      when: on_success
+
+# Define a hidden job for installer rules
+# This rule will generate installer only for .4 release when enable patch is false.
+# NOTE: this rule should be modified if there is a plan to give installer release for any other version apart from .4
+.installer_rules:
+  rules:
+    - if: $BDscan_project_version != ""
+      when: never
+    - if: $system_project_version =~ /^[0-9]{2}\.4$/ && $system_enable_patch_build == "false"
+      when: on_success
+
+# Define a hidden job for BlackDuck scan rule
+# With this rule BD scan will trigger when it is manual and BDscan_project_version has some value
+.BDscan_rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web' && $BDscan_project_version != "" && $CI_PIPELINE_SOURCE != 'schedule'
+      when: on_success
+
+stages:
+  - prerequisite
+  - compile
+  - full build
+  - container build
+  - BlackDuck scan
+
+before_script:
+  # Extract rc_tag value from CI_COMMIT_TAG and assign it to "build" variable
+  - |
+      if ($CI_COMMIT_TAG -ne $null) {
+        $rc_tag = ($CI_COMMIT_TAG -split '_')[1] -split '\.' | Select-Object -First 1
+        $RC_build = $rc_tag.ToLower()
+      }
+      $Env:DMTS_ARTIFACTORY_URL = "https://artifactory.otxlab.net/artifactory/dx-otmm-generic-dev/$build_type/DMTS/$system_otmm_version/$RC_build"
+
+  # Convert all the snake_case system variables to dot.notation and store them in ant.properties file
+  # This file will be passed to all ant target as a -propertyfile which will provide all the required parameters for that ant target
+  - echo "Converting snake_case system variables to dot.notation and storing it in ant.properties"
+  - |
+    New-Item -Path ant.properties -ItemType File -Force | Out-Null
+    $projectVersionModified = ""
+     # First pass: remove (dot) from system_project_version e.g 25.1 will be converted to 251 and stored it in projectVersionModified
+     # This conversion is reqired for handelling patch file name
+    $projectVersionModified = $Env:system_project_version -replace '\.', ''
+    
+    # Second pass: Remove system_ from all the variables with prefix system_ and convert them to dot.notation
+    Get-ChildItem Env: | ForEach-Object { 
+      if ($_.Name -match '^system_') {
+        # Convert 'system_' prefix to dot notation for property names
+        $dotNotationKey = $_.Name -replace '^system_', '' -replace '_', '.'
+
+        # For variables ending with 'patch_file_name', perform dynamic replacements of version number
+        if ($_.Name -match 'patch_file_name$' -and $projectVersionModified) {
+          $processedValue = $_.Value -replace '%projectVersion%', "${projectVersionModified}"
+          "$dotNotationKey=$processedValue" | Out-File -Append -Encoding UTF8 ant.properties
+        }
+        # For other 'system_' variables, write as usual
+        else {
+          "$dotNotationKey=$($_.Value)" | Out-File -Append -Encoding UTF8 ant.properties
+        }
+      } else {
+        # Non-'system_' variables are written directly as is
+        "$($_.Name)=$($_.Value)" | Out-File -Append -Encoding UTF8 ant.properties
+      }
+    }
+  - echo "ant.properties file created"
+  # - type ant.properties  # Display the file content on Windows
+
+  
+
+# This script will delete the checkout folder so that next job on that folder can start quickly
+.cleanup-script: &delete-checkout-dir
+  - cd..
+  - echo " ${CI_PROJECT_DIR}."
+  - echo "deleting folder ${CI_PROJECT_DIR}"
+  - |
+      if (Test-Path $env:CI_PROJECT_DIR) {
+        Remove-Item -Path $env:CI_PROJECT_DIR -Recurse -Force
+        Write-Output "------------ ${CI_PROJECT_DIR} Folder deleted -------------"
+      } else {
+          Write-Host "Directory not found."
+      }
+  - exit 0
+      
+# This job fails if the input parameter to the pipeline is invalid and stops the pipeline.
+Validate:
+  variables:
+    GIT_STRATEGY: none
+  stage: prerequisite
+  script:
+    # Validate project version number
+  - |
+      if ($system_project_version -notmatch '^[0-9]{2}\.[1-4]{1}$') {
+        Write-Output "Error: Invalid value entered for system_project_version. Expected format is 'YY.Q', where Y and Q are digits."
+        exit 1
+      }
+
+    # Validate patch version number
+  - |
+      if ($system_patch_version -notmatch '^[0-9]{1,2}$') {
+        Write-Output "Error: Invalid value entered for system_patch_version. Expected format is 'p', where p is digit."
+        exit 1
+      }
+
+    # Validate patch version number with enable patch build
+  - |
+      if ($system_patch_version -ne '0' -and $system_enable_patch_build -eq 'false') {
+        Write-Output "Error: If system_patch_version is greater than 0, then system_enable_patch_build should be true."
+        exit 1
+      }
+
+    # Validate patch component
+  - |
+      if ($system_enable_patch_build -eq 'true' -and $system_include_patch_amd -eq "false" -and $system_include_patch_is -eq "false" -and $system_include_patch_sm -eq "false" -and $system_include_patch_otmm -eq "false" -and $system_include_patch_search -eq "false" -and  $system_include_patch_msgservice -eq "false") {
+        Write-Output "Error: If system_enable_patch_build is true, then atleast one of the patch component should be true."
+        exit 1
+      }
+
+  - echo "Input parameters of this pipeline:"
+  - echo $system_project_version
+  - echo $system_enable_patch_build
+  - echo $system_patch_version
+  - echo $system_include_patch_otmm
+  - echo $system_include_patch_amd
+  - echo $system_include_patch_is
+  - echo $system_include_patch_search
+  - echo $system_include_patch_sm
+  - echo $system_include_patch_msgservice
+  - echo $build_type
+  - echo $RC_build
+  - echo $JAVA_HOME
+  - echo $DOCKER_IMAGES
+  - echo $DOCKER_PULL_IMAGES
+  - echo $AMD_TAG_VERSION
+  - echo $APACHE_TAG_VERSION
+  - echo $DH_TAG_VERSION
+  - echo $DMTS_IMAGE_TAG_VERSION
+  - echo $DMTS_SERVICE_TAG_VERSION
+  - echo $DMTS_VIDEO_TAG_VERSION
+  - echo $IS_TAG_VERSION
+  - echo $OTMM_TAG_VERSION
+  - echo $SEARCH_TAG_VERSION
+  - echo $DMTS_ARTIFACTORY_URL
+  extends:
+    - .general_rules 
+
+# Prepare dependent artifacts:
+#   stage: prerequisite
+#   needs: 
+#     - job: Validate
+#   script:
+#     - ant -f ${CI_PROJECT_DIR}\build.xml stage-all-dependent-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS}
+#   extends:
+#     - .installer_rules
+
+Compile package and publish:
+  stage: full build
+  variables:
+    RUNNER_SCRIPT_TIMEOUT: 2h30m
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 10m
+  script:
+    #-----------------------------------------------Compile-------------------------------------------------#
+    #(TC Step:  Update_Cots_Directory)
+    - ant -f ${CI_PROJECT_DIR}\build.xml update-cots-utilities -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS}
+
+    # print node and npm version
+    - node -v
+    - npm -v
+    #(TC Step:  Compile)
+    - ant -f ${CI_PROJECT_DIR}\build.xml clean-all package-all -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+     #(TC Step:  Create_build_properties)
+    - ant -f ${CI_PROJECT_DIR}\build.xml create-build-info -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  SM_Client)
+    - ant -f ${CI_PROJECT_DIR}\supportmanager\client\build.xml clean-all deliver-hotfix-client
+    # Create new folder with name hotfixclient and move the genereated HotfixClient.zip to this folder
+    - New-Item -ItemType Directory -Path "$CI_PROJECT_DIR\hotfixclient" -Force
+    - Copy-Item -Path "$CI_PROJECT_DIR\supportmanager\client\dist\HotfixClient.zip" -Destination "$CI_PROJECT_DIR\hotfixclient\HotfixClient.zip" -Recurse
+
+    # package-all-product-options for installer
+    - |
+      if ( $system_project_version -match '^[0-9]{2}\.4$' -or $system_project_version -eq $exceptional_vm_release) {
+        ant -f ${CI_PROJECT_DIR}\build.xml package-all-product-options -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+      }
+    #(TC Step:  SM_Compile)
+    - ant -f ${CI_PROJECT_DIR}\supportmanager/server/hotfixmgr/build.xml generate-installer-tools-jar create-build-info -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  IS_Compile)
+    - ant -f ${CI_PROJECT_DIR}\integrationservice/build.xml create-build-info -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+    #-------------------------------------------------------------------------------------------------------------#
+
+    #----------------------------------------------package------------------------------------------------------#
+    #(TC Step:  SM_Artifacts_:_Linux)
+    - ant -f ${CI_PROJECT_DIR}\supportmanager/server/hotfixmgr/build.xml clean-install-package build-linux-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  IS_Artifacts_:_Linux)
+    - ant -f ${CI_PROJECT_DIR}\integrationservice/build.xml clean-install-package build-linux-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+    
+    #(TC Step:  Artifacts:_Linux)
+    - ant -f ${CI_PROJECT_DIR}\build.xml clean-install-package build-linux-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+
+    #(TC Step:  Programmers_Guide)
+    - ant -f ${CI_PROJECT_DIR}\build.xml javadocs-public deliver-javadocs -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+    #-----------------------------------------------------------------------------------------------------------#
+
+    #----------------------------------------------publish------------------------------------------------------#
+  
+    # publish java docs
+    - jf rt u "staging\javadocs\*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/javadocs/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+    - echo "Published Programmers guide to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/javadocs/"
+
+    # publish sm server to artifactory location
+    # - jf rt u "supportmanager\server\hotfixmgr\build\libs\hotfixmgr*.jar" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/sm/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+    # - echo "Published SM server to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/sm/"
+
+    # publish sm client to artifactory location
+    - jf rt u "hotfixclient/*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+    - echo "Published SM client to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/"
+
+    # publish TEAMS-common
+    - jf rt u "dist\TEAMS-common.jar" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/lib-common/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+    - echo "Published TEAMS-common to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/lib-common/"
+
+    # publish artifacts for containers
+    - jf rt u "staging\artifacts\linux\*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/artifacts/linux/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+    - echo "Published artifacts to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/artifacts/linux/"
+    
+    # publish examples 
+    - |
+      if ($CI_COMMIT_TAG -eq $null) {
+        jf rt u "staging\examples\*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/examples/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published examples to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/examples/"
+      }
+
+    # publish build_number.txt 
+    - echo ${CI_COMMIT_SHORT_SHA} > build_number.txt
+    - jf rt u "build_number.txt" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+    - echo "Published build_number.txt to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/"
+    #-----------------------------------------------------------------------------------------------------------#
+    - echo "==========================================================================="
+    - echo "----------------------Artifacts Published successfully------------------------"
+    - echo "==========================================================================="
+    #----------------------------package and publish patch----------------------#
+    - |  
+      # (TC Step:  Package and publish Patch )
+      if ($system_patch_version -ne '0' -and ($system_project_version -match '^[0-9]{2}\.4$' -or $system_project_version -eq $exceptional_vm_release)) {
+        # (TC Step:  Package_Patch)
+        ant -f ${CI_PROJECT_DIR}\build.xml package-patch -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties 
+        #(TC Step:  Messaging_Service_Installer)
+        ant -f ${CI_PROJECT_DIR}\build.xml messaging-service-installanywhere -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties 
+        
+        # publish Patch files
+        jf rt u "dist\*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/patches/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published patch files to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/patches/"
+        # publish MessagingService Installer
+        jf rt u "installer/build/MessagingService/Default_Configuration/$system_messaging_delivery_file_name.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MessagingService/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published MessagingService Installer to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MessagingService/$system_otmm_version/$RC_build/"
+      }
+    #-------------------------------------------------Installer Generate and Publish----------------------------------------------------------#
+    - |
+      if ( $system_project_version -match '^[0-9]{2}\.4$' -or $system_project_version -eq $exceptional_vm_release) {
+        
+        echo "------------generate installer---------------" 
+         
+        #(TC Step:  stage dependent artifacts)
+        ant -f ${CI_PROJECT_DIR}\build.xml stage-all-dependent-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+        
+        #(TC Step:  amd_installer)
+        ant -f ${CI_PROJECT_DIR}\build.xml amd-installanywhere -DUSE _64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+        #(TC Step:  search_installer)
+        ant -f ${CI_PROJECT_DIR}\build.xml search-installanywhere -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+        #(TC Step:  Messaging_Service_Installer)
+        ant -f ${CI_PROJECT_DIR}\build.xml messaging-service-installanywhere -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+        
+        #(TC Step: IS Installer_:_Windows)
+        ant -f ${CI_PROJECT_DIR}\integrationservice/build.xml generate-installer-tools-jar clean-install-package build-windows-artifacts deliver-windows-installer -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties        
+        # publish IS Installer Windows
+        jf rt u "integrationservice/installer/build/Default_Configuration/*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/IntegrationService/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published IS Installer Windows to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/IntegrationService/$system_otmm_version/$RC_build/"
+
+        #(TC Step: IS Installer_:_Linux)
+        ant -f ${CI_PROJECT_DIR}\integrationservice/build.xml clean-install-package build-linux-artifacts  deliver-linux-installer -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties        
+        # publish IS Installer Linux
+        jf rt u "integrationservice/installer/build/Default_Configuration/*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/IntegrationService/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published IS Installer Linux to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/IntegrationService/$system_otmm_version/$RC_build/"
+
+        #(TC Step:  SM_Installer_: Windows)
+        ant -f ${CI_PROJECT_DIR}\supportmanager/server/hotfixmgr/build.xml clean-install-package build-windows-artifacts deliver-windows-installer -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties        
+        # publish SM Installer Windows
+        jf rt u "supportmanager/server/hotfixmgr/installer/build/Default_Configuration/*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/SupportManager/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published SM Installer Windows to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/SupportManager/$system_otmm_version/$RC_build/"
+
+        #(TC Step:  SM_Installer_:_Linux)
+        ant -f ${CI_PROJECT_DIR}\supportmanager/server/hotfixmgr/build.xml clean-install-package build-linux-artifacts deliver-linux-installer -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+        # publish SM Installer Linux
+        jf rt u "supportmanager/server/hotfixmgr/installer/build/Default_Configuration/*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/SupportManager/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published SM Installer Linux to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/SupportManager/$system_otmm_version/$RC_build/"
+
+        # publish MessagingService Installer
+        jf rt u "installer/build/MessagingService/Default_Configuration/*.zip" $ARTIFACTORY_REPO_NAME/${build_type}/MessagingService/$system_otmm_version/$RC_build/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published MessagingService Installer to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MessagingService/$system_otmm_version/$RC_build/"
+
+        #(TC Step:  ISO: Windows)
+        ant -f ${CI_PROJECT_DIR}\build.xml clean-install-package build-windows-artifacts  deliver-windows-installer -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties        
+        # publish Windows installer
+        jf rt u "staging/windows/*.*" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/windows/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published Windows installer to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/windows/"
+        
+        #(TC Step:  ISO:_Linux)
+        ant -f ${CI_PROJECT_DIR}\build.xml clean-install-package build-linux-artifacts deliver-linux-installer -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+        
+        # publish Linux installer
+        jf rt u "staging/linux/*.*" $ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/linux/ --flat=true --url="$ARTIFACTORY_URL" --user="$DX_ARTIFACTORY_USERNAME" --password="$DX_ARTIFACTORY_PASSWORD"
+        echo "Published Linux installer to - $ARTIFACTORY_URL/$ARTIFACTORY_REPO_NAME/${build_type}/MediaManagement/$system_otmm_version/$RC_build/linux/"
+      }
+    #-----------------------------------------------------------------------------------------------------------#
+    - echo "==========================================================================="
+    - echo "----------------------Build Completed successfully------------------------"
+    - echo "==========================================================================="
+    - exit 0
+  after_script:
+    - *delete-checkout-dir
+  extends:
+    - .general_rules
+ 
+# This job will be triggered on every checkin to master or dev branch and will be auto cancled on new commit
+Verify Compilation:
+  stage: compile
+  interruptible: true
+  variables:
+    RUNNER_SCRIPT_TIMEOUT: 1h
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 10m
+  script:
+    #(TC Step:  Update_Cots_Directory)
+    - ant -f ${CI_PROJECT_DIR}\build.xml update-cots-utilities -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS}
+
+    # print node and npm version
+    - node -v
+    - npm -v
+
+    #(TC Step:  Compile)
+    - ant -f ${CI_PROJECT_DIR}\build.xml clean-all package-all -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    - echo "==========================================================================="
+    - echo "-----------------Compilation completed successfully------------------------"
+    - echo "===========================================================================" 
+    - exit 0
+  after_script:
+    - *delete-checkout-dir
+  extends:
+    - .compilation_rules
+
+# This job will create a RC tag in cloud project
+create tag:
+  tags: []
+  variables:
+    TARGET_PROJECT: "https://${ACCESS_TOKEN_NAME}:${ACCESS_TOKEN}@$CI_SERVER_HOST/otmm/cloud.git"
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  stage: container build
+  before_script: []
+  script:
+    - apk update && apk add --no-cache git curl jq
+
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+
+    # Get the branch name in json format using GitLab API based upon the commit id
+    - |
+      curl --silent --header "PRIVATE-TOKEN: $PRIVATE_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/commits/$CI_COMMIT_SHA/refs?type=branch" > response.json
+      cat response.json | jq .
+
+    - BRANCH_NAME=$(jq -r '.[].name' response.json)
+
+    - |
+      echo "TAG: $CI_COMMIT_TAG will be created on BRANCH:$BRANCH_NAME in cloud project"
+
+    - git clone $TARGET_PROJECT
+    - cd cloud
+
+    - |
+      if ! git switch "$BRANCH_NAME"; then
+        echo "=================== ERROR: Unable to switch to branch ==================="
+        echo "Either this branch doesnot exits in cloud project or there are multiple branches with same commit ID"
+        echo "=============================================================================================================="
+        echo " MANUAL ACTION REQUIRED: Please create a tag manually in cloud project against the valid branch and trigger a pipeline"
+        echo "=============================================================================================================="
+        exit 1
+      fi
+    - echo "Successfully switched to $BRANCH_NAME"
+    - |
+      git tag -a "$CI_COMMIT_TAG" -m "This tag is created on branch $BRANCH_NAME via $CI_PIPELINE_URL
+      
+      $CI_COMMIT_TAG_MESSAGE"
+
+    - git push --tags $TARGET_PROJECT 
+  extends:
+    - .release_build_rules
+
+# This job will dynamically create a child_pipeline.yml file which will trigger container pipeline
+create pipeline:
+  tags: []
+  variables:
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  stage: container build
+  needs:
+    - job: Compile package and publish
+  before_script: 
+    # - printenv
+    - apk add --no-cache bash
+    - |
+      if [[ $system_patch_version -ne 0 ]]; then
+        OTMM_PATCH_VERSION=$system_otmm_version
+        echo "OTMM_PATCH_VERSION when system_patch_version is not 0 = $OTMM_PATCH_VERSION"
+      else
+        OTMM_PATCH_VERSION=""
+        echo "OTMM_PATCH_VERSION when system_patch_version is 0 = $OTMM_PATCH_VERSION"
+      fi     
+  script:
+    - |
+      cat <<EOF > child_pipeline.yml
+      image: docker:stable
+
+      services:
+        - name: docker:dind
+          alias: docker
+      
+      stages:
+        - intermediate
+
+      trigger container pipeline:
+        stage: intermediate
+        trigger:
+          project: otmm/cloud
+          branch: $CI_COMMIT_REF_NAME
+          strategy: depend
+        # below variables will be passed to cloud pipeline
+        variables:
+          OTMM_PATCH_VERSION: $OTMM_PATCH_VERSION
+          AMD_TAG_VERSION: $AMD_TAG_VERSION
+          APACHE_TAG_VERSION: $APACHE_TAG_VERSION
+          DH_TAG_VERSION: $DH_TAG_VERSION
+          DMTS_IMAGE_TAG_VERSION: $DMTS_IMAGE_TAG_VERSION
+          DMTS_SERVICE_TAG_VERSION: $DMTS_SERVICE_TAG_VERSION
+          DMTS_VIDEO_TAG_VERSION: $DMTS_VIDEO_TAG_VERSION
+          IS_TAG_VERSION: $IS_TAG_VERSION
+          OTMM_TAG_VERSION: $OTMM_TAG_VERSION
+          SEARCH_TAG_VERSION: $SEARCH_TAG_VERSION
+          DOCKER_IMAGES: $DOCKER_IMAGES
+          DOCKER_PULL_IMAGES: $DOCKER_PULL_IMAGES
+      EOF
+    - echo "Generated child_pipeline.yml file:"
+    - cat child_pipeline.yml  # Display the file for debugging
+  artifacts:
+    paths:
+      - child_pipeline.yml  # Save the generated file for later jobs
+  extends:
+    - .general_rules
+
+# This job will start child-pipeline which is created in "create pipeline" job
+trigger pipeline:
+  stage: container build
+  variables:
+    GIT_STRATEGY: none
+  needs:
+    - job: create tag
+      optional: true
+    - job: create pipeline
+      artifacts: true
+  trigger:
+    include:
+      # Use the dynamically generated child_pipeline.yml from "create pipeline" job
+      - artifact: child_pipeline.yml
+        job: create pipeline
+  extends:
+    - .general_rules
+ 
+Prepare for scan:
+  stage: BlackDuck scan
+  timeout: 3h
+  variables:
+    #RUNNER_SCRIPT_TIMEOUT: 1h10m
+    GIT_CLONE_PATH: $CI_BUILDS_DIR/BDScan
+    BDscan_checkout_dir: $GIT_CLONE_PATH
+    GIT_STRATEGY: clone
+  script:
+    # print node and npm version
+    - node -v
+    - npm -v
+
+    #(TC Step:  YML_generated_Stage)
+    - ant -f ${BDscan_checkout_dir}\build.xml update-cots-utilities clean-all package-all create-build-info build-all-product-options -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  Support_Manager_Client)
+    - ant -f ${BDscan_checkout_dir}\supportmanager/client/build.xml clean-all deliver-hotfix-client -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    # Create new folder with name hotfixclient and move the genereated HotfixClient.zip to this folder
+    - New-Item -ItemType Directory -Path "$BDscan_checkout_dir\hotfixclient" -Force
+    - Copy-Item -Path "$BDscan_checkout_dir\supportmanager\client\dist\HotfixClient.zip" -Destination "$BDscan_checkout_dir\hotfixclient\HotfixClient.zip" -Recurse
+
+    #(TC Step:  Support_Manager_Server)
+    - ant -f ${BDscan_checkout_dir}\supportmanager/server/hotfixmgr/build.xml download-otmm-artifact clean-all package-all create-build-info build-windows-artifacts clean-install-package build-linux-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  Integration_Service)
+    - ant -f ${BDscan_checkout_dir}\integrationservice/build.xml download-otmm-artifact clean-all package-all build-windows-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  Messaging_Service)
+    - ant -f ${BDscan_checkout_dir}\build.xml build-messaging-service-artifacts -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  YML_generated_Stage)
+    - ant -f ${BDscan_checkout_dir}\build.xml build-windows-artifacts build-delivery-directory-windows -DUSE_64_BIT=true ${JAVA_MEM_OPTIONS} -propertyfile ant.properties
+
+    #(TC Step:  YML_generated_Stage)
+    - |
+      C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe "[Net.ServicePointManager]::SecurityProtocol = 'tls12'; irm https://detect.synopsys.com/detect9.ps1?$(Get-Random) | iex; detect" --blackduck.api.token="$BLACKDUCK_TOKEN" --blackduck.url="https://blackduck.opentext.net" --detect.project.name="MediaManagement" --detect.project.version.name="$BDscan_project_version" --detect.blackduck.signature.scanner.individual.file.matching=all --detect.detector.search.exclusion='node_modules,tool,hotfixclient,QA-Automation,nut,ui-test,ui-test-java,StageUILibraries' --detect.blackduck.signature.scanner.exclusion.name.patterns='node_modules,tool,hotfixclient,QA-Automation,nut,ui-test,ui-test-java,integrationservice,mock-services,StageUILibraries' --detect.blackduck.signature.scanner.exclusion.patterns='/node_modules/,/tool/,/hotfixclient/,/QA-Automation/,/nut/,/ui-test/,/ui-test-java/,/integrationservice/,/mock-services/,/StageUILibraries/' --blackduck.timeout=600
+  extends:
+    - .BDscan_rules

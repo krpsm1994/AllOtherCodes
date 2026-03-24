@@ -1,0 +1,25 @@
+BUILD_SAP.DAM.Hybris_main=152
+BUILD_SAP.DAMIntegration_main=198
+BUILD_SAP.DAMS4HANA_main=450
+GITREV=01f27eddb290bbd16927388c7685fadf673a3f2a
+IXMKREPODIR=C:/Drive/CodeBase/Git
+OBJROOT=C:/Drive/CodeBase/Git
+PRODUCTION_BRANCHES=master
+REVISIONTIME_SAP.DAM.Hybris_main=@2025/10/29:18:43:48
+REVISIONTIME_SAP.DAMIntegration_main=@2025/10/29:18:43:48
+REVISIONTIME_SAP.DAMS4HANA_main=@2025/10/29:18:43:48
+REVISION_SAP.DAM.Hybris_main=@2025/10/30:06:44:17
+REVISION_SAP.DAMIntegration_main=@2025/10/30:06:44:17
+REVISION_SAP.DAMS4HANA_main=@2025/10/30:06:44:17
+SRCROOT=C:/Drive/CodeBase/Git
+VIEWBUILD=2025.1030
+VIEWBUILDTIME=20:00
+VIEWMODES=
+VIEWREVISION=@2025/10/30:06:44:17
+VIEWSPEC=SAP.DAMIntegration:main SAP.DAM.Hybris:main SAP.DAMS4HANA:main
+VIEWTIMESTAMP=2025/10/30 06:44:17 +0000 UTC
+VIEWTIME_T=1761806657
+VIEW_CLIENT_TIME=38
+VIEW_SYNC_TIME=0
+
+PATH=C:\Drive\CodeBase\Git\PRODUC~1\master\pkg\BUILD\bin;C:\STRAWB~1\perl\bin;C:\Drive\CodeBase\Git\PRODUC~1\master\pkg\BUILD\bin\MSWin32;C:\Program Files\Microsoft\jdk-11.0.28.6-hotspot\bin;C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\TortoiseGit\bin;C:\Program Files\nodejs;C:\Program Files\Git\cmd;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Users\skanimetta\AppData\Local\Microsoft\WindowsApps;C:\Users\skanimetta\AppData\Local\Programs\Microsoft VS Code\bin;C:\Drive\Utilities\IXMK;C:\Program Files\nodejs\node_modules\npm;C:\Drive\Softwares\apache-ant-1.10.14;C:\Hybris221137
