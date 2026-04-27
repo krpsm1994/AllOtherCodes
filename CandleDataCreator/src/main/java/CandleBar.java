@@ -1,10 +1,7 @@
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDateTime;
 
 public class CandleBar {
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime timestamp;
     private double open;
     private double high;
@@ -13,6 +10,8 @@ public class CandleBar {
     private long volume;
     private long initialVolume;
     private long previousCandleDayVolume;
+    // Multi-timeframe value computed externally (e.g., N-bar or N-month bucket close)
+    private double mtfValue = 0.0;
 
     public CandleBar() {}
     
@@ -36,6 +35,9 @@ public class CandleBar {
         this.close     = close;
         this.volume    = volume;
     }
+
+    public double getMtfValue() { return mtfValue; }
+    public void setMtfValue(double v) { this.mtfValue = v; }
 
     public LocalDateTime getTimestamp()         { return timestamp; }
     public void setTimestamp(LocalDateTime t)   { this.timestamp = t; }
@@ -77,10 +79,11 @@ public class CandleBar {
 				", open=" + open +
 				", high=" + high +
 				", low=" + low +
-				", close=" + close +
+                ", close=" + close +
 				", volume=" + volume +
 				", initialVolume=" + initialVolume +
 				", previousCandleDayVolume=" + previousCandleDayVolume +
+                ", mtfValue=" + mtfValue +
 				"}";
 	}
     

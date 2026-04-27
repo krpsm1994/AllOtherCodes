@@ -1,0 +1,6 @@
+com\sai\HistoricalDataFetcher$Candle.class
+com\sai\HistoricalDataFetcher$Interval.class
+com\sai\HistoricalDataFetcher.class
+com\sai\TestStrategy1.class
+com\sai\HistoricalDataFetcher$Exchange.class
+com\sai\HistoricalDataFetcher$OIData.class
