@@ -1,0 +1,49 @@
+<div class="page">
+  <div class="card">
+
+    <div class="card__brand">
+      <svg viewBox="0 0 24 24" fill="none" width="36" height="36">
+        <rect width="24" height="24" rx="6" fill="#1d4ed8"/>
+        <polyline points="4,16 8,10 12,13 16,7 20,9"
+                  stroke="white" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="card__brand-name">AlgoTrading</span>
+    </div>
+
+    <h1 class="card__title">Sign In</h1>
+    <p class="card__sub">Enter your credentials to continue</p>
+
+    @if (error) {
+      <div class="alert">{{ error }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate autocomplete="off">
+
+      <div class="field" [class.field--err]="u.invalid && u.touched">
+        <label for="username">Username</label>
+        <input id="username" type="text" formControlName="username" placeholder="Username" />
+        @if (u.touched && u.hasError('required')) {
+          <span class="field__msg">Username is required.</span>
+        } @else if (u.touched && u.hasError('minlength')) {
+          <span class="field__msg">Minimum 3 characters.</span>
+        }
+      </div>
+
+      <div class="field" [class.field--err]="p.invalid && p.touched">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="Password" />
+        @if (p.touched && p.hasError('required')) {
+          <span class="field__msg">Password is required.</span>
+        } @else if (p.touched && p.hasError('minlength')) {
+          <span class="field__msg">Minimum 4 characters.</span>
+        }
+      </div>
+
+      <button class="btn-primary" type="submit" [disabled]="loading">
+        @if (loading) { Signing in… } @else { Sign In }
+      </button>
+
+    </form>
+  </div>
+</div>

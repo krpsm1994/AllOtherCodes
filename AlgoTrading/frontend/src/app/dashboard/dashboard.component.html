@@ -1,0 +1,635 @@
+<div class="shell">
+
+  <!-- ════════ HEADER ════════ -->
+  <header class="header">
+    <div class="header__left">
+      <!-- Brand -->
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" width="28" height="28">
+          <rect width="24" height="24" rx="6" fill="#1d4ed8"/>
+          <polyline points="4,16 8,10 12,13 16,7 20,9"
+                    stroke="white" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="brand__name">Algo Trading Platform</span>
+      </div>
+
+      <!-- Broker buttons -->
+      <div class="broker-row">
+        @if (angelDone) {
+          <button class="broker-chip broker-chip--on" (click)="reloginAngel()" title="Re-login AngelOne">
+            <span class="dot dot--on"></span> AngelOne
+            <span class="relogin">&#8635;</span>
+          </button>
+        } @else {
+          <button class="broker-btn" (click)="openAngelPopup()">
+            <span class="dot"></span> AngelOne Login
+          </button>
+        }
+
+        @if (zerodhaDone) {
+          <button class="broker-chip broker-chip--on" title="Zerodha connected">
+            <span class="dot dot--on"></span> Zerodha
+          </button>
+        } @else if (zerodhaWaiting) {
+          <button class="broker-btn broker-btn--waiting" disabled>
+            <span class="dot dot--pulse"></span> Waiting…
+          </button>
+        } @else {
+          <button class="broker-btn" (click)="openZerodhaLogin()">
+            <span class="dot"></span> Zerodha Login
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="header__right">
+      <div class="profile" (click)="profileOpen = !profileOpen; stopProp($event)">
+        <button class="avatar">{{ userInitial }}</button>
+        @if (profileOpen) {
+          <div class="profile-menu">
+            <div class="profile-menu__name">{{ username }}</div>
+            <hr class="profile-menu__sep">
+              <button class="profile-menu__item" (click)="openSettings()">Settings</button>
+              <button class="profile-menu__item" (click)="logout()">Sign out</button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════ BODY ════════ -->
+  <div class="body">
+
+    <!-- Tab bar + actions -->
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="tab" [class.tab--active]="activeTab === 'Trades'"   (click)="setTab('Trades')">Trades</button>
+        <button class="tab" [class.tab--active]="activeTab === 'Candles'"  (click)="setTab('Candles')">Candles</button>
+        <button class="tab" [class.tab--active]="activeTab === 'Backtest'" (click)="setTab('Backtest')">Backtest</button>
+      </div>
+
+      <div class="actions">
+        @if (actionMsg) {
+          <span class="action-msg">{{ actionMsg }}</span>
+        }
+        <button class="action-btn" (click)="onReplaceCandles()" [disabled]="replacing">
+          @if (replacing) { Replacing… } @else { Replace candles }
+        </button>
+        <button class="action-btn" (click)="onRefreshTokens()" [disabled]="refreshing">
+          @if (refreshing) { Refreshing… } @else { Refresh tokens }
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Trades tab ── -->
+    @if (activeTab === 'Trades') {
+
+      <!-- Filter -->
+      <div class="filter-row">
+        <span class="filter-label">Filter By :</span>
+        <div class="dropdown" (click)="filterOpen = !filterOpen; stopProp($event)">
+          <button class="dropdown__btn">
+            {{ filter }}
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+          @if (filterOpen) {
+            <div class="dropdown__menu">
+              <button class="dropdown__item" [class.dropdown__item--active]="filter==='All'"      (click)="setFilter('All')">All</button>
+              <button class="dropdown__item" [class.dropdown__item--active]="filter==='Active'"   (click)="setFilter('Active')">Active</button>
+              <button class="dropdown__item" [class.dropdown__item--active]="filter==='Inactive'" (click)="setFilter('Inactive')">Inactive</button>
+            </div>
+          }
+        </div>
+        <button class="add-trade-btn" (click)="openAddTrade()" title="Add trade">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+            <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+          </svg>
+          Add Trade
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        @if (tradesLoading) {
+          <div class="state-msg">Loading trades…</div>
+        } @else if (tradesError) {
+          <div class="state-msg state-msg--err">{{ tradesError }}</div>
+        } @else if (filteredTrades.length === 0) {
+          <div class="state-msg">No trades found.</div>
+        } @else {
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Buy Price</th>
+                <th>Sell Price</th>
+                <th>Status</th>
+                <th>Qty</th>
+                <th>P&amp;L</th>
+                <th>Buy Order ID</th>
+                <th>Sell Order ID</th>
+                <th>Type</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of filteredTrades; track trackTrade(t); let odd = $odd) {
+                <tr [class.row--odd]="odd">
+                  <td class="mono">{{ t.token }}</td>
+                  <td class="bold">{{ t.name }}</td>
+                  <td>{{ t.date }}</td>
+                  <td>{{ t.buyPrice | number:'1.2-2' }}</td>
+                  <td>{{ t.sellPrice | number:'1.2-2' }}</td>
+                  <td><span [class]="statusClass(t.status)">{{ t.status }}</span></td>
+                  <td>{{ t.noOfShares }}</td>
+                  <td [class]="pnlClass(t.pnl)">
+                    @if (t.pnl != null) { {{ t.pnl | number:'1.2-2' }} } @else { — }
+                  </td>
+                  <td class="mono small">{{ t.buyOrderId || '—' }}</td>
+                  <td class="mono small">{{ t.sellOrderId || '—' }}</td>
+                  <td>
+                    @if (t.type) {
+                      <span [class]="t.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
+                        {{ t.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+                      </span>
+                    } @else { — }
+                  </td>
+                  <td class="row-actions">
+                    <button class="edit-btn" (click)="openEditTrade(t, $event)" title="Edit trade">
+                      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                      </svg>
+                    </button>
+                    <button class="delete-btn" (click)="deleteTrade(t, $event)" title="Delete trade">
+                      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+
+    <!-- ── Candles tab ── -->
+    @if (activeTab === 'Candles') {
+
+      <!-- Controls row -->
+      <div class="candle-ctrl">
+
+        <!-- Instrument picker -->
+        <div class="cpicker" (click)="stopProp($event)">
+          <div class="cpicker__trigger" (click)="instrumentDropOpen = !instrumentDropOpen">
+            @if (selectedInstrument) {
+              <span class="cpicker__selected">{{ selectedInstrument.name }}</span>
+              <span [class]="selectedInstrument.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
+                {{ selectedInstrument.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+              </span>
+            } @else {
+              <span class="cpicker__placeholder">{{ instrumentsLoading ? 'Loading stocks…' : '— Select Stock —' }}</span>
+            }
+            <svg class="cpicker__chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+
+          @if (instrumentDropOpen) {
+            <div class="cpicker__menu">
+              <input class="cpicker__search" type="text" placeholder="Search stock…"
+                     [(ngModel)]="instrumentSearch" (click)="stopProp($event)" autofocus />
+              <div class="cpicker__list">
+                @for (inst of filteredInstruments; track inst.token) {
+                  <button class="cpicker__item"
+                          [class.cpicker__item--active]="selectedInstrument?.token === inst.token"
+                          (click)="selectInstrument(inst)">
+                    <span>{{ inst.name }}</span>
+                    <span [class]="inst.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
+                      {{ inst.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+                    </span>
+                  </button>
+                }
+                @if (filteredInstruments.length === 0) {
+                  <div class="cpicker__empty">No results</div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <button class="action-btn action-btn--primary" (click)="fetchSelectedCandles()"
+                [disabled]="!selectedInstrument || candlesLoading">
+          @if (candlesLoading) { Fetching… } @else { Fetch Candles }
+        </button>
+
+        <!-- Table / Chart toggle -->
+        @if (candles.length > 0) {
+          <div class="view-toggle">
+            <button class="view-toggle__btn" [class.view-toggle__btn--active]="candleView === 'table'"
+                    (click)="setCandleView('table')">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                <path fill-rule="evenodd" d="M5 4a2 2 0 00-2 2v1h14V6a2 2 0 00-2-2H5zm-2 5v5a2 2 0 002 2h10a2 2 0 002-2V9H3zm3 2h2v1H6v-1zm4 0h2v1h-2v-1zm-4 3h2v1H6v-1zm4 0h2v1h-2v-1z" clip-rule="evenodd"/>
+              </svg>
+              Table
+            </button>
+            <button class="view-toggle__btn" [class.view-toggle__btn--active]="candleView === 'chart'"
+                    (click)="setCandleView('chart')">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+              </svg>
+              Chart
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Error -->
+      @if (candlesError) {
+        <div class="state-msg state-msg--err">{{ candlesError }}</div>
+      }
+
+      <!-- Loading -->
+      @if (candlesLoading) {
+        <div class="state-msg">Fetching candles…</div>
+      }
+
+      <!-- Table + pagination -->
+      @if (!candlesLoading && candles.length > 0) {
+
+        <div class="candle-meta">
+          <span class="candle-count">{{ candles.length }} candles — {{ selectedInstrument?.name }}</span>
+          @if (candleView === 'table') {
+            <div class="cpager">
+              <button class="page-btn" (click)="candlePage = candlePage - 1" [disabled]="candlePage === 0">&#8249;</button>
+              <span class="page-label">Page {{ candlePage + 1 }} / {{ candleTotalPages }}</span>
+              <button class="page-btn" (click)="candlePage = candlePage + 1" [disabled]="candlePage >= candleTotalPages - 1">&#8250;</button>
+            </div>
+          }
+        </div>
+
+        <!-- TABLE VIEW -->
+        @if (candleView === 'table') {
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Open</th>
+                  <th>High</th>
+                  <th>Low</th>
+                  <th>Close</th>
+                  @if (selectedInstrument?.type !== '10MinWatchlist') {
+                    <th>Volume</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of candlePagedData; track c.date; let odd = $odd) {
+                  <tr [class.row--odd]="odd">
+                    <td class="mono">{{ c.date }}</td>
+                    <td>{{ c.open  | number:'1.2-2' }}</td>
+                    <td class="pos-val">{{ c.high  | number:'1.2-2' }}</td>
+                    <td class="neg-val">{{ c.low   | number:'1.2-2' }}</td>
+                    <td class="bold">{{ c.close | number:'1.2-2' }}</td>
+                    @if (selectedInstrument?.type !== '10MinWatchlist') {
+                      <td class="mono">{{ c.volume | number }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="cpager cpager--bottom">
+            <button class="page-btn page-btn--text" (click)="candlePage = candlePage - 1" [disabled]="candlePage === 0">&#8249; Prev</button>
+            <span class="page-label">Page {{ candlePage + 1 }} / {{ candleTotalPages }}</span>
+            <button class="page-btn page-btn--text" (click)="candlePage = candlePage + 1" [disabled]="candlePage >= candleTotalPages - 1">Next &#8250;</button>
+          </div>
+        }
+
+        <!-- CHART VIEW -->
+        @if (candleView === 'chart') {
+          <div class="chart-wrap">
+            <apx-chart
+              [series]="chartSeries"
+              [chart]="chartOptions"
+              [xaxis]="chartXAxis"
+              [yaxis]="chartYAxis"
+              [tooltip]="chartTooltip"
+              [plotOptions]="chartPlotOptions"
+              [title]="chartTitle">
+            </apx-chart>
+          </div>
+        }
+      }
+
+      <!-- Empty state -->
+      @if (!candlesLoading && !candlesError && candles.length === 0 && selectedInstrument) {
+        <div class="state-msg">Click "Fetch Candles" to load data.</div>
+      }
+      @if (!candlesLoading && !selectedInstrument) {
+        <div class="state-msg">Select a stock from the dropdown to view candles.</div>
+      }
+    }
+
+    <!-- ── Backtest tab ── -->
+    @if (activeTab === 'Backtest') {
+      <div class="state-msg">Backtest view coming soon.</div>
+    }
+
+  </div><!-- /body -->
+</div><!-- /shell -->
+
+<!-- ════════ ANGEL LOGIN MODAL ════════ -->
+@if (angelPopupOpen) {
+  <div class="overlay">
+    <div class="modal" (click)="stopProp($event)">
+      <div class="modal__header">
+        <h2 class="modal__title">AngelOne Login</h2>
+        <button class="modal__close" (click)="closeAngelPopup()">&#10005;</button>
+      </div>
+
+      @if (angelError) {
+        <div class="modal__error">{{ angelError }}</div>
+      }
+
+      <form [formGroup]="angelForm" (ngSubmit)="submitAngel()" novalidate autocomplete="off">
+
+        <div class="mfield">
+          <label>Client Code</label>
+          <input type="text" formControlName="clientcode" placeholder="e.g. S812559" />
+          @if (angelForm.get('clientcode')!.touched && angelForm.get('clientcode')!.invalid) {
+            <span class="mfield__err">Required</span>
+          }
+        </div>
+
+        <div class="mfield">
+          <label>PIN</label>
+          <input type="password" formControlName="pin" placeholder="4-digit PIN" />
+          @if (angelForm.get('pin')!.touched && angelForm.get('pin')!.invalid) {
+            <span class="mfield__err">Required</span>
+          }
+        </div>
+
+        <div class="mfield">
+          <label>TOTP</label>
+          <input type="text" formControlName="totp" placeholder="6-digit TOTP" maxlength="6" />
+          @if (angelForm.get('totp')!.touched && angelForm.get('totp')!.invalid) {
+            <span class="mfield__err">Required</span>
+          }
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn-secondary" (click)="closeAngelPopup()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="angelLoading">
+            @if (angelLoading) { Logging in… } @else { Login }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ════════ TRADE MODAL ════════ -->
+@if (tradeModalOpen) {
+  <div class="overlay">
+    <div class="modal modal--trade" (click)="stopProp($event)">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ editingTradeId != null ? 'Edit Trade' : 'Add Trade' }}</h2>
+        <button class="modal__close" (click)="closeTradeModal()">&#10005;</button>
+      </div>
+
+      @if (tradeModalError) {
+        <div class="modal__error">{{ tradeModalError }}</div>
+      }
+
+      <form [formGroup]="tradeForm" (ngSubmit)="submitTradeModal()" novalidate autocomplete="off">
+
+        <!-- Stock picker -->
+        <div class="mfield">
+          <label>Stock</label>
+          <div class="cpicker" (click)="stopProp($event)">
+            <div class="cpicker__trigger" (click)="tradeInstrumentDropOpen = !tradeInstrumentDropOpen">
+              @if (selectedTradeInstrument) {
+                <span class="cpicker__selected">{{ selectedTradeInstrument.name }}</span>
+              } @else if (tradeForm.get('name')!.value) {
+                <span class="cpicker__selected">{{ tradeForm.get('name')!.value }}</span>
+              } @else {
+                <span class="cpicker__placeholder">{{ instrumentsLoading ? 'Loading…' : '— Select Stock —' }}</span>
+              }
+              <svg class="cpicker__chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            @if (tradeInstrumentDropOpen) {
+              <div class="cpicker__menu">
+                <input class="cpicker__search" type="text" placeholder="Search stock…"
+                       [(ngModel)]="tradeInstrumentSearch" [ngModelOptions]="{standalone: true}"
+                       (click)="stopProp($event)" autofocus />
+                <div class="cpicker__list">
+                  @for (inst of filteredTradeInstruments; track inst.token) {
+                    <button type="button" class="cpicker__item"
+                            [class.cpicker__item--active]="tradeForm.get('token')!.value === inst.token"
+                            (click)="selectTradeInstrument(inst)">
+                      <span>{{ inst.name }}</span>
+                      <span [class]="inst.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
+                        {{ inst.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+                      </span>
+                    </button>
+                  }
+                  @if (filteredTradeInstruments.length === 0) {
+                    <div class="cpicker__empty">No results</div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          @if (tradeForm.get('token')!.touched && tradeForm.get('token')!.invalid) {
+            <span class="mfield__err">Select a stock</span>
+          }
+        </div>
+
+        <!-- Date + Type row -->
+        <div class="settings-row">
+          <div class="mfield">
+            <label>Date</label>
+            <input type="date" formControlName="date" />
+            @if (tradeForm.get('date')!.touched && tradeForm.get('date')!.invalid) {
+              <span class="mfield__err">Required</span>
+            }
+          </div>
+          <div class="mfield">
+            <label>Type</label>
+            <select formControlName="type">
+              <option value="10MinWatchlist">10 Min</option>
+              <option value="DailyWatchlist">Daily</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Buy / Sell price row -->
+        <div class="settings-row">
+          <div class="mfield">
+            <label>Buy Price</label>
+            <input type="number" formControlName="buyPrice" min="0" step="0.01" />
+            @if (tradeForm.get('buyPrice')!.touched && tradeForm.get('buyPrice')!.invalid) {
+              <span class="mfield__err">Required</span>
+            }
+          </div>
+          <div class="mfield">
+            <label>Sell Price</label>
+            <input type="number" formControlName="sellPrice" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <!-- Qty + Status row -->
+        <div class="settings-row">
+          <div class="mfield">
+            <label>Quantity</label>
+            <input type="number" formControlName="noOfShares" min="1" />
+            @if (tradeForm.get('noOfShares')!.touched && tradeForm.get('noOfShares')!.invalid) {
+              <span class="mfield__err">Min 1</span>
+            }
+          </div>
+          <div class="mfield">
+            <label>Status</label>
+            <select formControlName="status">
+              <option value="WATCHING">WATCHING</option>
+              <option value="TRIGGERED">TRIGGERED</option>
+              <option value="OPEN">OPEN</option>
+              <option value="SELL IN PROGRESS">SELL IN PROGRESS</option>
+              <option value="CLOSED">CLOSED</option>
+              <option value="NOT TRIGGERED">NOT TRIGGERED</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- P&L -->
+        <div class="mfield">
+          <label>P&amp;L <span class="mfield__opt">(optional)</span></label>
+          <input type="number" formControlName="pnl" step="0.01" />
+        </div>
+
+        <!-- Order IDs row -->
+        <div class="settings-row">
+          <div class="mfield">
+            <label>Buy Order ID <span class="mfield__opt">(optional)</span></label>
+            <input type="text" formControlName="buyOrderId" />
+          </div>
+          <div class="mfield">
+            <label>Sell Order ID <span class="mfield__opt">(optional)</span></label>
+            <input type="text" formControlName="sellOrderId" />
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn-secondary" (click)="closeTradeModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="tradeModalSaving">
+            @if (tradeModalSaving) { Saving… } @else { Save }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+@if (settingsOpen) {
+  <div class="overlay">
+    <div class="modal modal--settings" (click)="stopProp($event)">
+      <div class="modal__header">
+        <h2 class="modal__title">Settings</h2>
+        <button class="modal__close" (click)="closeSettings()">&#10005;</button>
+      </div>
+
+      @if (settingsError) {
+        <div class="modal__error">{{ settingsError }}</div>
+      }
+
+      <form [formGroup]="settingsForm" (ngSubmit)="submitSettings()" novalidate autocomplete="off">
+
+        <!-- ── Algo Scan ──────────────────────────────── -->
+        <div class="settings-group">
+          <div class="settings-group__label">Algo Scan</div>
+
+          <div class="mfield">
+            <label>Number of candles to watch</label>
+            <input type="number" formControlName="numberOfCandles" min="1" />
+            @if (settingsForm.get('numberOfCandles')!.touched && settingsForm.get('numberOfCandles')!.invalid) {
+              <span class="mfield__err">Enter a valid number (min 1)</span>
+            }
+          </div>
+        </div>
+
+        <!-- ── Orders ─────────────────────────────────── -->
+        <div class="settings-group">
+          <div class="settings-group__label">Orders</div>
+
+          <div class="mfield mfield--toggle">
+            <label>Place 10-Min orders</label>
+            <label class="toggle">
+              <input type="checkbox" formControlName="place10MinOrders" />
+              <span class="toggle__track"></span>
+            </label>
+          </div>
+
+          <div class="mfield mfield--toggle">
+            <label>Place Daily orders</label>
+            <label class="toggle">
+              <input type="checkbox" formControlName="placeDailyOrders" />
+              <span class="toggle__track"></span>
+            </label>
+          </div>
+
+          <div class="mfield">
+            <label>Order type</label>
+            <select formControlName="orderType">
+              <option value="MARKET">MARKET</option>
+              <option value="LIMIT">LIMIT</option>
+            </select>
+          </div>
+
+          <div class="mfield">
+            <label>Polling interval (minutes)</label>
+            <input type="number" formControlName="pollingIntervalMinutes" min="1" />
+            @if (settingsForm.get('pollingIntervalMinutes')!.touched && settingsForm.get('pollingIntervalMinutes')!.invalid) {
+              <span class="mfield__err">Enter a valid number (min 1)</span>
+            }
+          </div>
+
+          <div class="settings-row">
+            <div class="mfield">
+              <label>Max 10-Min orders</label>
+              <input type="number" formControlName="max10MinOrders" min="1" />
+              @if (settingsForm.get('max10MinOrders')!.touched && settingsForm.get('max10MinOrders')!.invalid) {
+                <span class="mfield__err">Min 1</span>
+              }
+            </div>
+            <div class="mfield">
+              <label>Max Daily orders</label>
+              <input type="number" formControlName="maxDailyOrders" min="1" />
+              @if (settingsForm.get('maxDailyOrders')!.touched && settingsForm.get('maxDailyOrders')!.invalid) {
+                <span class="mfield__err">Min 1</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn-secondary" (click)="closeSettings()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="settingsSaving">
+            @if (settingsSaving) { Saving… } @else { Save }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
+
