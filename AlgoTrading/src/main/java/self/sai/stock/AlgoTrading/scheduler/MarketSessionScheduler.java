@@ -40,6 +40,9 @@ public class MarketSessionScheduler {
     @Autowired
     private TickStreamService tickStreamService;
 
+    @Autowired
+    private IndexOptionScheduler indexOptionScheduler;
+
     private Map<String, List<CandleBar>> candleMap = new ConcurrentHashMap<>();
     private ScheduledExecutorService timerExecutor;
 
@@ -101,6 +104,8 @@ public class MarketSessionScheduler {
         } catch (Exception e) {
             log.error("[Scheduler] Error fetching candles: {}", e.getMessage(), e);
         }
+        // Also pre-load historical 5-min index candles for the IndexOptionScheduler
+        indexOptionScheduler.loadHistoricalIndexCandles(CLIENT_CODE);
     }
 
     /** Returns live in-memory candles for the given token, or empty list if not loaded. */
@@ -172,6 +177,10 @@ public class MarketSessionScheduler {
             }
             fetchTodayCandles();
             algoScanService.runAlgoScan(candleMap, numberOfCandles);
+            // Ensure the stream is running after the scan (it may not have started at 8:55
+            // if there were no active trades, or it may have dropped). New WATCHING trades
+            // created by the scan will be subscribed when the stream starts here.
+            startStream();
             log.info("[Scheduler] Timer tick at {} (interval {} min)", current, intervalMinutes);
         }, initialDelay, period, TimeUnit.MILLISECONDS);
         log.info("[Scheduler] Timer scheduled: every {} min from {} to {}", intervalMinutes, start, end);

@@ -100,6 +100,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   refreshing   = false;
   replacing    = false;
   actionMsg    = '';
+  buyingTradeId: number | null = null;
+  sellingTradeId: number | null = null;
+
+  // ── SSE stream ────────────────────────────────────────────────────
+  private tradeEventSource: EventSource | null = null;
 
   // ── Angel login form ──────────────────────────────────────────────
   angelForm: FormGroup;
@@ -159,6 +164,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadTrades();
+    this.connectTradeStream();
     // Load persisted settings from server
     this.settings.fetchSettings().subscribe(s => this.patchSettingsForm(s));
     const params = this.route.snapshot.queryParamMap;
@@ -191,6 +197,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopZerodhaPoll();
+    this.disconnectTradeStream();
+  }
+
+  // ── SSE stream ────────────────────────────────────────────────────
+  private connectTradeStream(): void {
+    this.disconnectTradeStream();
+    const es = this.tradeService.openTradeStream();
+    this.tradeEventSource = es;
+
+    const upsert = (trade: Trade) => {
+      const idx = this.trades.findIndex(t => t.id === trade.id);
+      if (idx >= 0) {
+        this.trades[idx] = trade;
+      } else {
+        this.trades.unshift(trade);
+      }
+      this.cdr.detectChanges();
+    };
+
+    es.addEventListener('trade_snapshot', (e: MessageEvent) => {
+      try { upsert(JSON.parse(e.data)); } catch { /* ignore */ }
+    });
+    es.addEventListener('new_trade', (e: MessageEvent) => {
+      try { upsert(JSON.parse(e.data)); } catch { /* ignore */ }
+    });
+    es.addEventListener('trade_update', (e: MessageEvent) => {
+      try { upsert(JSON.parse(e.data)); } catch { /* ignore */ }
+    });
+    es.onerror = () => {
+      // Browser will auto-reconnect; nothing extra needed
+    };
+  }
+
+  private disconnectTradeStream(): void {
+    if (this.tradeEventSource) {
+      this.tradeEventSource.close();
+      this.tradeEventSource = null;
+    }
   }
 
   // ── Tabs ──────────────────────────────────────────────────────────
@@ -317,6 +361,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  buyOrder(t: Trade, e: Event): void {
+    e.stopPropagation();
+    if (t.id == null) return;
+    if (!confirm(`Place buy order for "${t.name}"?`)) return;
+    this.buyingTradeId = t.id;
+    this.tradeService.placeBuyOrder(t.id).subscribe({
+      next: () => {
+        this.buyingTradeId = null;
+        this.loadTrades();
+        this.actionMsg = `Buy order placed for ${t.name}.`;
+        setTimeout(() => this.actionMsg = '', 4000);
+      },
+      error: err => {
+        this.buyingTradeId = null;
+        this.actionMsg = err?.error?.message || 'Failed to place buy order.';
+        setTimeout(() => this.actionMsg = '', 4000);
+      }
+    });
+  }
+
+  sellOrder(t: Trade, e: Event): void {
+    e.stopPropagation();
+    if (t.id == null) return;
+    if (!confirm(`Place sell order for "${t.name}"?`)) return;
+    this.sellingTradeId = t.id;
+    this.tradeService.placeSellOrder(t.id).subscribe({
+      next: () => {
+        this.sellingTradeId = null;
+        this.loadTrades();
+        this.actionMsg = `Sell order placed for ${t.name}.`;
+        setTimeout(() => this.actionMsg = '', 4000);
+      },
+      error: err => {
+        this.sellingTradeId = null;
+        this.actionMsg = err?.error?.message || 'Failed to place sell order.';
+        setTimeout(() => this.actionMsg = '', 4000);
+      }
+    });
+  }
+
   submitTradeModal(): void {
     if (this.tradeForm.invalid) { this.tradeForm.markAllAsTouched(); return; }
     const f = this.tradeForm.value;
@@ -331,7 +415,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       pnl:         f.pnl != null ? Number(f.pnl) : null,
       buyOrderId:  f.buyOrderId  || null,
       sellOrderId: f.sellOrderId || null,
-      type:        f.type
+      type:        f.type,
+      exchange:    null,
+      optionType:  null,
+      indexToken:  null
     };
     this.tradeModalSaving = true;
     this.tradeModalError  = '';
@@ -381,42 +468,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.selectedInstrument) return;
     const inst = this.selectedInstrument;
 
-    if (inst.type === '10MinWatchlist') {
-      this.candlesLoading = true;
-      this.candlesError   = '';
-      this.candlePage     = 0;
-      this.tradeService.getCandlesByToken(inst.token).subscribe({
-        next: data => {
-          this.candles = data.slice().reverse();
-          this.candlesLoading = false;
-          this.buildCandleChart();
-        },
-        error: err => {
-          this.candlesError   = err?.error?.message || 'Failed to fetch candles.';
-          this.candlesLoading = false;
-        }
-      });
-    } else {
-      const clientcode = this.auth.getAngelClientcode();
-      if (!clientcode) {
-        this.candlesError = 'Please login to AngelOne first.';
-        return;
+    this.candlesLoading = true;
+    this.candlesError   = '';
+    this.candlePage     = 0;
+    this.tradeService.getCandlesByToken(inst.token).subscribe({
+      next: data => {
+        this.candles = data.slice().reverse();
+        this.candlesLoading = false;
+        this.buildCandleChart();
+      },
+      error: err => {
+        this.candlesError   = err?.error?.message || 'Failed to fetch candles.';
+        this.candlesLoading = false;
       }
-      this.candlesLoading = true;
-      this.candlesError   = '';
-      this.candlePage     = 0;
-      this.tradeService.getDailyCandles(inst.token, clientcode).subscribe({
-        next: data => {
-          this.candles = data.slice().reverse();
-          this.candlesLoading = false;
-          this.buildCandleChart();
-        },
-        error: err => {
-          this.candlesError   = err?.error?.message || 'Failed to fetch daily candles.';
-          this.candlesLoading = false;
-        }
-      });
-    }
+    });
   }
 
   private buildCandleChart(): void {
@@ -522,6 +587,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   reloginAngel(): void { this.openAngelPopup(); }
+
+  reloginZerodha(): void {
+    this.zerodhaDone = false;
+    this.openZerodhaLogin();
+  }
 
   // ── Zerodha ───────────────────────────────────────────────────────
   openZerodhaLogin(): void {

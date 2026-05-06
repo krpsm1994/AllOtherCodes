@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import self.sai.stock.AlgoTrading.dto.ScripMasterEntry;
 
@@ -16,7 +18,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Fetches the AngelOne OpenAPIScripMaster instrument list, applies watchlist-based
@@ -25,13 +29,19 @@ import java.util.*;
  *
  * <p>Filter rules:
  * <ol>
- *   <li>exchange == "NSE" (no NFO, no BSE, no MCX)</li>
- *   <li>symbol ends with "-EQ" (equity only — excludes index, ETF, bond tokens)</li>
- *   <li>name must appear in instruments.txt (either watchlist section)</li>
- *   <li>If a name is in both sections, "10MinWatchlist" wins as the stored type.</li>
+ *   <li>{@code 10MinWatchlist} stocks — NSE exchange, symbol ends with "-EQ",
+ *       exact name match from instruments.txt.</li>
+ *   <li>{@code Index} entries — NSE exchange, case-insensitive name match;
+ *       stored as type "Index".</li>
+ *   <li>NFO options for each listed index — only the nearest 4 expiry dates,
+ *       stored as type "IndexOption" with NFO exchange.</li>
  * </ol>
+ *
+ * Scheduled to run every Tuesday at 15:45 IST (after market close) to refresh
+ * option expiry chains.
  */
 @Service
+@EnableScheduling
 public class InstrumentRefreshService {
 
     private static final Logger log = LoggerFactory.getLogger(InstrumentRefreshService.class);
@@ -39,12 +49,32 @@ public class InstrumentRefreshService {
     private static final String SCRIP_MASTER_URL =
             "https://margincalculator.angelone.in/OpenAPI_File/files/OpenAPIScripMaster.json";
 
+    /** Number of upcoming expiry dates to retain for each index's option chain. */
+    private static final int MAX_EXPIRIES = 4;
+
     private final ObjectMapper objectMapper;
     private final JdbcTemplate jdbcTemplate;
+    private final OptionSelectionService optionSelectionService;
 
-    public InstrumentRefreshService(ObjectMapper objectMapper, JdbcTemplate jdbcTemplate) {
+    public InstrumentRefreshService(ObjectMapper objectMapper, JdbcTemplate jdbcTemplate,
+                                    OptionSelectionService optionSelectionService) {
         this.objectMapper = objectMapper;
         this.jdbcTemplate = jdbcTemplate;
+        this.optionSelectionService = optionSelectionService;
+    }
+
+    // ── Scheduled weekly refresh ──────────────────────────────────────────────
+
+    /** Auto-refreshes every Tuesday at 15:45 IST (after market close). */
+    @Scheduled(cron = "0 45 15 ? * TUE", zone = "Asia/Kolkata")
+    public void scheduledRefresh() {
+        log.info("[InstrumentRefreshService] Tuesday 15:45 scheduled refresh triggered");
+        try {
+            int saved = refresh();
+            log.info("[InstrumentRefreshService] Scheduled refresh complete — {} rows saved", saved);
+        } catch (Exception e) {
+            log.error("[InstrumentRefreshService] Scheduled refresh failed: {}", e.getMessage(), e);
+        }
     }
 
     // ── Public API ────────────────────────────────────────────────────────────
@@ -55,56 +85,95 @@ public class InstrumentRefreshService {
      * @return number of rows persisted
      */
     public int refresh() {
+        // ── Step 1: Read instruments.txt first ────────────────────────────────
+        Map<String, String> nameToType = buildNameToTypeMap();
+        long indexCount = nameToType.values().stream().filter("Index"::equals).count();
+        log.info("instruments.txt: {} names ({} from 10MinWatchlist, {} from Index)",
+                nameToType.size(),
+                nameToType.values().stream().filter("10MinWatchlist"::equals).count(),
+                indexCount);
+
+        if (nameToType.isEmpty()) {
+            log.warn("instruments.txt is empty or unreadable — aborting refresh");
+            return 0;
+        }
+
+        // Build the set of index display names (case-insensitive) and their
+        // corresponding option scrip names (e.g. "NIFTY 50" → "NIFTY")
+        Map<String, String> indexDisplayToScripName = new LinkedHashMap<>();
+        nameToType.forEach((name, type) -> {
+            if ("Index".equals(type)) {
+                indexDisplayToScripName.put(name.toLowerCase(), OptionSelectionService.toOptionName(name));
+            }
+        });
+
+        // ── Step 2: Fetch full ScripMaster ────────────────────────────────────
         log.info("Fetching ScripMaster from AngelOne…");
         List<ScripMasterEntry> all = fetchAll();
         log.info("Fetched {} raw entries from ScripMaster", all.size());
 
-        // ── Load instruments.txt → nameToType map (10Min wins on duplicate) ───
-        Map<String, String> nameToType = buildNameToTypeMap();
-        log.info("instruments.txt: {} unique names loaded ({} from 10MinWatchlist, {} from DailyWatchlist)",
-                nameToType.size(),
-                nameToType.values().stream().filter("10MinWatchlist"::equals).count(),
-                nameToType.values().stream().filter("DailyWatchlist"::equals).count());
-
-        // ── Filter and build insert batch ─────────────────────────────────────
-        // Use LinkedHashMap keyed by token to deduplicate (first NSE -EQ entry wins)
+        // ── Step 3: Build rows — stocks (10MinWatchlist) ──────────────────────
         Map<String, Object[]> rowMap = new LinkedHashMap<>();
         for (ScripMasterEntry e : all) {
-            String name = e.getName() != null ? e.getName().trim() : "";
-            if (name.isEmpty()) continue;
+            String name     = e.getName()   != null ? e.getName().trim()   : "";
+            String exchange = e.getExchSeg()!= null ? e.getExchSeg().trim(): "";
+            String symbol   = e.getSymbol() != null ? e.getSymbol().trim() : "";
+            String token    = e.getToken()  != null ? e.getToken().trim()  : "";
+            if (name.isEmpty() || token.isEmpty()) continue;
 
-            // Rule 2: name must be in instruments.txt
-            String type = nameToType.get(name);
-            if (type == null) continue;
+            // 10MinWatchlist stocks: NSE, exact name match, must end with -EQ
+            if ("NSE".equals(exchange) && symbol.endsWith("-EQ")) {
+                String stockType = nameToType.get(name);
+                if (stockType != null && !"Index".equals(stockType)) {
+                    rowMap.putIfAbsent(token, new Object[]{token, name, exchange,
+                            parseLotsize(e.getLotsize()), stockType});
+                }
+            }
 
-            // Rule 1: NSE only
-            String exchange = e.getExchSeg() != null ? e.getExchSeg().trim() : "";
-            if (!"NSE".equals(exchange)) continue;
-
-            // Rule 1 (extra guard): symbol must end with "-EQ" → equities only
-            String symbol = e.getSymbol() != null ? e.getSymbol().trim() : "";
-            if (!symbol.endsWith("-EQ")) continue;
-
-            String token = e.getToken() != null ? e.getToken().trim() : "";
-            if (token.isEmpty()) continue;
-
-            int lotSize = parseLotsize(e.getLotsize());
-
-            // token is the natural key; first occurrence wins
-            rowMap.putIfAbsent(token, new Object[]{token, name, exchange, lotSize, type});
+            // Index instruments: NSE, symbol matches instruments.txt name (case-insensitive)
+            // ScripMaster index: symbol="Nifty 50", name="NIFTY" — we match on symbol
+            if ("NSE".equals(exchange) && indexDisplayToScripName.containsKey(symbol.toLowerCase())) {
+                rowMap.putIfAbsent(token, new Object[]{token, symbol, exchange,
+                        parseLotsize(e.getLotsize()), "Index"});
+            }
         }
 
+        // ── Step 4: Build rows — ALL NFO OPTIDX options for listed indexes ───────
+        // Match: exch_seg=NFO, instrumenttype=OPTIDX, name matches index scrip name
+        Set<String> listedScripNames = indexDisplayToScripName.values().stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+
+        List<ScripMasterEntry> allOptions = new ArrayList<>();
+        for (ScripMasterEntry e : all) {
+            if (!"NFO".equals(e.getExchSeg())) continue;
+            if (!"OPTIDX".equals(e.getInstrumenttype())) continue;
+            String optName = e.getName() != null ? e.getName().trim().toUpperCase() : "";
+            if (!listedScripNames.contains(optName)) continue;
+            String token = e.getToken() != null ? e.getToken().trim() : "";
+            if (token.isEmpty()) continue;
+            allOptions.add(e);
+            rowMap.putIfAbsent(token, new Object[]{
+                    token, e.getSymbol(), "NFO",
+                    parseLotsize(e.getLotsize()), "IndexOption"});
+        }
+        log.info("Options picked: {} rows for indexes {}", allOptions.size(), listedScripNames);
+
+        // ── Step 5: Populate option cache ─────────────────────────────────────
+        optionSelectionService.cacheOptions(allOptions);
+
+        // ── Step 6: Diagnostics — log names with no match ─────────────────────
         List<Object[]> rows = new ArrayList<>(rowMap.values());
-        log.info("Matched {} instruments to persist", rows.size());
+        log.info("Total instruments to persist: {} (stocks + index + options)", rows.size());
 
-        // Log which watchlist names had no match (useful for diagnosing typos)
-        Set<String> matchedNames = new HashSet<>();
-        rows.forEach(r -> matchedNames.add((String) r[1]));
+        Set<String> matchedNames = rows.stream()
+                .map(r -> ((String) r[1]).toLowerCase())
+                .collect(Collectors.toSet());
         nameToType.keySet().stream()
-                .filter(n -> !matchedNames.contains(n))
-                .forEach(n -> log.warn("  No NSE equity match found for: {}", n));
+                .filter(n -> !matchedNames.contains(n.toLowerCase()))
+                .forEach(n -> log.warn("  No match found for: '{}'", n));
 
-        // ── TRUNCATE + chunked batch INSERT ───────────────────────────────────
+        // ── Step 7: TRUNCATE + chunked batch INSERT ───────────────────────────
         jdbcTemplate.execute("TRUNCATE TABLE instruments");
         log.info("Instruments table truncated");
 
@@ -153,17 +222,16 @@ public class InstrumentRefreshService {
      * <p>Expected format:
      * <pre>
      * type : 10MinWatchlist
-     * instruments : POLYCAB,KAYNES,DIVISLAB,...
+     * instruments : ADANIENT,TATAMOTORS,VEDL
      *
-     * type : DailyWatchlist
-     * instruments : POWERINDIA,FORCEMOT,...
+     * type : Index
+     * instruments : NIFTY 50
      * </pre>
      *
      * <p>Returns a map of instrument name → watchlist type.
      * If a name appears in both sections, "10MinWatchlist" takes priority.
      */
     private Map<String, String> buildNameToTypeMap() {
-        // Parse into sections first so we can apply priority correctly
         Map<String, Set<String>> sections = new LinkedHashMap<>();
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("instruments.txt");
              BufferedReader reader = new BufferedReader(
@@ -174,7 +242,6 @@ public class InstrumentRefreshService {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty()) continue;
-
                 if (line.startsWith("type :")) {
                     currentType = line.substring("type :".length()).trim();
                     sections.putIfAbsent(currentType, new LinkedHashSet<>());
@@ -182,9 +249,7 @@ public class InstrumentRefreshService {
                     String namesPart = line.substring("instruments :".length()).trim();
                     for (String raw : namesPart.split(",")) {
                         String name = raw.trim();
-                        if (!name.isEmpty()) {
-                            sections.get(currentType).add(name);
-                        }
+                        if (!name.isEmpty()) sections.get(currentType).add(name);
                     }
                 }
             }
@@ -192,13 +257,13 @@ public class InstrumentRefreshService {
             log.error("Failed to read instruments.txt: {}", e.getMessage(), e);
         }
 
-        // Build nameToType: add DailyWatchlist first, then let 10MinWatchlist overwrite
+        // Index first, then 10MinWatchlist overwrites on duplicate
         Map<String, String> nameToType = new LinkedHashMap<>();
-        for (String name : sections.getOrDefault("DailyWatchlist", Collections.emptySet())) {
-            nameToType.put(name, "DailyWatchlist");
+        for (String name : sections.getOrDefault("Index", Collections.emptySet())) {
+            nameToType.put(name, "Index");
         }
         for (String name : sections.getOrDefault("10MinWatchlist", Collections.emptySet())) {
-            nameToType.put(name, "10MinWatchlist");   // overrides DailyWatchlist if duplicate
+            nameToType.put(name, "10MinWatchlist");
         }
         return nameToType;
     }
@@ -208,3 +273,4 @@ public class InstrumentRefreshService {
         try { return Integer.parseInt(s.trim()); } catch (NumberFormatException e) { return 1; }
     }
 }
+

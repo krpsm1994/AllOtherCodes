@@ -44,9 +44,21 @@ public class Trade {
     @Column(name = "sellOrderId", length = 100)
     private String sellOrderId;
 
-    /** Instrument watchlist type — e.g. "10MinWatchlist" or "DailyWatchlist". */
+    /** Instrument watchlist type — e.g. "10MinWatchlist" or "IndexOption". */
     @Column(name = "type", length = 50)
     private String type;
+
+    /** Exchange of the traded instrument — "NSE" for stocks, "NFO" for index options. */
+    @Column(name = "exchange", length = 20)
+    private String exchange = "NSE";
+
+    /** For index option trades: "CE" or "PE". Null for stock trades. */
+    @Column(name = "option_type", length = 5)
+    private String optionType;
+
+    /** For index option trades: the NSE token of the parent index (e.g., NIFTY 50 token). */
+    @Column(name = "index_token", length = 50)
+    private String indexToken;
 
     public Trade() {}
 
@@ -74,4 +86,10 @@ public class Trade {
     public void   setSellOrderId(String s)  { this.sellOrderId = s; }
     public String getType()                 { return type; }
     public void   setType(String t)         { this.type = t; }
+    public String getExchange()             { return exchange; }
+    public void   setExchange(String e)     { this.exchange = e; }
+    public String getOptionType()           { return optionType; }
+    public void   setOptionType(String o)   { this.optionType = o; }
+    public String getIndexToken()           { return indexToken; }
+    public void   setIndexToken(String i)   { this.indexToken = i; }
 }

@@ -15,6 +15,9 @@ export interface Trade {
   buyOrderId:  string | null;
   sellOrderId: string | null;
   type:        string | null;
+  exchange:    string | null;
+  optionType:  string | null;  // "CE" | "PE" for index option trades
+  indexToken:  string | null;  // parent index NSE token for option trades
 }
 
 export interface Instrument {
@@ -55,6 +58,14 @@ export class TradeService {
     return this.http.delete<void>(`/api/trades/${id}`);
   }
 
+  placeBuyOrder(id: number): Observable<Trade> {
+    return this.http.post<Trade>(`/api/trades/${id}/buy`, {});
+  }
+
+  placeSellOrder(id: number): Observable<Trade> {
+    return this.http.post<Trade>(`/api/trades/${id}/sell`, {});
+  }
+
   refreshTokens(): Observable<any> {
     return this.http.post<any>('/api/instruments/refresh', {});
   }
@@ -76,5 +87,15 @@ export class TradeService {
   getDailyCandles(token: string, clientcode: string): Observable<CandleRow[]> {
     const params = new HttpParams().set('token', token).set('clientcode', clientcode);
     return this.http.get<CandleRow[]>('/api/market-data/daily', { params });
+  }
+
+  /**
+   * Opens an SSE connection to /api/trades/stream.
+   * Returns a plain EventSource — caller must close it on destroy.
+   * Events: trade_snapshot, new_trade, trade_update.
+   */
+  openTradeStream(): EventSource {
+    const token = sessionStorage.getItem('algoJwt') ?? '';
+    return new EventSource(`/api/trades/stream?token=${encodeURIComponent(token)}`);
   }
 }

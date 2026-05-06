@@ -72,13 +72,16 @@ public class TradeMonitorService {
     private final TradeRepository    tradeRepository;
     private final BrokerOrderService brokerOrderService;
     private final SettingService     settingService;
+    private final TradeSseBroadcaster tradeSseBroadcaster;
 
     public TradeMonitorService(TradeRepository tradeRepository,
                                BrokerOrderService brokerOrderService,
-                               SettingService settingService) {
+                               SettingService settingService,
+                               TradeSseBroadcaster tradeSseBroadcaster) {
         this.tradeRepository    = tradeRepository;
         this.brokerOrderService = brokerOrderService;
         this.settingService     = settingService;
+        this.tradeSseBroadcaster = tradeSseBroadcaster;
     }
 
     // ── Stream lifecycle ──────────────────────────────────────────────────────
@@ -162,6 +165,7 @@ public class TradeMonitorService {
         trade.setSellPrice(fresh.getSellPrice());
         trade.setStatus("SELL PLACED");
         tradeRepository.save(trade);
+        tradeSseBroadcaster.broadcastUpdate(trade);
 
         // Ensure it's in the cache (may have been absent if stream was down when OPEN)
         addToCache(trade);
@@ -260,6 +264,7 @@ public class TradeMonitorService {
         // Flip status first to prevent duplicate orders on concurrent ticks
         trade.setStatus("BUY PLACED");
         tradeRepository.save(trade);
+        tradeSseBroadcaster.broadcastUpdate(trade);
 
         log.info("TradeMonitor WATCHING → BUY PLACED — id={} name={} ltp={} orderType={}",
                 trade.getId(), trade.getName(), ltp, orderType);
@@ -276,6 +281,7 @@ public class TradeMonitorService {
         } else if (result.status == BrokerOrderService.OrderStatus.REJECTED) {
             trade.setStatus("Broker Rejected: " + result.rejectionReason);
             tradeRepository.save(trade);
+            tradeSseBroadcaster.broadcastUpdate(trade);
             return true; // Evict — terminal status
         }
         // PENDING: stays BUY PLACED, polled by order poller
@@ -369,6 +375,7 @@ public class TradeMonitorService {
         trade.setStatus("OPEN");
         log.info("TradeMonitor BUY filled — id={} name={} buyPrice={}",
                 trade.getId(), trade.getName(), fillPrice);
+        tradeSseBroadcaster.broadcastUpdate(trade);
     }
 
     private void onSellFilled(Trade trade, double fillPrice) {
@@ -378,6 +385,7 @@ public class TradeMonitorService {
         trade.setStatus("CLOSED");
         log.info("TradeMonitor SELL filled — id={} name={} sellPrice={} PnL={}",
                 trade.getId(), trade.getName(), fillPrice, pnl);
+        tradeSseBroadcaster.broadcastUpdate(trade);
     }
 
     // ── Order poller (independent of tick stream) ─────────────────────────────
@@ -430,6 +438,81 @@ public class TradeMonitorService {
     }
 
     // ── Public cache management ───────────────────────────────────────────────
+
+    /**
+     * Places a manual buy order for a WATCHING trade, bypassing auto-trigger gates.
+     * Reuses the same broker call and state transitions as the automatic path.
+     */
+    public Trade placeManualBuyOrder(Trade trade) {
+        // ── Gate: IndexOption orders controlled by "Place Option orders" setting ────
+        if ("IndexOption".equals(trade.getType())) {
+            if (!settingService.getBoolean(SettingService.GRP_ORDERS, "placeDailyOrders", true)) {
+                log.info("TradeMonitor Option orders disabled — skipping trade id={} name={}",
+                        trade.getId(), trade.getName());
+                return trade; // stay WATCHING
+            }
+            int  maxOption   = settingService.getInt(SettingService.GRP_ORDERS, "maxDailyOrders", 5);
+            long openOptions = countInCacheByTypeAndStatus("IndexOption", "OPEN");
+            if (openOptions >= maxOption) {
+                log.info("TradeMonitor max Option orders ({}) reached — skipping trade id={}",
+                        maxOption, trade.getId());
+                return trade; // stay WATCHING
+            }
+        }
+
+        String orderType = settingService.get(SettingService.GRP_ORDERS, "orderType", "MARKET");
+
+        trade.setStatus("BUY PLACED");
+        tradeRepository.save(trade);
+
+        log.info("TradeMonitor MANUAL BUY — id={} name={} orderType={}", trade.getId(), trade.getName(), orderType);
+
+        BrokerOrderService.OrderResult result = brokerOrderService.placeBuyOrder(trade, orderType, trade.getBuyPrice());
+        trade.setBuyOrderId(result.orderId);
+
+        if (result.status == BrokerOrderService.OrderStatus.FILLED) {
+            double fill = result.fillPrice > 0 ? result.fillPrice : trade.getBuyPrice();
+            onBuyFilled(trade, fill);
+        } else if (result.status == BrokerOrderService.OrderStatus.REJECTED) {
+            trade.setStatus("Broker Rejected: " + result.rejectionReason);
+        }
+        tradeRepository.save(trade);
+        tradeSseBroadcaster.broadcastUpdate(trade);
+        registerTrade(trade);
+        return trade;
+    }
+
+    /**
+     * Places a manual sell order for an OPEN trade at the current buy price (MARKET order).
+     * Reuses the same broker call and state transitions as the automatic path.
+     */
+    public Trade placeManualSellOrder(Trade trade) {
+        String orderType = settingService.get(SettingService.GRP_ORDERS, "orderType", "MARKET");
+
+        trade.setStatus("SELL PLACED");
+        tradeRepository.save(trade);
+
+        log.info("TradeMonitor MANUAL SELL — id={} name={} orderType={}", trade.getId(), trade.getName(), orderType);
+
+        BrokerOrderService.OrderResult result = brokerOrderService.placeSellOrder(trade, orderType, trade.getBuyPrice());
+        trade.setSellOrderId(result.orderId);
+
+        if (result.status == BrokerOrderService.OrderStatus.FILLED) {
+            double fill = result.fillPrice > 0 ? result.fillPrice : trade.getBuyPrice();
+            onSellFilled(trade, fill);
+            evictTrade(trade);
+        } else if (result.status == BrokerOrderService.OrderStatus.REJECTED) {
+            trade.setStatus("OPEN");
+            trade.setSellOrderId(null);
+            log.error("TradeMonitor manual sell order REJECTED for trade {} — reverting to OPEN. Reason: {}",
+                    trade.getId(), result.rejectionReason);
+        }
+        // PENDING → stays SELL PLACED, polled by order-poller thread
+        tradeRepository.save(trade);
+        tradeSseBroadcaster.broadcastUpdate(trade);
+        registerTrade(trade);
+        return trade;
+    }
 
     /**
      * Registers a trade into the live monitoring cache after a manual add or edit.

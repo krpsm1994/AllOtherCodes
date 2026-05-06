@@ -12,6 +12,7 @@
   <groupId>self.sai.stock</groupId>
   <artifactId>AlgoTrading</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
   <name>AlgoTrading</name>
 
   <properties>

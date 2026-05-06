@@ -44,6 +44,15 @@ public class BrokerOrderService {
     @Value("${trading.exchange:NSE}")
     private String exchange;
 
+    /**
+     * When placing a MARKET order, Kite's native {@code market_protection} parameter
+     * is used (percentage, e.g. 1 = 1%). This is applied server-side by Kite and is
+     * only valid for MARKET and SL-M order types.
+     * Set to 0 to disable. Per Kite docs: values 1-100 set custom protection.
+     */
+    @Value("${trading.market-protection-pct:1}")
+    private int marketProtectionPct;
+
     private final RestTemplate restTemplate;
     private final ZerodhaSessionStoreService sessionStore;
 
@@ -87,7 +96,7 @@ public class BrokerOrderService {
             log.warn("[Kite] BUY qty=0 — id={} name={}", trade.getId(), trade.getName());
             return new OrderResult(null, OrderStatus.REJECTED, 0.0, "qty=0");
         }
-        return placeKiteOrder("BUY", trade.getName(), qty, "AT" + trade.getId(), orderType, limitPrice);
+        return placeKiteOrder("BUY", trade.getName(), qty, "AT" + trade.getId(), orderType, limitPrice, trade.getExchange());
     }
 
     /**
@@ -100,7 +109,7 @@ public class BrokerOrderService {
             log.warn("[Kite] SELL qty=0 — id={} name={}", trade.getId(), trade.getName());
             return new OrderResult(null, OrderStatus.REJECTED, 0.0, "qty=0");
         }
-        return placeKiteOrder("SELL", trade.getName(), qty, "AT" + trade.getId(), orderType, limitPrice);
+        return placeKiteOrder("SELL", trade.getName(), qty, "AT" + trade.getId(), orderType, limitPrice, trade.getExchange());
     }
 
     /**
@@ -112,7 +121,7 @@ public class BrokerOrderService {
             log.warn("[Kite] BUY qty=0 — id={} name={}", trade.getId(), trade.getName());
             return new OrderResult(null, OrderStatus.REJECTED, 0.0, "qty=0");
         }
-        return placeKiteOrder("BUY", trade.getName(), qty, "AT" + trade.getId(), "MARKET", 0.0);
+        return placeKiteOrder("BUY", trade.getName(), qty, "AT" + trade.getId(), "MARKET", 0.0, trade.getExchange());
     }
 
     /**
@@ -124,7 +133,7 @@ public class BrokerOrderService {
             log.warn("[Kite] SELL qty=0 — id={} name={}", trade.getId(), trade.getName());
             return new OrderResult(null, OrderStatus.REJECTED, 0.0, "qty=0");
         }
-        return placeKiteOrder("SELL", trade.getName(), qty, "AT" + trade.getId(), "MARKET", 0.0);
+        return placeKiteOrder("SELL", trade.getName(), qty, "AT" + trade.getId(), "MARKET", 0.0, trade.getExchange());
     }
 
     /**
@@ -197,9 +206,22 @@ public class BrokerOrderService {
     // ── Internals ─────────────────────────────────────────────────────────────
 
     private OrderResult placeKiteOrder(String txType, String symbol, int qty, String tag,
-                                       String orderType, double limitPrice) {
+                                       String orderType, double limitPrice, String tradeExchange) {
         boolean isLimit = "LIMIT".equalsIgnoreCase(orderType);
-        log.info("[Kite] {} {} qty={} exchange={} orderType={} tag={}", txType, symbol, qty, exchange, isLimit ? "LIMIT" : "MARKET", tag);
+
+        // Derive exchange and product from the trade's exchange
+        String effectiveExchange = (tradeExchange != null && !tradeExchange.isBlank()) ? tradeExchange : exchange;
+        // NFO/CDS/MCX require NRML; NSE/BSE use CNC
+        String product = ("NFO".equalsIgnoreCase(effectiveExchange)
+                || "CDS".equalsIgnoreCase(effectiveExchange)
+                || "MCX".equalsIgnoreCase(effectiveExchange)) ? "NRML" : "CNC";
+
+        log.info("[Kite] {} {} qty={} exchange={} product={} orderType={} price={} marketProtection={}% tag={}",
+                txType, symbol, qty, effectiveExchange, product,
+                isLimit ? "LIMIT" : "MARKET",
+                isLimit ? String.format("%.2f", limitPrice) : "MARKET",
+                isLimit ? 0 : marketProtectionPct,
+                tag);
 
         if (paperTrading) {
             String paperId = "PAPER-" + System.currentTimeMillis();
@@ -216,16 +238,27 @@ public class BrokerOrderService {
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("tradingsymbol",    symbol);
-            form.add("exchange",         exchange);
+            form.add("exchange",         effectiveExchange);
             form.add("transaction_type", txType);
             form.add("order_type",       isLimit ? "LIMIT" : "MARKET");
-            form.add("product",          "CNC");
+            form.add("product",          product);
             form.add("validity",         "DAY");
             form.add("quantity",         String.valueOf(qty));
             form.add("tag",              tag);
             if (isLimit && limitPrice > 0) {
                 form.add("price", String.format("%.2f", limitPrice));
             }
+            // Native Kite market protection — only for MARKET orders, per Kite API docs
+            if (!isLimit && marketProtectionPct > 0) {
+                form.add("market_protection", String.valueOf(marketProtectionPct));
+            }
+
+            log.info("[Kite] Order request payload: tradingsymbol={} exchange={} transaction_type={} order_type={} product={} validity=DAY quantity={} price={} market_protection={} tag={}",
+                    symbol, effectiveExchange, txType,
+                    isLimit ? "LIMIT" : "MARKET", product, qty,
+                    isLimit && limitPrice > 0 ? String.format("%.2f", limitPrice) : "N/A",
+                    !isLimit && marketProtectionPct > 0 ? marketProtectionPct + "%" : "N/A",
+                    tag);
 
             HttpHeaders headers = buildHeaders(accessToken);
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

@@ -56,7 +56,7 @@ public class MarketDataService {
         log.info("Fetching {}-day 10-min candles for {} instruments",
                 TOTAL_DAYS, instruments.size());
 
-        LocalDateTime toDateTime = LocalDateTime.now(IST);
+        LocalDateTime toDateTime = LocalDateTime.now(IST).minusMinutes(2);
         
         LocalDateTime fromDateTime = null;
         
@@ -152,7 +152,7 @@ public class MarketDataService {
         log.info("Fetching {}-day 10-min candles for {} instruments",
                 TOTAL_DAYS, instruments.size());
 
-        LocalDateTime toDateTime = LocalDateTime.now(IST);
+        LocalDateTime toDateTime = LocalDateTime.now(IST).minusMinutes(2);
         LocalDateTime fromDateTime = toDateTime
                 .minusDays(TOTAL_DAYS)
                 .withHour(9).withMinute(15).withSecond(0).withNano(0);
@@ -328,5 +328,54 @@ public class MarketDataService {
         	}
         });
     	return candleMap;
+    }
+
+    /**
+     * Fetches 5-minute OHLCV candles from AngelOne for all {@code Index} type instruments.
+     * Used by the intraday index option scheduler.
+     *
+     * @param clientcode AngelOne clientcode (session must already be active)
+     * @param onlyToday  if true, fetches only today's session candles;
+     *                   if false, fetches full historical window (TOTAL_DAYS)
+     * @return token → candle list map
+     */
+    public Map<String, List<CandleBar>> fetchIndexCandles(String clientcode, boolean onlyToday) {
+        var session = sessionStore.get(clientcode);
+        if (session == null || session.getData() == null) {
+            throw new IllegalStateException(
+                    "No active AngelOne session for clientcode: " + clientcode);
+        }
+        String jwtToken = session.getData().getJwtToken();
+
+        List<Instrument> instruments = instrumentRepository.findByType("Index");
+        if (instruments.isEmpty()) {
+            log.warn("No Index instruments found — run POST /api/instruments/refresh first");
+            return new ConcurrentHashMap<>();
+        }
+        log.info("Fetching 5-min {} candles for {} index instrument(s)",
+                onlyToday ? "today" : TOTAL_DAYS + "-day", instruments.size());
+
+        LocalDateTime toDateTime = LocalDateTime.now(IST).minusMinutes(2);
+        LocalDateTime fromDateTime = onlyToday
+                ? toDateTime.withHour(9).withMinute(15).withSecond(0).withNano(0)
+                : toDateTime.minusDays(TOTAL_DAYS).withHour(9).withMinute(15).withSecond(0).withNano(0);
+
+        String fromStr = fromDateTime.format(FMT);
+        String toStr   = toDateTime.format(FMT);
+        log.info("Index candle range: {} → {}", fromStr, toStr);
+
+        Map<String, List<CandleBar>> candleMap = new ConcurrentHashMap<>();
+        for (Instrument inst : instruments) {
+            try {
+                List<CandleBar> bars = callCandleApi(
+                        jwtToken, inst.getToken(), inst.getExchange(), fromStr, toStr, "FIVE_MINUTE");
+                candleMap.put(inst.getToken(), bars);
+                log.info("  Index {} → {} candles fetched", inst.getName(), bars.size());
+                Thread.sleep(RATE_DELAY_MS);
+            } catch (Exception e) {
+                log.warn("  Failed index candles for {}: {}", inst.getName(), e.getMessage());
+            }
+        }
+        return candleMap;
     }
 }

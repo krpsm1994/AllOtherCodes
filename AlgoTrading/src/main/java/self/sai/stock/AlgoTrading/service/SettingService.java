@@ -38,6 +38,7 @@ public class SettingService {
         orders.put("pollingIntervalMinutes",   "5");
         orders.put("max10MinOrders",           "5");
         orders.put("maxDailyOrders",           "5");
+        orders.put("tradeAmount",              "20000");
         DEFAULTS.put(GRP_ORDERS, orders);
     }
 

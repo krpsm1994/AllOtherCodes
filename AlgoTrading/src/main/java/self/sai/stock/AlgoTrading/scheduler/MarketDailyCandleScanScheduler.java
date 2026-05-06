@@ -44,7 +44,8 @@ public class MarketDailyCandleScanScheduler {
         timerExecutor = Executors.newSingleThreadScheduledExecutor();
     }
 
-    @Scheduled(cron = "0 0 16 ? * MON-FRI", zone = "Asia/Kolkata")
+    // Disabled — DailyWatchlist replaced by Index option intraday scan (IndexOptionScheduler)
+    // @Scheduled(cron = "0 0 16 ? * MON-FRI", zone = "Asia/Kolkata")
     public void scheduleMarketSessionTasks() {
         log.info("[Scheduler] 04:00 PM triggered. Fetching settings and candles...");
         int numberOfCandles = getNumberOfCandlesFromSettings();
@@ -53,8 +54,8 @@ public class MarketDailyCandleScanScheduler {
         algoScanService.runAlgoScan(candleMap, numberOfCandles);
     }
     
- // This runs automatically whenever the server starts/restarts
-    @org.springframework.context.event.EventListener(ApplicationReadyEvent.class)
+    // Disabled — replaced by IndexOptionScheduler startup check
+    // @org.springframework.context.event.EventListener(ApplicationReadyEvent.class)
     public void checkOnStartup() {
         LocalTime now = LocalTime.now(ZoneId.of("Asia/Kolkata"));
         LocalTime start = LocalTime.of(16, 00);

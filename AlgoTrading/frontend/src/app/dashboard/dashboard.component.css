@@ -615,6 +615,7 @@
 }
 .ctag--10Min  { background: #dbeafe; color: #1d4ed8; }
 .ctag--daily { background: #dcfce7; color: #15803d; }
+.ctag--5min  { background: #dcfce7; color: #15803d; }
 
 /* Primary action button variant */
 .action-btn--primary {
@@ -701,6 +702,43 @@
   transition: background .15s;
 }
 .add-trade-btn:hover { background: #1e40af; }
+
+/* ── Sell button (in table row) ─────────────────────────────────── */
+.sell-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  background: #fff;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.sell-btn:hover:not(:disabled) { background: #fff7ed; border-color: #fdba74; color: #ea580c; }
+.sell-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Buy button (in table row) ───────────────────────────────────── */
+.buy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  background: #fff;
+  color: #16a34a;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.buy-btn:hover:not(:disabled) { background: #f0fdf4; border-color: #86efac; }
+.buy-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin .8s linear infinite; }
 
 /* ── Edit button (in table row) ──────────────────────────────────── */
 .edit-btn {

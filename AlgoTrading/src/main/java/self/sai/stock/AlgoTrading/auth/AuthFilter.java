@@ -43,6 +43,14 @@ public class AuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
+        // EventSource (SSE) cannot set headers — accept token as ?token= query param
+        if (authHeader == null) {
+            String queryToken = request.getParameter("token");
+            if (queryToken != null && !queryToken.isBlank()) {
+                authHeader = "Bearer " + queryToken;
+            }
+        }
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
                 String username = jwtUtil.validateAndGetUsername(authHeader);

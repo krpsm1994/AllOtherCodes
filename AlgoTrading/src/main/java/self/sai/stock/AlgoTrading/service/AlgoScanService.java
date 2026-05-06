@@ -1,6 +1,8 @@
 package self.sai.stock.AlgoTrading.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +23,18 @@ public class AlgoScanService {
 	private final InstrumentRepository instrumentRepository;
 	private final TradeRepository tradeRepository;
 	private final TradeMonitorService tradeMonitor;
+	private final SettingService settingService;
 
 	public InstrumentRepository getInstrumentRepository() {
 		return instrumentRepository;
 	}
 
 	public AlgoScanService(InstrumentRepository instrumentRepository, TradeRepository tradeRepository,
-			TradeMonitorService tradeMonitor) {
+			TradeMonitorService tradeMonitor, SettingService settingService) {
 		this.instrumentRepository = instrumentRepository;
 		this.tradeRepository = tradeRepository;
 		this.tradeMonitor = tradeMonitor;
+		this.settingService = settingService;
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(AlgoScanService.class);
@@ -45,6 +49,15 @@ public class AlgoScanService {
 			}
 
 			List<CandleBar> candles = candleMap.get(token);
+
+			// Skip if last raw candle is stale — prevents acting on 9:15 candle at 10:25
+			CandleBar lastCandle = candles.get(candles.size() - 1);
+			LocalDateTime staleThreshold = LocalDateTime.now(ZoneId.of("Asia/Kolkata")).minusMinutes(30);
+			if (lastCandle.getTimestamp().isBefore(staleThreshold)) {
+				log.info("[AlgoScan] Skipping {} — last candle {} is stale (threshold {})",
+						inst == null ? token : inst.getName(), lastCandle.getTimestamp(), staleThreshold);
+				continue;
+			}
 
 			// Calculate TEMA series for Close and Open
 			List<TEMASeries> htfTemaSeries = generateAltSeries(candles, 2);
@@ -96,8 +109,11 @@ public class AlgoScanService {
 						trade.setDate(signalCandle.getDate().toString());
 						trade.setBuyPrice(signalCandle.getPrice());
 						trade.setStatus("WATCHING");
-						trade.setNoOfShares(Math.toIntExact((long) (20000 / trade.getBuyPrice())));
+						int tradeAmount = settingService.getInt(SettingService.GRP_ORDERS, "tradeAmount", 20000);
+					trade.setNoOfShares(Math.max(1, (int) (tradeAmount / trade.getBuyPrice())));
 						tradeRepository.save(trade);
+						// Register into the live monitor cache so handleWatching fires on the next tick
+						tradeMonitor.registerTrade(trade);
 						System.out.println(trade);
 					}
 
@@ -109,7 +125,7 @@ public class AlgoScanService {
 		}
 	}
 
-	private List<TEMASeries> generateSignalSeries(List<TEMASeries> originalSeries, int altLength) {
+	public List<TEMASeries> generateSignalSeries(List<TEMASeries> originalSeries, int altLength) {
 		List<TEMASeries> newAltSeriesList = new ArrayList<>();
 
 		int i = 0;

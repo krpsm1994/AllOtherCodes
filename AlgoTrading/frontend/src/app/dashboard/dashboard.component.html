@@ -28,8 +28,9 @@
         }
 
         @if (zerodhaDone) {
-          <button class="broker-chip broker-chip--on" title="Zerodha connected">
+          <button class="broker-chip broker-chip--on" (click)="reloginZerodha()" title="Re-login Zerodha">
             <span class="dot dot--on"></span> Zerodha
+            <span class="relogin">&#8635;</span>
           </button>
         } @else if (zerodhaWaiting) {
           <button class="broker-btn broker-btn--waiting" disabled>
@@ -154,12 +155,38 @@
                   <td class="mono small">{{ t.sellOrderId || '—' }}</td>
                   <td>
                     @if (t.type) {
-                      <span [class]="t.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
-                        {{ t.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+                      <span [class]="t.type === '10MinWatchlist' ? 'ctag ctag--10Min' : t.type === 'IndexOption' ? 'ctag ctag--option' : 'ctag ctag--daily'">
+                        {{ t.type === '10MinWatchlist' ? '10 Min' : t.type === 'IndexOption' ? 'Option' : 'Daily' }}
                       </span>
                     } @else { — }
                   </td>
                   <td class="row-actions">
+                    @if (t.status === 'OPEN') {
+                      <button class="sell-btn" (click)="sellOrder(t, $event)" [disabled]="sellingTradeId === t.id" title="Place sell order">
+                        @if (sellingTradeId === t.id) {
+                          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" class="spin">
+                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                          </svg>
+                        } @else {
+                          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                          </svg>
+                        }
+                      </button>
+                    }
+                    @if (t.status === 'WATCHING') {
+                      <button class="buy-btn" (click)="buyOrder(t, $event)" [disabled]="buyingTradeId === t.id" title="Place buy order">
+                        @if (buyingTradeId === t.id) {
+                          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" class="spin">
+                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                          </svg>
+                        } @else {
+                          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/>
+                          </svg>
+                        }
+                      </button>
+                    }
                     <button class="edit-btn" (click)="openEditTrade(t, $event)" title="Edit trade">
                       <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
@@ -190,8 +217,8 @@
           <div class="cpicker__trigger" (click)="instrumentDropOpen = !instrumentDropOpen">
             @if (selectedInstrument) {
               <span class="cpicker__selected">{{ selectedInstrument.name }}</span>
-              <span [class]="selectedInstrument.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
-                {{ selectedInstrument.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+              <span [class]="selectedInstrument.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--5min'">
+                {{ selectedInstrument.type === '10MinWatchlist' ? '10 Min' : '5 Min' }}
               </span>
             } @else {
               <span class="cpicker__placeholder">{{ instrumentsLoading ? 'Loading stocks…' : '— Select Stock —' }}</span>
@@ -211,8 +238,8 @@
                           [class.cpicker__item--active]="selectedInstrument?.token === inst.token"
                           (click)="selectInstrument(inst)">
                     <span>{{ inst.name }}</span>
-                    <span [class]="inst.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
-                      {{ inst.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+                    <span [class]="inst.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--5min'">
+                      {{ inst.type === '10MinWatchlist' ? '10 Min' : '5 Min' }}
                     </span>
                   </button>
                 }
@@ -440,8 +467,8 @@
                             [class.cpicker__item--active]="tradeForm.get('token')!.value === inst.token"
                             (click)="selectTradeInstrument(inst)">
                       <span>{{ inst.name }}</span>
-                      <span [class]="inst.type === '10MinWatchlist' ? 'ctag ctag--10Min' : 'ctag ctag--daily'">
-                        {{ inst.type === '10MinWatchlist' ? '10 Min' : 'Daily' }}
+                      <span [class]="inst.type === '10MinWatchlist' ? 'ctag ctag--10Min' : inst.type === 'IndexOption' ? 'ctag ctag--option' : 'ctag ctag--daily'">
+                        {{ inst.type === '10MinWatchlist' ? '10 Min' : inst.type === 'IndexOption' ? 'Option' : 'Daily' }}
                       </span>
                     </button>
                   }
@@ -580,7 +607,7 @@
           </div>
 
           <div class="mfield mfield--toggle">
-            <label>Place Daily orders</label>
+            <label>Place Option orders</label>
             <label class="toggle">
               <input type="checkbox" formControlName="placeDailyOrders" />
               <span class="toggle__track"></span>
@@ -612,7 +639,7 @@
               }
             </div>
             <div class="mfield">
-              <label>Max Daily orders</label>
+              <label>Max Option orders</label>
               <input type="number" formControlName="maxDailyOrders" min="1" />
               @if (settingsForm.get('maxDailyOrders')!.touched && settingsForm.get('maxDailyOrders')!.invalid) {
                 <span class="mfield__err">Min 1</span>
